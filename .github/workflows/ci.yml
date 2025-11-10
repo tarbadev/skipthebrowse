@@ -80,14 +80,14 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
       - name: Upload App Bundle artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android-aab
           path: build/app/outputs/bundle/release/app-release.aab
@@ -165,7 +165,7 @@ jobs:
           rm -rf Payload
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ios-ipa
           path: app-release.ipa
@@ -226,7 +226,7 @@ jobs:
             "build/macos/Build/Products/Release/skipthebrowse.app" || true
 
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: macos-app
           path: build/macos/Build/Products/Release/skipthebrowse.app
@@ -234,7 +234,7 @@ jobs:
 
       - name: Upload DMG artifact
         if: hashFiles('SkipTheBrowse.dmg') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: macos-dmg
           path: SkipTheBrowse.dmg
@@ -283,7 +283,7 @@ jobs:
           cd ../../../../../
 
       - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: linux-x64
           path: skipthebrowse-linux-x64.tar.gz
@@ -325,7 +325,7 @@ jobs:
           cd ../../../../../
 
       - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: windows-x64
           path: skipthebrowse-windows-x64.zip
@@ -358,7 +358,7 @@ jobs:
         run: flutter build web --release --web-renderer canvaskit
 
       - name: Upload web artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: web-build
           path: build/web
