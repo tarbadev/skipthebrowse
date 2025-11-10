@@ -1,0 +1,100 @@
+name: Generate Release Notes
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-notes:
+    name: Generate Release Notes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          writeToFile: false
+          includeInvalidCommits: false
+          excludeTypes: 'build,docs,style,chore'
+
+      - name: Create/Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ${{ steps.changelog.outputs.changes }}
+
+            ---
+
+            ## Downloads
+
+            ### Mobile
+            - **Android APK** - Direct installation for Android devices
+            - **Android App Bundle (AAB)** - For Google Play Store deployment
+            - **iOS IPA** - For iOS devices (requires proper signing/provisioning)
+
+            ### Desktop
+            - **macOS** - Native macOS application (Apple Silicon & Intel)
+            - **Linux x64** - Tarball for Linux distributions
+            - **Windows x64** - ZIP archive for Windows 10/11
+
+            ### Web
+            - **Web Bundle** - Static files for web hosting (nginx, Vercel, Netlify, etc.)
+
+            ---
+
+            ## Installation
+
+            ### Android
+            ```bash
+            # Download APK and install
+            adb install skipthebrowse-${{ github.ref_name }}.apk
+            ```
+
+            ### iOS
+            ```bash
+            # Requires code signing - use Xcode or your signing service
+            ```
+
+            ### macOS
+            ```bash
+            # Extract and move to Applications
+            unzip skipthebrowse-macos.zip
+            mv skipthebrowse.app /Applications/
+            ```
+
+            ### Linux
+            ```bash
+            tar -xzf skipthebrowse-linux-x64.tar.gz
+            cd skipthebrowse
+            ./skipthebrowse
+            ```
+
+            ### Windows
+            ```powershell
+            # Extract ZIP and run skipthebrowse.exe
+            Expand-Archive skipthebrowse-windows-x64.zip
+            ```
+
+            ### Web
+            ```bash
+            # Extract and deploy to your web server
+            tar -xzf skipthebrowse-web.tar.gz
+            # Upload to static hosting (Vercel, Netlify, S3, etc.)
+            ```
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
