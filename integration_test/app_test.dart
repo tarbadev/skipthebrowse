@@ -8,8 +8,8 @@ void main() {
 
   group('end-to-end test', () {
     testWidgets('tap on the floating action button, verify counter', (
-        tester,
-        ) async {
+      tester,
+    ) async {
       await tester.pumpWidget(const SkipTheBrowse());
 
       expect(find.text('0'), findsOneWidget);
