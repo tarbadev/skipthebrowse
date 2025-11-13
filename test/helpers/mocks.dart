@@ -1,0 +1,22 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:skipthebrowse/core/navigation/router_helper.dart';
+import 'package:skipthebrowse/features/conversation/domain/repositories/conversation_repository.dart';
+
+class MockConversationRepository extends Mock
+    implements ConversationRepository {}
+
+final mockConversationRepository = MockConversationRepository();
+
+final dio = Dio(BaseOptions(baseUrl: 'http://example.com'));
+final dioAdapter = DioAdapter(dio: dio);
+
+class MockObserver extends Mock implements NavigatorObserver {}
+
+final mockObserver = MockObserver();
+
+class MockRouterHelper extends Mock implements RouterHelper {}
+
+final mockRouterHelper = MockRouterHelper();
