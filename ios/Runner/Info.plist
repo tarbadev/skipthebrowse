@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Allow network access for API calls -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Allow localhost for development/testing -->
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<!-- If you need to allow HTTP (not recommended for production) -->
+		<!-- <key>NSAllowsArbitraryLoads</key>
+		<true/> -->
+	</dict>
 </dict>
 </plist>
