@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 
-import '../../../../../test_helper/home_page_tester.dart';
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_factory.dart';
 import '../../../../helpers/test_harness.dart';
@@ -47,10 +46,15 @@ void main() {
 
     expect(find.text('Looking for something to watch?'), findsOneWidget);
 
-    final homePageTester = HomePageTester(tester);
-    await homePageTester.createConversation(question);
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      question,
+    );
+    await tester.pump();
 
-    await tester.pumpAndSettle(const Duration(seconds: 5));
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+    await tester.pumpAndSettle();
 
     verify(
       () => mockConversationRepository.createConversation(question),

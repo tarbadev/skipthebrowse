@@ -27,33 +27,75 @@ class _CreateConversationWidget
   }
 
   Future<void> _createConversation() async {
-    final conversationRepository = ref.read(conversationRepositoryProvider);
-    final conversation = await conversationRepository.createConversation(
-      _message,
-    );
-    widget.callback(conversation);
+    await ref
+        .read(conversationCreateStateProvider.notifier)
+        .createConversation(_message);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final conversationState = ref.watch(conversationCreateStateProvider);
+
+    ref.listen<AsyncValue<Conversation?>>(conversationCreateStateProvider, (
+      previous,
+      next,
+    ) {
+      next.whenData((conversation) {
+        if (conversation != null) {
+          widget.callback(conversation);
+          ref.read(conversationCreateStateProvider.notifier).clear();
+        }
+      });
+    });
+
+    final isLoading = conversationState.isLoading;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: TextField(
-            key: Key('create_conversation_text_box'),
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search),
-              labelText:
-                  'Enter a brief description of what you would like to watch',
-              filled: true,
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                key: Key('create_conversation_text_box'),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  labelText:
+                      'Enter a brief description of what you would like to watch',
+                  filled: true,
+                ),
+                onChanged: _updateMessage,
+                enabled: !isLoading,
+              ),
             ),
-            onChanged: _updateMessage,
-          ),
+            if (isLoading)
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else
+              IconButton(
+                key: Key('create_conversation_button'),
+                icon: Icon(Icons.send),
+                onPressed: _message.isNotEmpty ? _createConversation : null,
+              ),
+          ],
         ),
-        IconButton(
-          key: Key('create_conversation_button'),
-          icon: Icon(Icons.send),
-          onPressed: _createConversation,
+        conversationState.when(
+          data: (_) => SizedBox.shrink(),
+          loading: () => SizedBox.shrink(),
+          error: (error, stack) => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Error: ${error.toString()}',
+              key: Key('create_conversation_error'),
+              style: TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
         ),
       ],
     );

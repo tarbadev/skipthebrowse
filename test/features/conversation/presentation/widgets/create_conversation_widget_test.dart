@@ -1,11 +1,11 @@
 import 'package:const_date_time/const_date_time.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/create_conversation_widget.dart';
 
-import '../../../../../test_helper/home_page_tester.dart';
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_factory.dart';
 import '../../../../helpers/test_harness.dart';
@@ -13,6 +13,10 @@ import '../../../../helpers/test_harness.dart';
 void main() {
   final question = 'What movies do you recommend?';
   final response = 'Are you in a mood for ';
+
+  setUp(() {
+    reset(mockConversationRepository);
+  });
 
   setUpAll(() {
     registerFallbackValue(
@@ -22,6 +26,38 @@ void main() {
         createdAt: ConstDateTime(2025),
       ),
     );
+  });
+
+  testWidgets('renders widget', (tester) async {
+    await tester.pumpProviderWidget(
+      CreateConversationWidget(callback: (_) => {}),
+    );
+
+    expect(
+      find.byKey(const Key('create_conversation_text_box')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('create_conversation_button')), findsOneWidget);
+  });
+
+  testWidgets('button is enabled after entering text', (tester) async {
+    await tester.pumpProviderWidget(
+      CreateConversationWidget(callback: (_) => {}),
+    );
+
+    final buttonFinder = find.byKey(const Key('create_conversation_button'));
+
+    IconButton button = tester.widget(buttonFinder);
+    expect(button.onPressed, isNull);
+
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      question,
+    );
+    await tester.pump();
+
+    button = tester.widget(buttonFinder);
+    expect(button.onPressed, isNotNull);
   });
 
   testWidgets('calls repository on submit tap', (tester) async {
@@ -52,9 +88,15 @@ void main() {
       CreateConversationWidget(callback: (_) => {}),
     );
 
-    final homePageTester = HomePageTester(tester);
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      question,
+    );
+    await tester.pump();
 
-    await homePageTester.createConversation(question);
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+    await tester.pump();
 
     verify(
       () => mockConversationRepository.createConversation(question),
@@ -62,7 +104,7 @@ void main() {
   });
 
   testWidgets('calls callback on successful creation', (tester) async {
-    final mockCallback = MockCreationSuccessCallback();
+    var callbackInvoked = false;
     final expectedConversation = conversation();
 
     when(
@@ -70,13 +112,25 @@ void main() {
     ).thenAnswer((_) async => expectedConversation);
 
     await tester.pumpProviderWidget(
-      CreateConversationWidget(callback: mockCallback.call),
+      CreateConversationWidget(
+        callback: (conv) {
+          callbackInvoked = true;
+          expect(conv, expectedConversation);
+        },
+      ),
     );
 
-    final homePageTester = HomePageTester(tester);
-    await homePageTester.createConversation(question);
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      question,
+    );
+    await tester.pump();
 
-    verify(() => mockCallback.call(expectedConversation)).called(1);
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+    await tester.pump();
+
+    expect(callbackInvoked, true);
   });
 }
 
