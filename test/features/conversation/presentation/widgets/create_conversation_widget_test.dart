@@ -132,6 +132,62 @@ void main() {
 
     expect(callbackInvoked, true);
   });
+
+  testWidgets('shows error when input is too short', (tester) async {
+    await tester.pumpProviderWidget(
+      CreateConversationWidget(callback: (_) => {}),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      'Short',
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+
+    expect(find.text('Message must be at least 10 characters'), findsOneWidget);
+  });
+
+  testWidgets('shows error when input is too long', (tester) async {
+    await tester.pumpProviderWidget(
+      CreateConversationWidget(callback: (_) => {}),
+    );
+
+    final longText = 'a' * 501;
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      longText,
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+
+    expect(find.text('Message must not exceed 500 characters'), findsOneWidget);
+  });
+
+  testWidgets('does not call repository when validation fails', (tester) async {
+    when(
+      () => mockConversationRepository.createConversation(any()),
+    ).thenAnswer((_) async => conversation());
+
+    await tester.pumpProviderWidget(
+      CreateConversationWidget(callback: (_) => {}),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('create_conversation_text_box')),
+      'Short',
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const Key('create_conversation_button')));
+    await tester.pump();
+
+    verifyNever(() => mockConversationRepository.createConversation(any()));
+  });
 }
 
 class MockCreationSuccessCallback extends Mock {

@@ -19,14 +19,34 @@ class CreateConversationWidget extends ConsumerStatefulWidget {
 class _CreateConversationWidget
     extends ConsumerState<CreateConversationWidget> {
   String _message = '';
+  String? _validationError;
 
   void _updateMessage(String message) {
     setState(() {
       _message = message;
+      _validationError = null;
     });
   }
 
+  String? _validateMessage(String message) {
+    if (message.length < 10) {
+      return 'Message must be at least 10 characters';
+    }
+    if (message.length > 500) {
+      return 'Message must not exceed 500 characters';
+    }
+    return null;
+  }
+
   Future<void> _createConversation() async {
+    final error = _validateMessage(_message);
+    if (error != null) {
+      setState(() {
+        _validationError = error;
+      });
+      return;
+    }
+
     await ref
         .read(conversationCreateStateProvider.notifier)
         .createConversation(_message);
@@ -85,6 +105,15 @@ class _CreateConversationWidget
               ),
           ],
         ),
+        if (_validationError != null)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              _validationError!,
+              key: Key('create_conversation_validation_error'),
+              style: TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
         conversationState.when(
           data: (_) => SizedBox.shrink(),
           loading: () => SizedBox.shrink(),
