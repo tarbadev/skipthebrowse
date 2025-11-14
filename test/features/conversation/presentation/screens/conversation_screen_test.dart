@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:skipthebrowse/core/config/router.dart';
 
 import '../../../../../test_helper/conversation_screen_tester.dart';
 import '../../../../helpers/test_factory.dart';
@@ -17,7 +18,7 @@ void main() {
     ];
 
     await tester.pumpRouterWidget(
-      initialRoute: '/conversation',
+      initialRoute: AppRoutes.conversation,
       initialExtra: conversation(messages: messages),
     );
     await tester.pumpAndSettle();

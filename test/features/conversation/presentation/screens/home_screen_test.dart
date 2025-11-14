@@ -2,6 +2,7 @@ import 'package:const_date_time/const_date_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -42,7 +43,7 @@ void main() {
       () => mockConversationRepository.getConversation(any()),
     ).thenAnswer((_) async => createdConversation);
 
-    await tester.pumpRouterWidget(initialRoute: '/');
+    await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
     expect(find.text('Looking for something to watch?'), findsOneWidget);
 

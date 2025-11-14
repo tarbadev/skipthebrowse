@@ -10,19 +10,19 @@ import 'mocks.dart';
 
 extension TestX on WidgetTester {
   Future<void> pumpProviderWidget(Widget widget) async => await pumpWidget(
-    ProviderScope(
-      overrides: [
-        conversationRepositoryProvider.overrideWithValue(
-          mockConversationRepository,
+        ProviderScope(
+          overrides: [
+            conversationRepositoryProvider.overrideWithValue(
+              mockConversationRepository,
+            ),
+            dioProvider.overrideWithValue(dio),
+          ],
+          child: MaterialApp(home: Scaffold(body: widget)),
         ),
-        dioProvider.overrideWithValue(dio),
-      ],
-      child: MaterialApp(home: Scaffold(body: widget)),
-    ),
-  );
+      );
 
   Future<void> pumpRouterWidget({
-    String initialRoute = '/',
+    String initialRoute = AppRoutes.home,
     Object? initialExtra,
   }) async {
     final goRouter = GoRouter(
