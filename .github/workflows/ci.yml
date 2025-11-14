@@ -116,7 +116,7 @@ jobs:
           profile: Nexus 6
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: flutter test integration_test
+          script: flutter test integration_test --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
 
   ios:
     name: iOS
@@ -151,7 +151,7 @@ jobs:
           xcrun simctl boot $SIMULATOR_ID
 
       - name: Run integration tests on iOS
-        run: flutter test integration_test
+        run: flutter test integration_test --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
 
       - name: Shutdown simulator
         if: always()
@@ -184,7 +184,7 @@ jobs:
         run: flutter build macos --release
 
       - name: Run integration tests on macOS
-        run: flutter test integration_test -d macos
+        run: flutter test integration_test -d macos --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
 
   linux:
     name: Linux
@@ -220,7 +220,7 @@ jobs:
         run: flutter build linux --release
 
       - name: Run integration tests on Linux
-        run: xvfb-run flutter test integration_test -d linux
+        run: xvfb-run flutter test integration_test -d linux --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
 
   windows:
     name: Windows
@@ -249,7 +249,7 @@ jobs:
         run: flutter build windows --release
 
       - name: Run integration tests on Windows
-        run: flutter test integration_test -d windows
+        run: flutter test integration_test -d windows --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
 
   web:
     name: Web
