@@ -8,7 +8,7 @@ import 'dio_provider.dart';
 
 final conversationRepositoryProvider = Provider<ConversationRepository>((ref) {
   final dio = ref.watch(dioProvider);
-  final restClient = RestClient(dio);
+  final restClient = RestClient(dio, baseUrl: dio.options.baseUrl);
 
   return ApiConversationRepository(restClient: restClient);
 });
