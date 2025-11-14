@@ -22,7 +22,6 @@ void main() {
       expect(homePageTester.title, 'Looking for something to watch?');
 
       await homePageTester.createConversation(initialMessage);
-      await tester.pumpAndSettle();
 
       final conversationPageTester = ConversationScreenTester(tester);
 
