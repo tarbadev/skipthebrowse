@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:skipthebrowse/core/config/env_config.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
 
-import '../test_helper/conversation_screen_tester.dart';
-import '../test_helper/home_page_tester.dart';
+import '../test/features/conversation/presentation/helpers/conversation_screen_tester.dart';
+import '../test/features/conversation/presentation/helpers/home_screen_tester.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ void main() {
 
       final testDio = Dio(
         BaseOptions(
-          baseUrl: 'https://skipthebrowse-backend.onrender.com',
+          baseUrl: EnvConfig.apiBaseUrl,
           connectTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
         ),
@@ -36,15 +37,13 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            dioProvider.overrideWithValue(testDio),
-          ],
+          overrides: [dioProvider.overrideWithValue(testDio)],
           child: const SkipTheBrowse(),
         ),
       );
       await tester.pumpAndSettle();
 
-      final homePageTester = HomePageTester(tester);
+      final homePageTester = HomeScreenTester(tester);
       expect(homePageTester.isVisible, true);
       expect(homePageTester.title, 'Looking for something to watch?');
 

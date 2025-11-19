@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
 
-import 'base_view_tester.dart';
+import 'base_screen_tester.dart';
 
-class ConversationScreenTester extends BaseViewTester {
+class ConversationScreenTester extends BaseWidgetTester {
   String titleKey = 'conversation_screen_title';
 
   ConversationScreenTester(super.tester);

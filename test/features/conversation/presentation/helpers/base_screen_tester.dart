@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class BaseViewTester {
-  BaseViewTester(this.tester);
+class BaseWidgetTester {
+  BaseWidgetTester(this.tester);
 
   final WidgetTester tester;
 

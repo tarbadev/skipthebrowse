@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 
-import '../../../../../test_helper/conversation_screen_tester.dart';
 import '../../../../helpers/test_factory.dart';
 import '../../../../helpers/test_harness.dart';
+import '../helpers/conversation_screen_tester.dart';
 
 void main() {
   setUpAll(() {

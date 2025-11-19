@@ -8,6 +8,8 @@ import 'package:skipthebrowse/features/conversation/domain/entities/conversation
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_factory.dart';
 import '../../../../helpers/test_harness.dart';
+import '../helpers/conversation_screen_tester.dart';
+import '../helpers/home_screen_tester.dart';
 
 void main() {
   final question = 'What movies do you recommend?';
@@ -45,27 +47,20 @@ void main() {
 
     await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
+    final homeScreenTester = HomeScreenTester(tester);
+    final conversationScreenTester = ConversationScreenTester(tester);
+
     expect(find.text('Looking for something to watch?'), findsOneWidget);
+    expect(conversationScreenTester.isVisible, isFalse);
 
-    await tester.enterText(
-      find.byKey(const Key('create_conversation_text_box')),
-      question,
-    );
-    await tester.pump();
-
-    await tester.tap(find.byKey(const Key('create_conversation_button')));
-    await tester.pump();
-    await tester.pumpAndSettle();
+    await homeScreenTester.createConversation(question);
 
     verify(
       () => mockConversationRepository.createConversation(question),
     ).called(1);
     verify(() => mockObserver.didPush(any(), any())).called(greaterThan(1));
 
-    expect(
-      find.text('Conversation ID: ${createdConversation.id}'),
-      findsOneWidget,
-    );
     expect(find.text('Looking for something to watch?'), findsNothing);
+    expect(conversationScreenTester.isVisible, isTrue);
   });
 }

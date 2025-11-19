@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+
+typedef OnSubmitCallback = void Function(String);
+
+class AddMessageWidget extends StatefulWidget {
+  final OnSubmitCallback onSubmit;
+  final bool isLoading;
+
+  const AddMessageWidget({
+    super.key,
+    required this.onSubmit,
+    required this.isLoading,
+  });
+
+  @override
+  State<StatefulWidget> createState() {
+    return _AddMessageWidgetState();
+  }
+}
+
+class _AddMessageWidgetState extends State<AddMessageWidget> {
+  String _message = '';
+  String? _validationError;
+
+  void _updateMessage(String message) => setState(() {
+    _message = message;
+    _validationError = null;
+  });
+
+  String? _validateMessage(String message) {
+    if (message.length < 10) {
+      return 'Message must be at least 10 characters';
+    }
+    if (message.length > 500) {
+      return 'Message must not exceed 500 characters';
+    }
+    return null;
+  }
+
+  Future<void> _addMessage() async {
+    final error = _validateMessage(_message);
+    if (error != null) {
+      setState(() {
+        _validationError = error;
+      });
+      return;
+    }
+
+    widget.onSubmit(_message);
+  }
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              key: Key('add_message_text_box'),
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                labelText:
+                    'Enter a brief description of what you would like to watch',
+                filled: true,
+              ),
+              onChanged: _updateMessage,
+              enabled: !widget.isLoading,
+            ),
+          ),
+          if (widget.isLoading)
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            IconButton(
+              key: Key('add_message_button'),
+              icon: Icon(Icons.send),
+              onPressed: _message.isNotEmpty ? _addMessage : null,
+            ),
+        ],
+      ),
+      if (_validationError != null)
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            _validationError!,
+            key: Key('add_message_validation_error'),
+            style: TextStyle(color: Colors.red, fontSize: 12),
+          ),
+        ),
+    ],
+  );
+}
