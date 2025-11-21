@@ -13,7 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
-  retrofit: ^4.9.0
+  retrofit: ^4.9.1
   dio: ^5.9.0
   json_annotation: ^4.9.0
   equatable: ^2.0.7
@@ -29,7 +29,7 @@ dev_dependencies:
   const_date_time: ^1.2.1
   http_mock_adapter: ^0.6.1
   build_runner: ^2.10.2
-  retrofit_generator: ^10.0.6
+  retrofit_generator: ^10.2.0
   json_serializable: ^6.11.1
 
 flutter:
