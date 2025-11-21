@@ -66,6 +66,20 @@ void main() {
     expect(find.text('Message must be at least 10 characters'), findsOneWidget);
   });
 
+  testWidgets('shows error when input is too short and min length is set', (
+    tester,
+  ) async {
+    await tester.pumpProviderWidget(
+      AddMessageWidget(onSubmit: (_) => {}, isLoading: false, minLength: 3),
+    );
+
+    final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
+    await addMessageWidgetHelper.enterMessage('S');
+    await addMessageWidgetHelper.submit();
+
+    expect(find.text('Message must be at least 3 characters'), findsOneWidget);
+  });
+
   testWidgets('shows error when input is too long', (tester) async {
     await tester.pumpProviderWidget(
       AddMessageWidget(onSubmit: (_) => {}, isLoading: false),

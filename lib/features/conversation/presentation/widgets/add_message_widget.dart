@@ -5,11 +5,13 @@ typedef OnSubmitCallback = void Function(String);
 class AddMessageWidget extends StatefulWidget {
   final OnSubmitCallback onSubmit;
   final bool isLoading;
+  final int minLength;
 
   const AddMessageWidget({
     super.key,
     required this.onSubmit,
     required this.isLoading,
+    this.minLength = 10,
   });
 
   @override
@@ -28,8 +30,8 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
   });
 
   String? _validateMessage(String message) {
-    if (message.length < 10) {
-      return 'Message must be at least 10 characters';
+    if (message.length < widget.minLength) {
+      return 'Message must be at least ${widget.minLength} characters';
     }
     if (message.length > 500) {
       return 'Message must not exceed 500 characters';

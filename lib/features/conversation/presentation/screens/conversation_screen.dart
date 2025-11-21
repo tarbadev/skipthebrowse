@@ -53,7 +53,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               key: const Key('conversation_screen_title'),
             ),
             ...messages,
-            AddMessageWidget(onSubmit: _addMessage, isLoading: isLoading),
+            AddMessageWidget(
+              onSubmit: _addMessage,
+              isLoading: isLoading,
+              minLength: 3,
+            ),
           ],
         ),
       ),
