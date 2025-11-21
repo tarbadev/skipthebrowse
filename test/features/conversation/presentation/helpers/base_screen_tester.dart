@@ -18,7 +18,7 @@ class BaseWidgetTester {
   Future<void> tapOnButtonByKey(String key) async {
     await tester.tap(find.byKey(Key(key)));
 
-    await tester.pumpAndSettle();
+    await tester.pump();
   }
 
   Future<void> enterText(String key, String text) async {

@@ -43,21 +43,30 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final homePageTester = HomeScreenTester(tester);
-      expect(homePageTester.isVisible, true);
-      expect(homePageTester.title, 'Looking for something to watch?');
+      final homeScreenTester = HomeScreenTester(tester);
+      expect(homeScreenTester.isVisible, true);
+      expect(homeScreenTester.title, 'Looking for something to watch?');
 
-      await homePageTester.createConversation(initialMessage);
+      await homeScreenTester.createConversation(initialMessage);
+      await tester.pumpAndSettle();
 
       final conversationPageTester = ConversationScreenTester(tester);
 
       await conversationPageTester.waitForIsVisible();
       expect(conversationPageTester.isVisible, true);
 
-      final conversation = conversationPageTester.getConversation();
+      var conversation = conversationPageTester.getConversation();
 
       expect(conversation[0], initialMessage);
       expect(conversation[1].length, greaterThanOrEqualTo(50));
+
+      final response = 'I want to watch a comedy';
+      await conversationPageTester.addMessage(response);
+      await tester.pumpAndSettle();
+
+      conversation = conversationPageTester.getConversation();
+      expect(conversation[2], response);
+      expect(conversation[3].length, greaterThanOrEqualTo(50));
     });
   });
 }

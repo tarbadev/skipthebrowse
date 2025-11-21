@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
 
 import '../../domain/entities/conversation.dart';
+import '../../domain/providers/conversation_providers.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
   final Conversation conversation;
@@ -17,8 +19,27 @@ class ConversationScreen extends ConsumerStatefulWidget {
 
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(conversationStateProvider.notifier)
+          .setConversation(widget.conversation);
+    });
+  }
+
+  Future<void> _addMessage(String message) => ref
+      .read(conversationStateProvider.notifier)
+      .addMessage(widget.conversation.id, message);
+
+  @override
   Widget build(BuildContext context) {
-    final messages = widget.conversation.messages.map(
+    final conversationState = ref.watch(conversationStateProvider);
+    final currentConversation =
+        conversationState.asData?.value ?? widget.conversation;
+    final isLoading = conversationState.isLoading;
+
+    final messages = currentConversation.messages.map(
       (c) => MessageWidget(c.content),
     );
 
@@ -28,10 +49,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         child: Column(
           children: [
             Text(
-              'Conversation ID: ${widget.conversation.id}',
+              'Conversation ID: ${currentConversation.id}',
               key: const Key('conversation_screen_title'),
             ),
             ...messages,
+            AddMessageWidget(onSubmit: _addMessage, isLoading: isLoading),
           ],
         ),
       ),

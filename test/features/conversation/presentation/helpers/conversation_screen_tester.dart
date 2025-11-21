@@ -6,6 +6,8 @@ import 'base_screen_tester.dart';
 
 class ConversationScreenTester extends BaseWidgetTester {
   String titleKey = 'conversation_screen_title';
+  String textBoxKey = 'add_message_text_box';
+  String buttonKey = 'add_message_button';
 
   ConversationScreenTester(super.tester);
 
@@ -32,5 +34,14 @@ class ConversationScreenTester extends BaseWidgetTester {
     return textWidgets
         .map((Widget message) => (message as MessageWidget).text)
         .toList();
+  }
+
+  Future<void> addMessage(String response) async {
+    expect(find.byKey(Key(textBoxKey)), findsOneWidget);
+    await enterText(textBoxKey, response);
+    await tester.pump();
+
+    expect(find.byKey(Key(buttonKey)), findsOneWidget);
+    await tapOnButtonByKey(buttonKey);
   }
 }

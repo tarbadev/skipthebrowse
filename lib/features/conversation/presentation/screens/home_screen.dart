@@ -11,21 +11,25 @@ class HomeScreen extends ConsumerWidget {
 
   Future<void> _createConversation(String message, WidgetRef ref) async =>
       await ref
-          .read(conversationCreateStateProvider.notifier)
+          .read(conversationStateProvider.notifier)
           .createConversation(message);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final conversationState = ref.watch(conversationCreateStateProvider);
+    final conversationState = ref.watch(conversationStateProvider);
 
-    ref.listen<AsyncValue<Conversation?>>(conversationCreateStateProvider, (
+    ref.listen<AsyncValue<Conversation?>>(conversationStateProvider, (
       previous,
       next,
     ) {
       next.whenData((conversation) {
-        if (conversation != null) {
-          AppRoutes.goToConversation(context, conversation);
-          ref.read(conversationCreateStateProvider.notifier).clear();
+        final prevConversation = previous?.valueOrNull;
+        final nextConversation = next.valueOrNull;
+
+        if (prevConversation == null && nextConversation != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            AppRoutes.goToConversation(context, nextConversation);
+          });
         }
       });
     });

@@ -58,6 +58,9 @@ void main() {
     verify(
       () => mockConversationRepository.createConversation(question),
     ).called(1);
+
+    await tester.pumpAndSettle();
+
     verify(() => mockObserver.didPush(any(), any())).called(greaterThan(1));
 
     expect(find.text('Looking for something to watch?'), findsNothing);

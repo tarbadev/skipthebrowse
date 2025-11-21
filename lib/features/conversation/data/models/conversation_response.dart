@@ -34,6 +34,8 @@ class MessageResponse {
   final String content;
   final DateTime timestamp;
   final String author;
+  final String type;
+  final RecommendationResponse? recommendation;
 
   factory MessageResponse.fromJson(Map<String, dynamic> json) =>
       _$MessageResponseFromJson(json);
@@ -43,8 +45,54 @@ class MessageResponse {
     required this.content,
     required this.timestamp,
     required this.author,
+    required this.type,
+    this.recommendation,
   });
 
   Message toMessage() =>
       Message(id: id, content: content, timestamp: timestamp, author: author);
+}
+
+@JsonSerializable()
+class RecommendationResponse {
+  final String id;
+  final String title;
+  final String? description;
+  @JsonKey(name: 'release_year')
+  final int? releaseYear;
+  final double? rating;
+  final double confidence;
+  final List<PlatformResponse> platforms;
+
+  factory RecommendationResponse.fromJson(Map<String, dynamic> json) =>
+      _$RecommendationResponseFromJson(json);
+
+  RecommendationResponse({
+    required this.id,
+    required this.title,
+    this.description,
+    this.releaseYear,
+    this.rating,
+    required this.confidence,
+    required this.platforms,
+  });
+}
+
+@JsonSerializable()
+class PlatformResponse {
+  final String name;
+  final String slug;
+  final String url;
+  @JsonKey(name: 'is_preferred')
+  final bool isPreferred;
+
+  factory PlatformResponse.fromJson(Map<String, dynamic> json) =>
+      _$PlatformResponseFromJson(json);
+
+  PlatformResponse({
+    required this.name,
+    required this.slug,
+    required this.url,
+    required this.isPreferred,
+  });
 }

@@ -14,11 +14,15 @@ MessageResponse messageResponse({
   String content = messageContent,
   DateTime timestamp = fixedDateTime,
   String author = 'user',
+  String type = 'question',
+  RecommendationResponse? recommendation,
 }) => MessageResponse(
   id: id,
   content: content,
   timestamp: timestamp,
   author: author,
+  type: type,
+  recommendation: recommendation,
 );
 
 Conversation conversation({

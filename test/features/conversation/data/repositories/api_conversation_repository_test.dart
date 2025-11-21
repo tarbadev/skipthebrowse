@@ -55,12 +55,14 @@ void main() {
             'content': messageContent,
             'timestamp': DateTime(2025).toIso8601String(),
             'author': 'user',
+            'type': 'question',
           },
           {
             'id': '2',
             'content': response,
             'timestamp': DateTime(2025).toIso8601String(),
             'author': 'assistant',
+            'type': 'question',
           },
         ],
         'created_at': DateTime(2025).toIso8601String(),
@@ -69,6 +71,59 @@ void main() {
     );
 
     final actual = await subject.createConversation(messageContent);
+
+    expect(actual, equals(expectedConversation));
+  });
+
+  test('addMessage calls the API', () async {
+    final messageContent = 'I want to watch a recent movie';
+    final response = 'How recent, last year? Last 6 months? Last month?';
+
+    final expectedConversation = Conversation(
+      id: conversationId,
+      messages: [
+        Message(
+          id: '1',
+          content: messageContent,
+          timestamp: DateTime(2025),
+          author: 'user',
+        ),
+        Message(
+          id: '2',
+          content: response,
+          timestamp: DateTime(2025),
+          author: 'assistant',
+        ),
+      ],
+      createdAt: DateTime(2025),
+    );
+
+    dioAdapter.onPost(
+      '/api/v1/conversations/$conversationId/respond',
+      (server) => server.reply(200, {
+        'id': conversationId,
+        'messages': [
+          {
+            'id': '1',
+            'content': messageContent,
+            'timestamp': DateTime(2025).toIso8601String(),
+            'author': 'user',
+            'type': 'question',
+          },
+          {
+            'id': '2',
+            'content': response,
+            'timestamp': DateTime(2025).toIso8601String(),
+            'author': 'assistant',
+            'type': 'question',
+          },
+        ],
+        'created_at': DateTime(2025).toIso8601String(),
+      }),
+      data: {'message': messageContent},
+    );
+
+    final actual = await subject.addMessage(conversationId, messageContent);
 
     expect(actual, equals(expectedConversation));
   });
@@ -107,12 +162,14 @@ void main() {
             'content': messageUser,
             'timestamp': DateTime(2025).toIso8601String(),
             'author': 'user',
+            'type': 'question',
           },
           {
             'id': '2',
             'content': messageAssistant,
             'timestamp': DateTime(2025).toIso8601String(),
             'author': 'assistant',
+            'type': 'question',
           },
         ],
         'created_at': DateTime(2025).toIso8601String(),
