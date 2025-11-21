@@ -35,8 +35,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final conversationState = ref.watch(conversationStateProvider);
-    final currentConversation =
-        conversationState.asData?.value ?? widget.conversation;
+    final currentConversation = conversationState.value ?? widget.conversation;
     final isLoading = conversationState.isLoading;
 
     final messages = currentConversation.messages.map(
@@ -56,7 +55,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             AddMessageWidget(
               onSubmit: _addMessage,
               isLoading: isLoading,
-              minLength: 3,
+              minLength: 2,
             ),
           ],
         ),

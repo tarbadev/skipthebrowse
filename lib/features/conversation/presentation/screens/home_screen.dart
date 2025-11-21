@@ -22,14 +22,16 @@ class HomeScreen extends ConsumerWidget {
       previous,
       next,
     ) {
+      final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
+      if (!isCurrent) {
+        return;
+      }
+
       next.whenData((conversation) {
         final prevConversation = previous?.valueOrNull;
-        final nextConversation = next.valueOrNull;
 
-        if (prevConversation == null && nextConversation != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            AppRoutes.goToConversation(context, nextConversation);
-          });
+        if (prevConversation == null && conversation != null) {
+          AppRoutes.goToConversation(context, conversation);
         }
       });
     });
