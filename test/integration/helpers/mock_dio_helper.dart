@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
+import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 
 class MockDioHelper {
   final Dio dio;
@@ -76,33 +77,11 @@ class MockDioHelper {
   }
 
   void mockAddMessage({
-    required String conversationId,
-    required List<Map<String, String>> allMessages,
+    required ConversationResponse conversationResponse,
     required String userMessage,
-    required DateTime timestamp,
-  }) {
-    final messagesJson = allMessages
-        .asMap()
-        .entries
-        .map(
-          (entry) => {
-            'id': '$conversationId-${entry.key}',
-            'content': entry.value['content']!,
-            'timestamp': timestamp.toIso8601String(),
-            'author': entry.value['author']!,
-            'type': 'question',
-          },
-        )
-        .toList();
-
-    dioAdapter.onPost(
-      '/api/v1/conversations/$conversationId/respond',
-      (server) => server.reply(200, {
-        'id': conversationId,
-        'messages': messagesJson,
-        'created_at': timestamp.toIso8601String(),
-      }),
-      data: {'message': userMessage},
-    );
-  }
+  }) => dioAdapter.onPost(
+    '/api/v1/conversations/${conversationResponse.id}/respond',
+    (server) => server.reply(200, conversationResponse.toJson()),
+    data: {'message': userMessage},
+  );
 }

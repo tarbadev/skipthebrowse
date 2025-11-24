@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/features/conversation/presentation/screens/conversation_screen.dart';
 
 import '../features/conversation/presentation/helpers/conversation_screen_tester.dart';
+import '../helpers/test_factory.dart';
 import 'helpers/mock_dio_helper.dart';
 
 void main() {
@@ -40,15 +42,25 @@ void main() {
       );
 
       mockDioHelper.mockAddMessage(
-        conversationId: conversationId,
-        allMessages: [
-          {'content': initialMessage, 'author': 'user'},
-          {'content': initialResponse, 'author': 'assistant'},
-          {'content': userReply, 'author': 'user'},
-          {'content': assistantReply, 'author': 'assistant'},
-        ],
+        conversationResponse: ConversationResponse(
+          id: conversationId,
+          messages: [
+            messageResponse(id: '1', content: initialMessage),
+            messageResponse(
+              id: '2',
+              content: initialResponse,
+              author: 'assistant',
+            ),
+            messageResponse(id: '3', content: userReply),
+            messageResponse(
+              id: '4',
+              content: assistantReply,
+              author: 'assistant',
+            ),
+          ],
+          createdAt: timestamp,
+        ),
         userMessage: userReply,
-        timestamp: timestamp,
       );
 
       await tester.pumpWidget(

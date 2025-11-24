@@ -26,6 +26,8 @@ class ConversationResponse {
     messages: messages.map((m) => m.toMessage()).toList(),
     createdAt: createdAt,
   );
+
+  Map<String, dynamic> toJson() => _$ConversationResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -51,6 +53,8 @@ class MessageResponse {
 
   Message toMessage() =>
       Message(id: id, content: content, timestamp: timestamp, author: author);
+
+  Map<String, dynamic> toJson() => _$MessageResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -76,6 +80,8 @@ class RecommendationResponse {
     required this.confidence,
     required this.platforms,
   });
+
+  Map<String, dynamic> toJson() => _$RecommendationResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -95,4 +101,6 @@ class PlatformResponse {
     required this.url,
     required this.isPreferred,
   });
+
+  Map<String, dynamic> toJson() => _$PlatformResponseToJson(this);
 }
