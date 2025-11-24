@@ -12,7 +12,7 @@ import '../test/features/conversation/presentation/helpers/home_screen_tester.da
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Integration Tests', () {
+  group('E2E Tests', () {
     testWidgets('create a conversation', (tester) async {
       final initialMessage =
           "I'm looking for a movie to watch with my best friend";
