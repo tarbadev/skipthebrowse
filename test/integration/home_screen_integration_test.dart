@@ -8,7 +8,7 @@ import '../features/conversation/presentation/helpers/home_screen_tester.dart';
 import 'helpers/mock_dio_helper.dart';
 
 void main() {
-  group('Home Screen Integration Tests (Mocked)', () {
+  group('Integration Tests - Home Screen', () {
     testWidgets('creates a conversation and navigates to conversation screen', (
       tester,
     ) async {

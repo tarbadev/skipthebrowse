@@ -10,7 +10,7 @@ import '../features/conversation/presentation/helpers/conversation_screen_tester
 import 'helpers/mock_dio_helper.dart';
 
 void main() {
-  group('Conversation Screen Integration Tests (Mocked)', () {
+  group('Integration Tests - Conversation Screen', () {
     testWidgets('displays conversation and adds new message', (tester) async {
       final mockDioHelper = MockDioHelper();
       final conversationId = 'test-conversation-id';
