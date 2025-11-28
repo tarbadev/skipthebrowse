@@ -40,6 +40,9 @@ class MessageResponse {
   final String type;
   final RecommendationResponse? recommendation;
 
+  @JsonKey(name: 'quick_replies')
+  final List<String>? quickReplies;
+
   factory MessageResponse.fromJson(Map<String, dynamic> json) =>
       _$MessageResponseFromJson(json);
 
@@ -50,6 +53,7 @@ class MessageResponse {
     required this.author,
     required this.type,
     this.recommendation,
+    this.quickReplies,
   });
 
   Message toMessage() => Message(
@@ -61,6 +65,7 @@ class MessageResponse {
         ? MessageType.recommendation
         : MessageType.question,
     recommendation: recommendation?.toRecommendation(),
+    quickReplies: quickReplies,
   );
 
   Map<String, dynamic> toJson() => _$MessageResponseToJson(this);

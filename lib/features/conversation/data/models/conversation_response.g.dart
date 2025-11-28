@@ -36,6 +36,9 @@ MessageResponse _$MessageResponseFromJson(Map<String, dynamic> json) =>
           : RecommendationResponse.fromJson(
               json['recommendation'] as Map<String, dynamic>,
             ),
+      quickReplies: (json['quick_replies'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
@@ -46,6 +49,7 @@ Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
       'author': instance.author,
       'type': instance.type,
       'recommendation': instance.recommendation,
+      'quick_replies': instance.quickReplies,
     };
 
 RecommendationResponse _$RecommendationResponseFromJson(

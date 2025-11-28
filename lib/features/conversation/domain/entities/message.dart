@@ -10,6 +10,7 @@ class Message extends Equatable {
   final String author;
   final MessageType type;
   final Recommendation? recommendation;
+  final List<String>? quickReplies;
 
   const Message({
     required this.id,
@@ -18,6 +19,7 @@ class Message extends Equatable {
     required this.author,
     required this.type,
     this.recommendation,
+    this.quickReplies,
   });
 
   @override
@@ -28,5 +30,6 @@ class Message extends Equatable {
     author,
     type,
     recommendation,
+    quickReplies,
   ];
 }

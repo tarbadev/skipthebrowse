@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
+import 'package:skipthebrowse/features/conversation/presentation/widgets/quick_reply_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/recommendation_widget.dart';
 
 import '../../domain/entities/conversation.dart';
@@ -67,6 +68,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                         message.recommendation != null)
                       RecommendationWidget(
                         recommendation: message.recommendation!,
+                      ),
+                    if (message.author == 'assistant' &&
+                        message.quickReplies != null &&
+                        message.quickReplies!.isNotEmpty)
+                      QuickReplyWidget(
+                        replies: message.quickReplies!,
+                        onReplyTap: (reply) => _addMessage(reply),
                       ),
                   ],
                 );
