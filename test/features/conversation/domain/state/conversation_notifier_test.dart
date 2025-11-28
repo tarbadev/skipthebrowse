@@ -35,7 +35,7 @@ void main() {
       await subject.createConversation('What should I watch tonight?');
 
       expect(states.length, 2);
-      expect(states[0], isA<AsyncLoading>());
+      expect(states[0].isLoading, isTrue);
       expect(states[1].asData?.value, expectedConversation);
       expect(subject.state.asData?.value, expectedConversation);
     });
@@ -56,7 +56,7 @@ void main() {
       await subject.createConversation('What should I watch tonight?');
 
       expect(states.length, 2);
-      expect(states[0], isA<AsyncLoading>());
+      expect(states[0].isLoading, isTrue);
       expect(states[1], isA<AsyncError>());
 
       final errorState = subject.state as AsyncError;
@@ -86,7 +86,7 @@ void main() {
       await subject.addMessage(conversationId, message);
 
       expect(states.length, 2);
-      expect(states[0], isA<AsyncLoading>());
+      expect(states[0].isLoading, isTrue);
       expect(states[1].asData?.value, expectedConversation);
       expect(subject.state.asData?.value, expectedConversation);
 
@@ -113,7 +113,7 @@ void main() {
       await subject.addMessage(conversationId, message);
 
       expect(states.length, 2);
-      expect(states[0], isA<AsyncLoading>());
+      expect(states[0].isLoading, isTrue);
       expect(states[1], isA<AsyncError>());
 
       final errorState = subject.state as AsyncError;

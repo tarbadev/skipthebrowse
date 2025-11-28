@@ -4,7 +4,6 @@ import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:skipthebrowse/features/conversation/data/repositories/api_conversation_repository.dart';
 import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
-import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
 
 import '../../../../helpers/test_factory.dart';
 
@@ -29,13 +28,13 @@ void main() {
     final expectedConversation = Conversation(
       id: conversationId,
       messages: [
-        Message(
+        message(
           id: '1',
           content: messageContent,
           timestamp: DateTime(2025),
           author: 'user',
         ),
-        Message(
+        message(
           id: '2',
           content: response,
           timestamp: DateTime(2025),
@@ -82,13 +81,13 @@ void main() {
     final expectedConversation = Conversation(
       id: conversationId,
       messages: [
-        Message(
+        message(
           id: '1',
           content: messageContent,
           timestamp: DateTime(2025),
           author: 'user',
         ),
-        Message(
+        message(
           id: '2',
           content: response,
           timestamp: DateTime(2025),
@@ -136,13 +135,13 @@ void main() {
     final expectedConversation = Conversation(
       id: conversationId,
       messages: [
-        Message(
+        message(
           id: '1',
           content: messageUser,
           timestamp: DateTime(2025),
           author: 'user',
         ),
-        Message(
+        message(
           id: '2',
           content: messageAssistant,
           timestamp: DateTime(2025),

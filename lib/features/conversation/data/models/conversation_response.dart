@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
+import 'package:skipthebrowse/features/conversation/domain/entities/recommendation.dart';
 
 part 'conversation_response.g.dart';
 
@@ -51,8 +52,16 @@ class MessageResponse {
     this.recommendation,
   });
 
-  Message toMessage() =>
-      Message(id: id, content: content, timestamp: timestamp, author: author);
+  Message toMessage() => Message(
+    id: id,
+    content: content,
+    timestamp: timestamp,
+    author: author,
+    type: type == 'recommendation'
+        ? MessageType.recommendation
+        : MessageType.question,
+    recommendation: recommendation?.toRecommendation(),
+  );
 
   Map<String, dynamic> toJson() => _$MessageResponseToJson(this);
 }
@@ -82,6 +91,16 @@ class RecommendationResponse {
   });
 
   Map<String, dynamic> toJson() => _$RecommendationResponseToJson(this);
+
+  Recommendation toRecommendation() => Recommendation(
+    id: id,
+    title: title,
+    description: description,
+    releaseYear: releaseYear,
+    rating: rating,
+    confidence: confidence,
+    platforms: platforms.map((p) => p.toPlatform()).toList(),
+  );
 }
 
 @JsonSerializable()
@@ -103,4 +122,7 @@ class PlatformResponse {
   });
 
   Map<String, dynamic> toJson() => _$PlatformResponseToJson(this);
+
+  Platform toPlatform() =>
+      Platform(name: name, slug: slug, url: url, isPreferred: isPreferred);
 }

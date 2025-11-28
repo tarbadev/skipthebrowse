@@ -12,7 +12,7 @@ void main() {
 
   testWidgets('renders widget', (tester) async {
     await tester.pumpProviderWidget(
-      AddMessageWidget(onSubmit: (_) => {}, isLoading: false),
+      AddMessageWidget(onSubmit: (_) async {}, isLoading: false),
     );
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
     addMessageWidgetHelper.isVisible();
@@ -20,7 +20,7 @@ void main() {
 
   testWidgets('button is enabled after entering text', (tester) async {
     await tester.pumpProviderWidget(
-      AddMessageWidget(onSubmit: (_) => {}, isLoading: false),
+      AddMessageWidget(onSubmit: (_) async {}, isLoading: false),
     );
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
 
@@ -38,7 +38,7 @@ void main() {
 
     await tester.pumpProviderWidget(
       AddMessageWidget(
-        onSubmit: (message) {
+        onSubmit: (message) async {
           onSubmitInvoked = true;
           expect(message, expectedMessage);
         },
@@ -56,7 +56,7 @@ void main() {
 
   testWidgets('shows error when input is too short', (tester) async {
     await tester.pumpProviderWidget(
-      AddMessageWidget(onSubmit: (_) => {}, isLoading: false),
+      AddMessageWidget(onSubmit: (_) async {}, isLoading: false),
     );
 
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
@@ -70,7 +70,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpProviderWidget(
-      AddMessageWidget(onSubmit: (_) => {}, isLoading: false, minLength: 3),
+      AddMessageWidget(onSubmit: (_) async {}, isLoading: false, minLength: 3),
     );
 
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
@@ -82,7 +82,7 @@ void main() {
 
   testWidgets('shows error when input is too long', (tester) async {
     await tester.pumpProviderWidget(
-      AddMessageWidget(onSubmit: (_) => {}, isLoading: false),
+      AddMessageWidget(onSubmit: (_) async {}, isLoading: false),
     );
 
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
@@ -102,7 +102,7 @@ void main() {
 
     await tester.pumpProviderWidget(
       AddMessageWidget(
-        onSubmit: (message) {
+        onSubmit: (message) async {
           onSubmitInvoked = true;
           expect(message, expectedMessage);
         },
@@ -115,6 +115,39 @@ void main() {
     await addMessageWidgetHelper.submit();
 
     expect(onSubmitInvoked, isFalse);
+  });
+
+  testWidgets('clears text field after successful submission', (tester) async {
+    var onSubmitInvoked = false;
+
+    await tester.pumpProviderWidget(
+      AddMessageWidget(
+        onSubmit: (message) async {
+          onSubmitInvoked = true;
+          expect(message, expectedMessage);
+        },
+        isLoading: false,
+        minLength: 2,
+      ),
+    );
+
+    final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
+
+    // Enter message and submit
+    await addMessageWidgetHelper.enterMessage(expectedMessage);
+    await addMessageWidgetHelper.submit();
+
+    expect(onSubmitInvoked, isTrue);
+
+    // Verify text field is cleared
+    final textField = tester.widget<TextField>(
+      find.byKey(const Key('add_message_text_box')),
+    );
+    expect(textField.controller?.text, isEmpty);
+
+    // Verify button is disabled again after clearing
+    final button = addMessageWidgetHelper.getButton();
+    expect(button.onPressed, isNull);
   });
 }
 

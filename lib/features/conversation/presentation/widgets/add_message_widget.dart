@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-typedef OnSubmitCallback = void Function(String);
+typedef OnSubmitCallback = Future<void> Function(String);
 
 class AddMessageWidget extends StatefulWidget {
   final OnSubmitCallback onSubmit;
@@ -21,8 +21,15 @@ class AddMessageWidget extends StatefulWidget {
 }
 
 class _AddMessageWidgetState extends State<AddMessageWidget> {
+  final TextEditingController _controller = TextEditingController();
   String _message = '';
   String? _validationError;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _updateMessage(String message) => setState(() {
     _message = message;
@@ -48,7 +55,14 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
       return;
     }
 
-    widget.onSubmit(_message);
+    await widget.onSubmit(_message);
+
+    // Clear the text field after successful submission
+    _controller.clear();
+    setState(() {
+      _message = '';
+      _validationError = null;
+    });
   }
 
   @override
@@ -60,6 +74,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
           Expanded(
             child: TextField(
               key: Key('add_message_text_box'),
+              controller: _controller,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 labelText:

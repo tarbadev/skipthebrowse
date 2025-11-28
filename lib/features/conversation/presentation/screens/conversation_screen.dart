@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
+import 'package:skipthebrowse/features/conversation/presentation/widgets/recommendation_widget.dart';
 
 import '../../domain/entities/conversation.dart';
+import '../../domain/entities/message.dart';
 import '../../domain/providers/conversation_providers.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -38,27 +40,58 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     final currentConversation = conversationState.value ?? widget.conversation;
     final isLoading = conversationState.isLoading;
 
-    final messages = currentConversation.messages.map(
-      (c) => MessageWidget(c.content),
-    );
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Conversation')),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              'Conversation ID: ${currentConversation.id}',
-              key: const Key('conversation_screen_title'),
+      appBar: AppBar(
+        title: const Text('Find Your Next Watch'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: currentConversation.messages.length,
+              itemBuilder: (context, index) {
+                final message = currentConversation.messages[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
+                      child: MessageWidget(message.content),
+                    ),
+                    if (message.type == MessageType.recommendation &&
+                        message.recommendation != null)
+                      RecommendationWidget(
+                        recommendation: message.recommendation!,
+                      ),
+                  ],
+                );
+              },
             ),
-            ...messages,
-            AddMessageWidget(
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(8),
+            child: AddMessageWidget(
               onSubmit: _addMessage,
               isLoading: isLoading,
               minLength: 2,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
