@@ -31,7 +31,7 @@ dev_dependencies:
   http_mock_adapter: ^0.6.1
   build_runner: ^2.10.2
   retrofit_generator: ^10.2.0
-  json_serializable: ^6.11.1
+  json_serializable: ^6.11.3
 
 flutter:
   uses-material-design: true
