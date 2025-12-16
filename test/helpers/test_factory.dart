@@ -58,7 +58,7 @@ Recommendation recommendation({
       'the bear, Ted or his girlfriend, Lori.',
   int releaseYear = 2012,
   double rating = 6.9,
-  double confidence = 60.3,
+  double confidence = 0.603,
   List<Platform> platforms = const [
     Platform(
       name: 'Netflix',

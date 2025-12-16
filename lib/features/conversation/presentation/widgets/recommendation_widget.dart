@@ -57,26 +57,23 @@ class RecommendationWidget extends StatelessWidget {
             Row(
               children: [
                 if (recommendation.releaseYear != null) ...[
-                  Chip(
+                  Text(
+                    '${recommendation.releaseYear}',
                     key: Key(
                       'recommendation_${recommendation.id}_release_year',
                     ),
-                    label: Text('${recommendation.releaseYear}'),
-                    backgroundColor: theme.colorScheme.secondaryContainer,
-                    labelStyle: TextStyle(
-                      color: theme.colorScheme.onSecondaryContainer,
-                    ),
+                    style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(width: 8),
                 ],
                 if (recommendation.rating != null)
                   Row(
-                    key: Key('recommendation_${recommendation.id}_rating'),
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 20),
                       const SizedBox(width: 4),
                       Text(
                         recommendation.rating!.toStringAsFixed(1),
+                        key: Key('recommendation_${recommendation.id}_rating'),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -106,7 +103,6 @@ class RecommendationWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Wrap(
-              key: Key('recommendation_${recommendation.id}_platforms_count'),
               spacing: 8,
               runSpacing: 8,
               children: recommendation.platforms.asMap().entries.map((entry) {
@@ -116,7 +112,7 @@ class RecommendationWidget extends StatelessWidget {
 
                 return ElevatedButton.icon(
                   key: Key(
-                    'recommendation_${recommendation.id}_platform_${index}_name',
+                    'recommendation_${recommendation.id}_platform_$index',
                   ),
                   icon: _buildProviderLogo(platform.slug),
                   label: Text(platform.name),
@@ -138,7 +134,6 @@ class RecommendationWidget extends StatelessWidget {
             // Confidence indicator (subtle)
             const SizedBox(height: 12),
             Row(
-              key: Key('recommendation_${recommendation.id}_confidence'),
               children: [
                 Expanded(
                   child: LinearProgressIndicator(
@@ -150,6 +145,7 @@ class RecommendationWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${(recommendation.confidence * 100).toStringAsFixed(0)}% match',
+                  key: Key('recommendation_${recommendation.id}_confidence'),
                   style: theme.textTheme.bodySmall,
                 ),
               ],

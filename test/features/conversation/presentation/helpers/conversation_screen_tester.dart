@@ -43,7 +43,8 @@ class ConversationScreenTester extends BaseWidgetTester {
 
     for (final element in recommendationFinders.evaluate()) {
       final widget = element.widget as RecommendationWidget;
-      final recommendationId = widget.recommendation.id;
+      final recommendation = widget.recommendation;
+      final recommendationId = recommendation.id;
 
       final title = getTextByKey('recommendation_${recommendationId}_title');
       final description = getTextByKey(
@@ -55,25 +56,14 @@ class ConversationScreenTester extends BaseWidgetTester {
       final rating = double.parse(
         getTextByKey('recommendation_${recommendationId}_rating'),
       );
-      final confidence = double.parse(
-        getTextByKey('recommendation_${recommendationId}_confidence'),
-      );
 
-      final platformsCount = int.parse(
-        getTextByKey('recommendation_${recommendationId}_platforms_count'),
-      );
+      // Get confidence directly from entity (already in decimal format 0.0-1.0)
+      final confidence = recommendation.confidence;
 
-      final platforms = <Map<String, dynamic>>[];
-      for (int i = 0; i < platformsCount; i++) {
-        final name = getTextByKey(
-          'recommendation_${recommendationId}_platform_${i}_name',
-        );
-        final url = getTextByKey(
-          'recommendation_${recommendationId}_platform_${i}_url',
-        );
-
-        platforms.add({'name': name, 'url': url});
-      }
+      // Get platforms directly from the recommendation entity
+      final platforms = recommendation.platforms
+          .map((platform) => {'name': platform.name, 'url': platform.url})
+          .toList();
 
       recommendations.add({
         'title': title,

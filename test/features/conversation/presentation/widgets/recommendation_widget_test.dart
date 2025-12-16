@@ -93,19 +93,13 @@ void main() {
     expect(find.text('Netflix'), findsOneWidget);
     expect(find.text('Amazon Prime Video'), findsOneWidget);
 
-    // Verify platform count key
-    expect(
-      find.byKey(const Key('recommendation_rec-123_platforms_count')),
-      findsOneWidget,
-    );
-
     // Verify individual platform keys
     expect(
-      find.byKey(const Key('recommendation_rec-123_platform_0_name')),
+      find.byKey(const Key('recommendation_rec-123_platform_0')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('recommendation_rec-123_platform_1_name')),
+      find.byKey(const Key('recommendation_rec-123_platform_1')),
       findsOneWidget,
     );
 
@@ -123,12 +117,12 @@ void main() {
 
     // Find the first platform button (Netflix - preferred)
     final netflixButton = tester.widget<ElevatedButton>(
-      find.byKey(const Key('recommendation_rec-123_platform_0_name')),
+      find.byKey(const Key('recommendation_rec-123_platform_0')),
     );
 
     // Find the second platform button (Amazon Prime - not preferred)
     final primeButton = tester.widget<ElevatedButton>(
-      find.byKey(const Key('recommendation_rec-123_platform_1_name')),
+      find.byKey(const Key('recommendation_rec-123_platform_1')),
     );
 
     // Verify preferred platform has different styling
@@ -359,15 +353,11 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('recommendation_rec-123_platforms_count')),
+      find.byKey(const Key('recommendation_rec-123_platform_0')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('recommendation_rec-123_platform_0_name')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const Key('recommendation_rec-123_platform_1_name')),
+      find.byKey(const Key('recommendation_rec-123_platform_1')),
       findsOneWidget,
     );
     expect(

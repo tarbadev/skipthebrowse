@@ -43,7 +43,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Find Your Next Watch'),
+        title: Text(
+          'Conversation ID: ${widget.conversation.id}',
+          key: const Key('conversation_screen_title'),
+        ),
         centerTitle: true,
       ),
       body: Column(
