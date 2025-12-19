@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
-import 'package:skipthebrowse/features/conversation/presentation/widgets/quick_reply_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/recommendation_widget.dart';
 
 import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/providers/conversation_providers.dart';
+import '../widgets/quick_reply_widget.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
   final Conversation conversation;
@@ -52,13 +52,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: currentConversation.messages.length,
-              itemBuilder: (context, index) {
-                final message = currentConversation.messages[index];
+            child: ListView(
+              children: currentConversation.messages.map((message) {
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  key: Key('message_column_${message.id}'),
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -81,7 +78,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                       ),
                   ],
                 );
-              },
+              }).toList(),
             ),
           ),
           Container(

@@ -26,7 +26,7 @@ extension TestX on WidgetTester {
     Object? initialExtra,
   }) async {
     final goRouter = GoRouter(
-      routes: applicationRouter.configuration.routes,
+      routes: routes,
       observers: [mockObserver],
       initialLocation: initialRoute,
       initialExtra: initialExtra,

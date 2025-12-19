@@ -34,4 +34,16 @@ class ApiConversationRepository implements ConversationRepository {
 
     return response.toConversation();
   }
+
+  @override
+  Future<List<ConversationSummary>> listConversations({
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final response = await restClient.listConversations(limit, offset);
+
+    return response.conversations
+        .map((summary) => summary.toConversationSummary())
+        .toList();
+  }
 }

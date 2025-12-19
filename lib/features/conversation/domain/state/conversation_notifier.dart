@@ -7,13 +7,15 @@ class ConversationNotifier extends StateNotifier<AsyncValue<Conversation?>> {
 
   ConversationNotifier(this.repository) : super(const AsyncValue.data(null));
 
-  Future<void> createConversation(String question) async {
+  Future<Conversation?> createConversation(String question) async {
     state = const AsyncLoading<Conversation?>().copyWithPrevious(state);
     try {
       final conversation = await repository.createConversation(question);
       state = AsyncValue.data(conversation);
+      return conversation;
     } catch (err, stack) {
       state = AsyncError<Conversation?>(err, stack).copyWithPrevious(state);
+      return null;
     }
   }
 

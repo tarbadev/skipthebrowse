@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:skipthebrowse/core/config/env_config.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
@@ -10,9 +9,7 @@ import '../test/features/conversation/presentation/helpers/conversation_screen_t
 import '../test/features/conversation/presentation/helpers/home_screen_tester.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  group('E2E Tests', () {
+  group('Home Tests', () {
     testWidgets('create a conversation', (tester) async {
       final initialMessage =
           "I'm looking for a movie to watch with my best friend";

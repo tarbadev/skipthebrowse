@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: '3.35.7'
+  FLUTTER_VERSION: '3.38.5'
 
 jobs:
   analyze-and-test:
@@ -48,12 +48,24 @@ jobs:
           fail_ci_if_error: true
 
   android:
-    name: Android
+    name: Android - API level ${{ matrix.api-level }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [ 26, 30, 31, 32, 33, 34, 35 ]
     needs: analyze-and-test
     timeout-minutes: 30
 
     steps:
+      - name: Free Disk Space
+        uses: AdityaGarg8/remove-unwanted-software@v5
+        with:
+          remove-dotnet: true
+          remove-haskell: true
+          remove-codeql: true
+          remove-docker-images: true
+#          remove-large-packages: true
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -74,17 +86,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Build App Bundle
-        run: flutter build appbundle --release
-
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -93,16 +102,16 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-30
+          key: avd-${{ matrix.api-level }}-atd
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
-          target: google_apis
+          api-level: ${{ matrix.api-level }}
+          target: google_atd
           arch: x86_64
-          profile: Nexus 6
+          force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
@@ -110,13 +119,15 @@ jobs:
       - name: Run integration tests on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
-          target: google_apis
+          api-level: ${{ matrix.api-level }}
+          target: google_atd
           arch: x86_64
-          profile: Nexus 6
+          force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: flutter test integration_test --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
+          script: flutter test integration_test/app_test.dart 
+            --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com 
+            --dart-define=ENVIRONMENT=dev
 
   ios:
     name: iOS
@@ -151,7 +162,9 @@ jobs:
           xcrun simctl boot $SIMULATOR_ID
 
       - name: Run integration tests on iOS
-        run: flutter test integration_test --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
+        run: flutter test integration_test/app_test.dart 
+          --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com
+          --dart-define=ENVIRONMENT=dev
 
       - name: Shutdown simulator
         if: always()
@@ -184,7 +197,9 @@ jobs:
         run: flutter build macos --release
 
       - name: Run integration tests on macOS
-        run: flutter test integration_test -d macos --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
+        run: flutter test integration_test/app_test.dart -d macos
+          --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com
+          --dart-define=ENVIRONMENT=dev
 
   linux:
     name: Linux
@@ -220,7 +235,9 @@ jobs:
         run: flutter build linux --release
 
       - name: Run integration tests on Linux
-        run: xvfb-run flutter test integration_test -d linux --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
+        run: xvfb-run flutter test integration_test/app_test.dart -d linux
+          --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com
+          --dart-define=ENVIRONMENT=dev
 
   windows:
     name: Windows
@@ -249,7 +266,9 @@ jobs:
         run: flutter build windows --release
 
       - name: Run integration tests on Windows
-        run: flutter test integration_test -d windows --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com --dart-define=ENVIRONMENT=dev
+        run: flutter test integration_test/app_test.dart -d windows
+          --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com
+          --dart-define=ENVIRONMENT=dev
 
   web:
     name: Web
@@ -285,12 +304,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2

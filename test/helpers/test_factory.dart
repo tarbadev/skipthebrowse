@@ -33,6 +33,22 @@ Conversation conversation({
   DateTime createdAt = fixedDateTime,
 }) => Conversation(id: id, messages: messages, createdAt: createdAt);
 
+ConversationSummary conversationSummary({
+  String id = conversationId,
+  String status = 'active',
+  String previewText = 'I want to watch a recent movie',
+  DateTime createdAt = fixedDateTime,
+  DateTime updatedAt = fixedDateTime,
+  int messageCount = 4,
+}) => ConversationSummary(
+  id: id,
+  status: status,
+  previewText: previewText,
+  createdAt: createdAt,
+  updatedAt: updatedAt,
+  messageCount: messageCount,
+);
+
 Message message({
   String id = messageId,
   String content = messageContent,

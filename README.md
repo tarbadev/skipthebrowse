@@ -1,4 +1,4 @@
-# skipthebrowse
+# skipthebrowse [![CI/CD](https://github.com/tarbadev/skipthebrowse/actions/workflows/ci.yml/badge.svg)](https://github.com/tarbadev/skipthebrowse/actions/workflows/ci.yml)
 
 A new Flutter project.
 
