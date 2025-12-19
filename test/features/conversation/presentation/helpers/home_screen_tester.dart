@@ -19,4 +19,9 @@ class HomeScreenTester extends BaseWidgetTester {
     await _addMessageWidgetHelper.enterMessage(initialMessage);
     await _addMessageWidgetHelper.submit();
   }
+
+  Future<void> tapHistoryButton() async {
+    await tester.tap(find.byTooltip('View past conversations'));
+    await tester.pumpAndSettle();
+  }
 }

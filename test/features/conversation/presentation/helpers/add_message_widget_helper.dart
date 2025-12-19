@@ -21,6 +21,7 @@ class AddMessageWidgetHelper extends BaseWidgetTester {
   }
 
   Future<void> enterMessage(String message) async {
+    await tapOnWidgetByKey(textBoxKey);
     expect(find.byKey(Key(textBoxKey)), findsOneWidget);
     await enterText(textBoxKey, message);
     await tester.pump();
@@ -28,6 +29,6 @@ class AddMessageWidgetHelper extends BaseWidgetTester {
 
   Future<void> submit() async {
     expect(find.byKey(Key(buttonKey)), findsOneWidget);
-    await tapOnButtonByKey(buttonKey);
+    await tapOnWidgetByKey(buttonKey);
   }
 }

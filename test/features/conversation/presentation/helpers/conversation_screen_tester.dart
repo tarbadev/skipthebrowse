@@ -84,6 +84,6 @@ class ConversationScreenTester extends BaseWidgetTester {
     await tester.pump();
 
     expect(find.byKey(Key(buttonKey)), findsOneWidget);
-    await tapOnButtonByKey(buttonKey);
+    await tapOnWidgetByKey(buttonKey);
   }
 }

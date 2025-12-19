@@ -84,4 +84,22 @@ class MockDioHelper {
     (server) => server.reply(200, conversationResponse.toJson()),
     data: {'message': userMessage},
   );
+
+  void mockListConversations({
+    required List<Map<String, dynamic>> conversations,
+    int total = 0,
+    int limit = 20,
+    int offset = 0,
+  }) {
+    dioAdapter.onGet(
+      '/api/v1/conversations',
+      (server) => server.reply(200, {
+        'conversations': conversations,
+        'total': total,
+        'limit': limit,
+        'offset': offset,
+      }),
+      queryParameters: {'limit': limit, 'offset': offset},
+    );
+  }
 }
