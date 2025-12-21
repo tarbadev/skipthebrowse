@@ -8,7 +8,7 @@ import '../models/create_conversation_request.dart';
 
 part 'rest_client.g.dart';
 
-@RestApi(baseUrl: 'http://localhost:8000')
+@RestApi()
 abstract class RestClient {
   factory RestClient(
     Dio dio, {
