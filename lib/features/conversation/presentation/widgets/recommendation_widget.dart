@@ -8,10 +8,17 @@ class RecommendationWidget extends StatelessWidget {
 
   const RecommendationWidget({super.key, required this.recommendation});
 
-  Future<void> _launchUrl(String urlString) async {
+  Future<void> _launchUrl(BuildContext context, String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      debugPrint('Could not launch $urlString');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to open link. Please try again later.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
@@ -126,7 +133,7 @@ class RecommendationWidget extends StatelessWidget {
                               theme.colorScheme.surfaceContainerHighest,
                           foregroundColor: theme.colorScheme.onSurface,
                         ),
-                  onPressed: () => _launchUrl(platform.url),
+                  onPressed: () => _launchUrl(context, platform.url),
                 );
               }).toList(),
             ),
