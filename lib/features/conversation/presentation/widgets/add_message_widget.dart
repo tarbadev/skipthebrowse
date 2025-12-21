@@ -11,7 +11,7 @@ class AddMessageWidget extends StatefulWidget {
     super.key,
     required this.onSubmit,
     required this.isLoading,
-    this.minLength = 10,
+    this.minLength = 2,
   });
 
   @override
