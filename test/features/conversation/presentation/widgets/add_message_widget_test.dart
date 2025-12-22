@@ -60,10 +60,10 @@ void main() {
     );
 
     final addMessageWidgetHelper = AddMessageWidgetHelper(tester);
-    await addMessageWidgetHelper.enterMessage('Short');
+    await addMessageWidgetHelper.enterMessage('S');
     await addMessageWidgetHelper.submit();
 
-    expect(find.text('Message must be at least 10 characters'), findsOneWidget);
+    expect(find.text('Message must be at least 2 characters'), findsOneWidget);
   });
 
   testWidgets('shows error when input is too short and min length is set', (
@@ -98,7 +98,7 @@ void main() {
     tester,
   ) async {
     var onSubmitInvoked = false;
-    var expectedMessage = 'Short';
+    var expectedMessage = 'S';
 
     await tester.pumpProviderWidget(
       AddMessageWidget(
