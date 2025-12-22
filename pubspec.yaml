@@ -30,7 +30,7 @@ dev_dependencies:
   const_date_time: ^1.2.1
   http_mock_adapter: ^0.6.1
   build_runner: ^2.10.2
-  retrofit_generator: ^10.2.0
+  retrofit_generator: ^10.2.1
   json_serializable: ^6.11.3
 
 flutter:
