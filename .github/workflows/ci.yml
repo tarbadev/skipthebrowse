@@ -3,6 +3,8 @@ name: CI/CD
 on:
   push:
     branches: [main, develop]
+    tags:
+      - 'v*'
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -55,7 +57,7 @@ jobs:
       matrix:
         api-level: [ 30, 31, 32, 33, 34, 35 ]
     needs: analyze-and-test
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Free Disk Space

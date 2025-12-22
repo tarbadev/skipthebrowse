@@ -1,20 +1,21 @@
-.PHONY: help release test build clean run format lint
+.PHONY: help release release-github test build clean run format lint
 
 # Default target
 help:
 	@echo "SkipTheBrowse Client - Available Commands:"
 	@echo ""
-	@echo "  make release VERSION=1.0.0    - Create a new release (updates version, commits, tags)"
-	@echo "  make test                     - Run all tests"
-	@echo "  make build                    - Generate code (build_runner)"
-	@echo "  make clean                    - Clean build artifacts"
-	@echo "  make run                      - Run the app in debug mode"
-	@echo "  make run-dev                  - Run against dev backend"
-	@echo "  make format                   - Format code"
-	@echo "  make lint                     - Analyze code"
+	@echo "  make release VERSION=1.0.0         - Create a new release (updates version, commits, tags)"
+	@echo "  make release-github VERSION=1.0.0  - Create GitHub release (requires gh CLI)"
+	@echo "  make test                          - Run all tests"
+	@echo "  make build                         - Generate code (build_runner)"
+	@echo "  make clean                         - Clean build artifacts"
+	@echo "  make run                           - Run the app in debug mode"
+	@echo "  make run-dev                       - Run against dev backend"
+	@echo "  make format                        - Format code"
+	@echo "  make lint                          - Analyze code"
 	@echo ""
 
-# Create a new release
+# Create a new release (local)
 release:
 	@if [ -z "$(VERSION)" ]; then \
 		echo "❌ Error: VERSION is required"; \
@@ -22,6 +23,15 @@ release:
 		exit 1; \
 	fi
 	@./release.sh $(VERSION)
+
+# Create GitHub release (requires gh CLI)
+release-github:
+	@if [ -z "$(VERSION)" ]; then \
+		echo "❌ Error: VERSION is required"; \
+		echo "Usage: make release-github VERSION=1.0.0"; \
+		exit 1; \
+	fi
+	@./create-release.sh $(VERSION)
 
 # Run tests
 test:

@@ -4,6 +4,8 @@ This document describes how to create a new release for the SkipTheBrowse Flutte
 
 ## Quick Release
 
+### Step 1: Create Local Release
+
 Use the release script for a streamlined release process:
 
 ```bash
@@ -19,6 +21,54 @@ Or use the Makefile:
 ```bash
 make release VERSION=1.0.0
 ```
+
+### Step 2: Create GitHub Release
+
+After creating the local tag and pushing it to GitHub:
+
+```bash
+# Create GitHub release (requires gh CLI)
+./create-release.sh 1.0.0
+
+# Or with make
+make release-github VERSION=1.0.0
+```
+
+**Prerequisites:**
+- Install GitHub CLI: `brew install gh` (macOS) or see [installation guide](https://github.com/cli/cli#installation)
+- Authenticate: `gh auth login`
+- Push your tag: `git push origin v1.0.0`
+- (Optional) Create `RELEASE_NOTES_v1.0.0.md` file for custom release notes
+
+**Note:** If you don't create a release notes file, GitHub will auto-generate them from commits. For the **first release only**, it's recommended to create a custom release notes file to establish the baseline.
+
+## Release Notes Format
+
+Create a file named `RELEASE_NOTES_v<VERSION>.md` (e.g., `RELEASE_NOTES_v1.0.0.md`) with this format:
+
+```markdown
+# Release Notes - v1.0.0
+
+## ✨ New Features
+
+- Feature description 1
+- Feature description 2
+
+## 🐛 Bug Fixes
+
+- Bug fix description 1
+- Bug fix description 2
+
+## ♻️ Refactoring
+
+- Refactor description 1
+
+---
+
+**Full Changelog**: https://github.com/tarbadev/skipthebrowse/compare/v0.9.0...v1.0.0
+```
+
+After the **first two releases**, the CI will automatically generate changelog between tags.
 
 ## What the Script Does
 
