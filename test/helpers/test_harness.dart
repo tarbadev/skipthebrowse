@@ -15,6 +15,7 @@ extension TestX on WidgetTester {
         conversationRepositoryProvider.overrideWithValue(
           mockConversationRepository,
         ),
+        pendingMessageQueueProvider.overrideWithValue(mockPendingMessageQueue),
         dioProvider.overrideWithValue(dio),
       ],
       child: MaterialApp(home: Scaffold(body: widget)),
@@ -37,6 +38,9 @@ extension TestX on WidgetTester {
         overrides: [
           conversationRepositoryProvider.overrideWithValue(
             mockConversationRepository,
+          ),
+          pendingMessageQueueProvider.overrideWithValue(
+            mockPendingMessageQueue,
           ),
           dioProvider.overrideWithValue(dio),
         ],

@@ -4,11 +4,15 @@ import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/core/navigation/router_helper.dart';
 import 'package:skipthebrowse/features/conversation/domain/repositories/conversation_repository.dart';
+import 'package:skipthebrowse/features/conversation/domain/services/pending_message_queue.dart';
 
 class MockConversationRepository extends Mock
     implements ConversationRepository {}
 
+class MockPendingMessageQueue extends Mock implements PendingMessageQueue {}
+
 final mockConversationRepository = MockConversationRepository();
+final mockPendingMessageQueue = MockPendingMessageQueue();
 
 final dio = Dio(BaseOptions(baseUrl: 'http://example.com'));
 final dioAdapter = DioAdapter(dio: dio);

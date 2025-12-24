@@ -62,7 +62,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                         horizontal: 16,
                         vertical: 4,
                       ),
-                      child: MessageWidget(message.content),
+                      child: MessageWidget(message),
                     ),
                     if (message.type == MessageType.recommendation &&
                         message.recommendation != null)

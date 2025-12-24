@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
+import 'package:skipthebrowse/features/conversation/domain/entities/pending_message.dart';
 
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_factory.dart';
@@ -16,6 +17,28 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(conversation());
+    registerFallbackValue(
+      PendingMessage(
+        conversationId: 'test',
+        content: 'test',
+        timestamp: DateTime.now(),
+      ),
+    );
+  });
+
+  setUp(() {
+    reset(mockConversationRepository);
+    reset(mockPendingMessageQueue);
+
+    when(
+      () => mockPendingMessageQueue.enqueue(any()),
+    ).thenAnswer((_) async => {});
+    when(
+      () => mockPendingMessageQueue.remove(any()),
+    ).thenAnswer((_) async => {});
+    when(
+      () => mockPendingMessageQueue.getForConversation(any()),
+    ).thenAnswer((_) async => []);
   });
 
   testWidgets('loads conversation at startup', (tester) async {

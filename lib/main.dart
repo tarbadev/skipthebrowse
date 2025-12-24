@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/providers/route_provider.dart';
+import 'features/conversation/domain/providers/conversation_providers.dart';
 
-void main() {
-  runApp(const ProviderScope(child: SkipTheBrowse()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const SkipTheBrowse(),
+    ),
+  );
 }
 
 class SkipTheBrowse extends ConsumerWidget {

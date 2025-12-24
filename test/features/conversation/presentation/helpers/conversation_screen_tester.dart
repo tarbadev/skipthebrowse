@@ -33,7 +33,7 @@ class ConversationScreenTester extends BaseWidgetTester {
     );
 
     return textWidgets
-        .map((Widget message) => (message as MessageWidget).text)
+        .map((Widget message) => (message as MessageWidget).message.content)
         .toList();
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
 
@@ -13,6 +15,9 @@ void main() {
     testWidgets(
       'displays conversation list with 3 conversations and navigates to conversation on tap',
       (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final sharedPreferences = await SharedPreferences.getInstance();
+
         final mockDioHelper = MockDioHelper();
         final now = DateTime.now();
 
@@ -86,7 +91,10 @@ void main() {
         // Pump the app
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [dioProvider.overrideWithValue(mockDioHelper.dio)],
+            overrides: [
+              dioProvider.overrideWithValue(mockDioHelper.dio),
+              sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+            ],
             child: const SkipTheBrowse(),
           ),
         );

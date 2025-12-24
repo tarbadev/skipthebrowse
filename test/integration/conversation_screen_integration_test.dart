@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
+import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/features/conversation/presentation/screens/conversation_screen.dart';
 
@@ -13,6 +15,9 @@ import 'helpers/mock_dio_helper.dart';
 void main() {
   group('Integration Tests - Conversation Screen', () {
     testWidgets('displays conversation and adds new message', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final sharedPreferences = await SharedPreferences.getInstance();
+
       final mockDioHelper = MockDioHelper();
       final conversationId = 'test-conversation-id';
       final initialMessage = "I'm looking for a comedy movie";
@@ -64,7 +69,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [dioProvider.overrideWithValue(mockDioHelper.dio)],
+          overrides: [
+            dioProvider.overrideWithValue(mockDioHelper.dio),
+            sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          ],
           child: MaterialApp(
             home: ConversationScreen(conversation: initialConversation),
           ),
@@ -91,6 +99,9 @@ void main() {
     });
 
     testWidgets('displays recommendation on response', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final sharedPreferences = await SharedPreferences.getInstance();
+
       final mockDioHelper = MockDioHelper();
       final conversationId = 'test-conversation-id';
       final initialMessage = "I'm looking for a comedy movie";
@@ -161,7 +172,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [dioProvider.overrideWithValue(mockDioHelper.dio)],
+          overrides: [
+            dioProvider.overrideWithValue(mockDioHelper.dio),
+            sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          ],
           child: MaterialApp(
             home: ConversationScreen(conversation: initialConversation),
           ),

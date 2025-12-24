@@ -1,44 +1,16 @@
-import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:skipthebrowse/core/config/env_config.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
-import 'package:skipthebrowse/main.dart';
 
 import '../test/features/conversation/presentation/helpers/conversation_list_screen_tester.dart';
 import '../test/features/conversation/presentation/helpers/conversation_screen_tester.dart';
 import '../test/features/conversation/presentation/helpers/home_screen_tester.dart';
+import 'test_helper.dart';
 
 void main() {
   group('Conversation Navigation E2E Tests', () {
     testWidgets('can create conversation after visiting conversation list', (
       tester,
     ) async {
-      final testDio = Dio(
-        BaseOptions(
-          baseUrl: EnvConfig.apiBaseUrl,
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-        ),
-      );
-
-      testDio.interceptors.add(
-        LogInterceptor(
-          request: true,
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          responseBody: true,
-        ),
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [dioProvider.overrideWithValue(testDio)],
-          child: const SkipTheBrowse(),
-        ),
-      );
-      await tester.pumpAndSettle();
+      await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
       final conversationScreenTester = ConversationScreenTester(tester);
