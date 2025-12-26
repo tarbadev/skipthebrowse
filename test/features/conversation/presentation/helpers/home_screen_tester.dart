@@ -24,4 +24,13 @@ class HomeScreenTester extends BaseWidgetTester {
     await tester.tap(find.byTooltip('View past conversations'));
     await tester.pumpAndSettle();
   }
+
+  Future<void> tapConversationStarter(String starterText) async {
+    await tester.tap(find.text(starterText));
+    await tester.pumpAndSettle();
+  }
+
+  bool conversationStarterExists(String starterText) {
+    return tester.any(find.text(starterText));
+  }
 }

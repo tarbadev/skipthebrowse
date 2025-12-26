@@ -27,6 +27,12 @@ class HomeScreen extends ConsumerWidget {
     final conversationState = ref.watch(conversationStateProvider);
     final isLoading = conversationState.isLoading;
 
+    final conversationStarters = [
+      "I want something thrilling to watch",
+      "Looking for a comedy series to binge",
+      "Recommend me something like Inception",
+    ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -40,19 +46,48 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Looking for something to watch?',
-              key: Key('home_page_title'),
-            ),
-            AddMessageWidget(
-              onSubmit: (String message) =>
-                  _createConversation(message, ref, context),
-              isLoading: isLoading,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'Looking for something to watch?',
+                key: Key('home_page_title'),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Try one of these:',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: conversationStarters.map((starter) {
+                  return ActionChip(
+                    label: Text(starter),
+                    onPressed: isLoading
+                        ? null
+                        : () => _createConversation(starter, ref, context),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Or start your own:',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 8),
+              AddMessageWidget(
+                onSubmit: (String message) =>
+                    _createConversation(message, ref, context),
+                isLoading: isLoading,
+              ),
+            ],
+          ),
         ),
       ),
     );
