@@ -46,7 +46,7 @@ class RecommendationWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: const Color(0xFF6366F1).withOpacity(0.3),
+          color: const Color(0xFF6366F1).withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -110,7 +110,7 @@ class RecommendationWidget extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -119,7 +119,7 @@ class RecommendationWidget extends StatelessWidget {
                         'recommendation_${recommendation.id}_release_year',
                       ),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -134,7 +134,7 @@ class RecommendationWidget extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFBBF24).withOpacity(0.15),
+                      color: const Color(0xFFFBBF24).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -170,7 +170,7 @@ class RecommendationWidget extends StatelessWidget {
                 recommendation.description!,
                 key: Key('recommendation_${recommendation.id}_description'),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -184,7 +184,7 @@ class RecommendationWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 letterSpacing: 1.0,
               ),
             ),
@@ -243,12 +243,12 @@ class _PlatformButtonState extends State<_PlatformButton> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             backgroundColor: widget.isPreferred
                 ? const Color(0xFF6366F1)
-                : Colors.white.withOpacity(0.05),
-            foregroundColor: Colors.white.withOpacity(0.9),
+                : Colors.white.withValues(alpha: 0.05),
+            foregroundColor: Colors.white.withValues(alpha: 0.9),
             side: BorderSide(
               color: widget.isPreferred
                   ? Colors.transparent
-                  : Colors.white.withOpacity(0.1),
+                  : Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
             shape: RoundedRectangleBorder(
@@ -264,7 +264,7 @@ class _PlatformButtonState extends State<_PlatformButton> {
               if (states.contains(WidgetState.hovered)) {
                 return const Color(0xFF2A2A2A);
               }
-              return Colors.white.withOpacity(0.05);
+              return Colors.white.withValues(alpha: 0.05);
             }),
             side: WidgetStateProperty.resolveWith<BorderSide>((
               Set<WidgetState> states,
@@ -274,12 +274,12 @@ class _PlatformButtonState extends State<_PlatformButton> {
               }
               if (states.contains(WidgetState.hovered)) {
                 return BorderSide(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   width: 1.5,
                 );
               }
               return BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               );
             }),
@@ -292,7 +292,7 @@ class _PlatformButtonState extends State<_PlatformButton> {
           Text(
             widget.platform.name,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
@@ -302,7 +302,7 @@ class _PlatformButtonState extends State<_PlatformButton> {
             Icon(
               Icons.arrow_forward_rounded,
               size: 16,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ],
         ],

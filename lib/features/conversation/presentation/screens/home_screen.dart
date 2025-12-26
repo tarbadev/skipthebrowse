@@ -64,10 +64,10 @@ class HomeScreen extends ConsumerWidget {
           Container(
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -89,7 +89,7 @@ class HomeScreen extends ConsumerWidget {
                   center: const Alignment(-0.3, -0.5),
                   radius: 1.2,
                   colors: [
-                    const Color(0xFF242424).withOpacity(0.6),
+                    const Color(0xFF242424).withValues(alpha: 0.6),
                     const Color(0xFF181818),
                   ],
                 ),
@@ -156,7 +156,7 @@ class HomeScreen extends ConsumerWidget {
                             'Let AI be your personal curator',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               letterSpacing: 1.2,
                               fontWeight: FontWeight.w300,
                             ),
@@ -171,7 +171,7 @@ class HomeScreen extends ConsumerWidget {
                         'Try one of these:',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           letterSpacing: 1.0,
                           fontWeight: FontWeight.w500,
                         ),
@@ -188,7 +188,7 @@ class HomeScreen extends ConsumerWidget {
                                 shape: BoxShape.circle,
                                 color: const Color(
                                   0xFF6366F1,
-                                ).withOpacity(0.15),
+                                ).withValues(alpha: 0.15),
                               ),
                               child: const SizedBox(
                                 width: 40,
@@ -206,7 +206,7 @@ class HomeScreen extends ConsumerWidget {
                               'Finding the perfect match...',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -261,7 +261,9 @@ class HomeScreen extends ConsumerWidget {
                                       gradient: LinearGradient(
                                         colors: [
                                           Colors.transparent,
-                                          Colors.white.withOpacity(0.3 * value),
+                                          Colors.white.withValues(
+                                            alpha: 0.3 * value,
+                                          ),
                                           Colors.transparent,
                                         ],
                                       ),
@@ -294,7 +296,7 @@ class HomeScreen extends ConsumerWidget {
                               'Or start your own:',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.4),
+                                color: Colors.white.withValues(alpha: 0.4),
                                 letterSpacing: 1.0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -360,14 +362,14 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
                 : const Color(0xFF242424),
             border: Border.all(
               color: _isHovered
-                  ? const Color(0xFF6366F1).withOpacity(0.5)
-                  : Colors.white.withOpacity(0.1),
+                  ? const Color(0xFF6366F1).withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
             boxShadow: _isHovered
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF6366F1).withOpacity(0.2),
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: -2,
                     ),
@@ -383,7 +385,7 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF6366F1).withOpacity(0.15),
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.15),
                   ),
                   child: Center(
                     child: Text(
@@ -401,7 +403,7 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
                       fontWeight: FontWeight.w600,
                       color: _isHovered
                           ? Colors.white
-                          : Colors.white.withOpacity(0.9),
+                          : Colors.white.withValues(alpha: 0.9),
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -410,7 +412,7 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
                   Icons.arrow_forward_rounded,
                   color: _isHovered
                       ? const Color(0xFF6366F1)
-                      : Colors.white.withOpacity(0.3),
+                      : Colors.white.withValues(alpha: 0.3),
                   size: 24,
                 ),
               ],

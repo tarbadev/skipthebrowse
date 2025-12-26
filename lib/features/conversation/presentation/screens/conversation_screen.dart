@@ -45,7 +45,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       backgroundColor: const Color(0xFF181818),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF181818).withOpacity(0.95),
+        backgroundColor: const Color(0xFF181818).withValues(alpha: 0.95),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
@@ -81,7 +81,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                   center: const Alignment(0, -0.8),
                   radius: 1.5,
                   colors: [
-                    const Color(0xFF242424).withOpacity(0.6),
+                    const Color(0xFF242424).withValues(alpha: 0.6),
                     const Color(0xFF181818),
                   ],
                 ),
@@ -131,7 +131,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF181818).withOpacity(0.0),
+                      const Color(0xFF181818).withValues(alpha: 0.0),
                       const Color(0xFF181818),
                     ],
                   ),

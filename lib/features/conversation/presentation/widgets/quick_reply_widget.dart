@@ -51,8 +51,11 @@ class _QuickReplyChipState extends State<_QuickReplyChip> {
           OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             backgroundColor: const Color(0xFF242424),
-            foregroundColor: Colors.white.withOpacity(0.85),
-            side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1.5),
+            foregroundColor: Colors.white.withValues(alpha: 0.85),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1.5,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -71,7 +74,7 @@ class _QuickReplyChipState extends State<_QuickReplyChip> {
               if (states.contains(WidgetState.hovered)) {
                 return Colors.white;
               }
-              return Colors.white.withOpacity(0.85);
+              return Colors.white.withValues(alpha: 0.85);
             }),
             side: WidgetStateProperty.resolveWith<BorderSide>((
               Set<WidgetState> states,
@@ -80,7 +83,7 @@ class _QuickReplyChipState extends State<_QuickReplyChip> {
                 return const BorderSide(color: Color(0xFF6366F1), width: 1.5);
               }
               return BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               );
             }),

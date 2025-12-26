@@ -27,7 +27,9 @@ class MessageWidget extends StatelessWidget {
             bottomRight: Radius.circular(isUser ? 4 : 16),
           ),
           border: Border.all(
-            color: isUser ? Colors.transparent : Colors.white.withOpacity(0.1),
+            color: isUser
+                ? Colors.transparent
+                : Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -40,7 +42,7 @@ class MessageWidget extends StatelessWidget {
                 style: TextStyle(
                   color: message.status == MessageStatus.failed
                       ? const Color(0xFFEF4444)
-                      : Colors.white.withOpacity(isUser ? 1.0 : 0.9),
+                      : Colors.white.withValues(alpha: isUser ? 1.0 : 0.9),
                   fontSize: 15,
                   fontWeight: isUser ? FontWeight.w600 : FontWeight.w400,
                   height: 1.4,
@@ -56,7 +58,7 @@ class MessageWidget extends StatelessWidget {
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     isUser
-                        ? Colors.white.withOpacity(0.8)
+                        ? Colors.white.withValues(alpha: 0.8)
                         : const Color(0xFF6366F1),
                   ),
                 ),

@@ -75,7 +75,10 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: const Color(0xFF242424),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1.5,
+          ),
         ),
         child: Row(
           children: [
@@ -91,7 +94,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
                 decoration: InputDecoration(
                   hintText: 'Describe what you\'re looking for...',
                   hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
@@ -111,7 +114,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
               decoration: BoxDecoration(
                 color: _message.isNotEmpty
                     ? const Color(0xFF6366F1)
-                    : Colors.white.withOpacity(0.05),
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
@@ -120,7 +123,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
                   Icons.arrow_forward_rounded,
                   color: _message.isNotEmpty
                       ? Colors.white
-                      : Colors.white.withOpacity(0.2),
+                      : Colors.white.withValues(alpha: 0.2),
                 ),
                 onPressed: _message.isNotEmpty ? _addMessage : null,
               ),
@@ -135,7 +138,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
             _validationError!,
             key: const Key('add_message_validation_error'),
             style: TextStyle(
-              color: const Color(0xFFEF4444).withOpacity(0.9),
+              color: const Color(0xFFEF4444).withValues(alpha: 0.9),
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),

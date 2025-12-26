@@ -32,7 +32,7 @@ class _ConversationListScreenState
       backgroundColor: const Color(0xFF181818),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF181818).withOpacity(0.95),
+        backgroundColor: const Color(0xFF181818).withValues(alpha: 0.95),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
@@ -60,10 +60,10 @@ class _ConversationListScreenState
           Container(
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -85,7 +85,7 @@ class _ConversationListScreenState
                   center: const Alignment(0, -0.5),
                   radius: 1.2,
                   colors: [
-                    const Color(0xFF242424).withOpacity(0.6),
+                    const Color(0xFF242424).withValues(alpha: 0.6),
                     const Color(0xFF181818),
                   ],
                 ),
@@ -113,7 +113,7 @@ class _ConversationListScreenState
                     Text(
                       'Loading conversations...',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 16,
                       ),
                     ),
@@ -128,7 +128,7 @@ class _ConversationListScreenState
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: const Color(0xFFEF4444).withOpacity(0.2),
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.2),
                       ),
                       child: const Icon(
                         Icons.error_outline_rounded,
@@ -152,7 +152,7 @@ class _ConversationListScreenState
                         error.toString(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           fontSize: 14,
                         ),
                       ),
@@ -194,12 +194,12 @@ class _ConversationListScreenState
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.05),
+                            color: Colors.white.withValues(alpha: 0.05),
                           ),
                           child: Icon(
                             Icons.chat_bubble_outline_rounded,
                             size: 64,
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -216,7 +216,7 @@ class _ConversationListScreenState
                           'Start a conversation to discover\nyour perfect watch',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 15,
                             height: 1.5,
                           ),
@@ -273,7 +273,10 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
       decoration: BoxDecoration(
         color: const Color(0xFF242424),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
+        ),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
@@ -299,7 +302,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
         },
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: const Color(0xFF6366F1).withOpacity(0.2),
+          backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.2),
           child: Text(
             widget.summary.messageCount.toString(),
             style: const TextStyle(
@@ -314,7 +317,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontSize: 15,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -325,7 +328,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
           child: Text(
             _formatTimestamp(widget.summary.updatedAt),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -333,7 +336,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
         ),
         trailing: Icon(
           Icons.arrow_forward_rounded,
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           size: 24,
         ),
       ),
