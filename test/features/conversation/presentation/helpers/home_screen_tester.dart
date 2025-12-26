@@ -26,6 +26,8 @@ class HomeScreenTester extends BaseWidgetTester {
   }
 
   Future<void> tapConversationStarter(String starterText) async {
+    await tester.ensureVisible(find.text(starterText));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(starterText));
     await tester.pumpAndSettle();
   }

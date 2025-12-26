@@ -16,7 +16,10 @@ class BaseWidgetTester {
   }
 
   Future<void> tapOnWidgetByKey(String key) async {
-    await tester.tap(find.byKey(Key(key)));
+    final finder = find.byKey(Key(key));
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder, warnIfMissed: false);
 
     await tester.pump();
   }

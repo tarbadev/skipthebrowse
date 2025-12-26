@@ -38,77 +38,157 @@ class RecommendationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
       key: Key('recommendation_${recommendation.id}_card'),
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: const Color(0xFF242424),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: const Color(0xFF6366F1).withOpacity(0.3),
+          width: 2,
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${(recommendation.confidence * 100).toStringAsFixed(0)}% match',
+                    key: Key('recommendation_${recommendation.id}_confidence'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Title
             Text(
               recommendation.title,
               key: Key('recommendation_${recommendation.id}_title'),
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                height: 1.2,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
             // Release year and rating row
             Row(
               children: [
                 if (recommendation.releaseYear != null) ...[
-                  Text(
-                    '${recommendation.releaseYear}',
-                    key: Key(
-                      'recommendation_${recommendation.id}_release_year',
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
                     ),
-                    style: theme.textTheme.bodyMedium,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${recommendation.releaseYear}',
+                      key: Key(
+                        'recommendation_${recommendation.id}_release_year',
+                      ),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                 ],
                 if (recommendation.rating != null)
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 20),
-                      const SizedBox(width: 4),
-                      Text(
-                        recommendation.rating!.toStringAsFixed(1),
-                        key: Key('recommendation_${recommendation.id}_rating'),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFBBF24).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Color(0xFFFBBF24),
+                          size: 16,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          recommendation.rating!.toStringAsFixed(1),
+                          key: Key(
+                            'recommendation_${recommendation.id}_rating',
+                          ),
+                          style: const TextStyle(
+                            color: Color(0xFFFBBF24),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             // Description
             if (recommendation.description != null &&
-                recommendation.description!.isNotEmpty)
+                recommendation.description!.isNotEmpty) ...[
               Text(
                 recommendation.description!,
                 key: Key('recommendation_${recommendation.id}_description'),
-                style: theme.textTheme.bodyMedium,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 15,
+                  height: 1.5,
+                ),
               ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
+            ],
 
             // Platforms section
             Text(
-              'Watch on:',
-              style: theme.textTheme.labelLarge?.copyWith(
+              'Available on',
+              style: TextStyle(
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
+                color: Colors.white.withOpacity(0.5),
+                letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -117,48 +197,115 @@ class RecommendationWidget extends StatelessWidget {
                 final platform = entry.value;
                 final isPreferred = platform.isPreferred;
 
-                return ElevatedButton.icon(
-                  key: Key(
-                    'recommendation_${recommendation.id}_platform_$index',
-                  ),
-                  icon: _buildProviderLogo(platform.slug),
-                  label: Text(platform.name),
-                  style: isPreferred
-                      ? ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                        )
-                      : ElevatedButton.styleFrom(
-                          backgroundColor:
-                              theme.colorScheme.surfaceContainerHighest,
-                          foregroundColor: theme.colorScheme.onSurface,
-                        ),
+                return _PlatformButton(
+                  platformId: '${recommendation.id}_platform_$index',
+                  platform: platform,
+                  isPreferred: isPreferred,
+                  providerLogo: _buildProviderLogo(platform.slug),
                   onPressed: () => _launchUrl(context, platform.url),
                 );
               }).toList(),
             ),
-
-            // Confidence indicator (subtle)
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: LinearProgressIndicator(
-                    value: recommendation.confidence,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${(recommendation.confidence * 100).toStringAsFixed(0)}% match',
-                  key: Key('recommendation_${recommendation.id}_confidence'),
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
-            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PlatformButton extends StatefulWidget {
+  final String platformId;
+  final Platform platform;
+  final bool isPreferred;
+  final Widget providerLogo;
+  final VoidCallback onPressed;
+
+  const _PlatformButton({
+    required this.platformId,
+    required this.platform,
+    required this.isPreferred,
+    required this.providerLogo,
+    required this.onPressed,
+  });
+
+  @override
+  State<_PlatformButton> createState() => _PlatformButtonState();
+}
+
+class _PlatformButtonState extends State<_PlatformButton> {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      key: Key('recommendation_${widget.platformId}'),
+      onPressed: widget.onPressed,
+      style:
+          ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            backgroundColor: widget.isPreferred
+                ? const Color(0xFF6366F1)
+                : Colors.white.withOpacity(0.05),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            side: BorderSide(
+              color: widget.isPreferred
+                  ? Colors.transparent
+                  : Colors.white.withOpacity(0.1),
+              width: 1.5,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ).copyWith(
+            backgroundColor: WidgetStateProperty.resolveWith<Color>((
+              Set<WidgetState> states,
+            ) {
+              if (widget.isPreferred) {
+                return const Color(0xFF6366F1);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xFF2A2A2A);
+              }
+              return Colors.white.withOpacity(0.05);
+            }),
+            side: WidgetStateProperty.resolveWith<BorderSide>((
+              Set<WidgetState> states,
+            ) {
+              if (widget.isPreferred) {
+                return const BorderSide(color: Colors.transparent, width: 1.5);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return BorderSide(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1.5,
+                );
+              }
+              return BorderSide(
+                color: Colors.white.withOpacity(0.1),
+                width: 1.5,
+              );
+            }),
+          ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          widget.providerLogo,
+          const SizedBox(width: 8),
+          Text(
+            widget.platform.name,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (widget.isPreferred) ...[
+            const SizedBox(width: 6),
+            Icon(
+              Icons.arrow_forward_rounded,
+              size: 16,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -36,8 +36,13 @@ class ConversationListScreenTester extends BaseWidgetTester {
   String getConversationTimestamp(int index) {
     final listItems = find.byType(ListTile);
     final listTile = tester.widget<ListTile>(listItems.at(index));
-    final subtitle = listTile.subtitle as Text;
-    return subtitle.data!;
+    final subtitle = listTile.subtitle;
+    if (subtitle is Padding) {
+      final text = subtitle.child as Text;
+      return text.data!;
+    }
+    final text = subtitle as Text;
+    return text.data!;
   }
 
   Future<void> tapConversation(int index) async {

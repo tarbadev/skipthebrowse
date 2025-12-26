@@ -31,7 +31,7 @@ void main() {
       expect(firstConversation[1].length, greaterThanOrEqualTo(50));
 
       // Step 4: Go back to home screen
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Back'));
       await tester.pumpAndSettle();
       expect(homeScreenTester.isVisible, true);
 
@@ -48,12 +48,12 @@ void main() {
       expect(conversationScreenTester.isVisible, true);
 
       // Back to list
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Back'));
       await tester.pumpAndSettle();
       expect(conversationListTester.isVisible, true);
 
       // Step 6: Go back to home screen
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Back'));
       await tester.pumpAndSettle();
       expect(homeScreenTester.isVisible, true);
 

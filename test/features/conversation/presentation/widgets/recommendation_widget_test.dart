@@ -54,7 +54,7 @@ void main() {
 
     // Verify rating
     expect(find.text('8.7'), findsOneWidget);
-    expect(find.byIcon(Icons.star), findsOneWidget);
+    expect(find.byIcon(Icons.star_rounded), findsOneWidget);
     expect(
       find.byKey(const Key('recommendation_rec-123_rating')),
       findsOneWidget,
@@ -74,14 +74,12 @@ void main() {
 
     // Verify confidence indicator
     expect(find.text('92% match'), findsOneWidget);
-    expect(find.byType(LinearProgressIndicator), findsOneWidget);
     expect(
       find.byKey(const Key('recommendation_rec-123_confidence')),
       findsOneWidget,
     );
 
-    // Verify "Watch on:" label
-    expect(find.text('Watch on:'), findsOneWidget);
+    expect(find.text('Available on'), findsOneWidget);
   });
 
   testWidgets('renders platform buttons correctly', (tester) async {

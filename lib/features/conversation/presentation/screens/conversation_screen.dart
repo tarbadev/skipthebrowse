@@ -42,62 +42,108 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     final isLoading = conversationState.isLoading;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF181818),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
-          'Conversation ID: ${widget.conversation.id}',
-          key: const Key('conversation_screen_title'),
+        backgroundColor: const Color(0xFF181818).withOpacity(0.95),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
+          tooltip: 'Back',
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6366F1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text(
+            'Conversation',
+            key: Key('conversation_screen_title'),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+              color: Colors.white,
+            ),
+          ),
         ),
         centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: ListView(
-              children: currentConversation.messages.map((message) {
-                return Column(
-                  key: Key('message_column_${message.id}'),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
-                      ),
-                      child: MessageWidget(message),
-                    ),
-                    if (message.type == MessageType.recommendation &&
-                        message.recommendation != null)
-                      RecommendationWidget(
-                        recommendation: message.recommendation!,
-                      ),
-                    if (message.author == 'assistant' &&
-                        message.quickReplies != null &&
-                        message.quickReplies!.isNotEmpty)
-                      QuickReplyWidget(
-                        replies: message.quickReplies!,
-                        onReplyTap: (reply) => _addMessage(reply),
-                      ),
+          // Atmospheric background
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.8),
+                  radius: 1.5,
+                  colors: [
+                    const Color(0xFF242424).withOpacity(0.6),
+                    const Color(0xFF181818),
                   ],
-                );
-              }).toList(),
+                ),
+              ),
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, -2),
+          // Main content
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(top: 100, bottom: 20),
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: currentConversation.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = currentConversation.messages[index];
+                    return Column(
+                      key: Key('message_column_${message.id}'),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: MessageWidget(message),
+                        ),
+                        if (message.type == MessageType.recommendation &&
+                            message.recommendation != null)
+                          RecommendationWidget(
+                            recommendation: message.recommendation!,
+                          ),
+                        if (message.author == 'assistant' &&
+                            message.quickReplies != null &&
+                            message.quickReplies!.isNotEmpty)
+                          QuickReplyWidget(
+                            replies: message.quickReplies!,
+                            onReplyTap: (reply) => _addMessage(reply),
+                          ),
+                      ],
+                    );
+                  },
                 ),
-              ],
-            ),
-            padding: const EdgeInsets.all(8),
-            child: AddMessageWidget(
-              onSubmit: _addMessage,
-              isLoading: isLoading,
-              minLength: 2,
-            ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFF181818).withOpacity(0.0),
+                      const Color(0xFF181818),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                child: AddMessageWidget(
+                  onSubmit: _addMessage,
+                  isLoading: isLoading,
+                  minLength: 2,
+                ),
+              ),
+            ],
           ),
         ],
       ),

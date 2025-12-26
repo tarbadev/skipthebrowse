@@ -50,10 +50,7 @@ void main() {
 
     final conversationPageTester = ConversationScreenTester(tester);
     expect(conversationPageTester.isVisible, isTrue);
-    expect(
-      conversationPageTester.title,
-      equals('Conversation ID: $conversationId'),
-    );
+    expect(conversationPageTester.title, equals('Conversation'));
     expect(
       conversationPageTester.getConversation(),
       equals(messages.map((m) => m.content).toList()),

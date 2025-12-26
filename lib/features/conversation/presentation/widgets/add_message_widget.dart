@@ -58,57 +58,87 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
     await widget.onSubmit(_message);
 
     // Clear the text field after successful submission
-    _controller.clear();
-    setState(() {
-      _message = '';
-      _validationError = null;
-    });
+    if (mounted) {
+      _controller.clear();
+      setState(() {
+        _message = '';
+        _validationError = null;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              key: Key('add_message_text_box'),
-              controller: _controller,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                labelText:
-                    'Enter a brief description of what you would like to watch',
-                filled: true,
+      Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: const Color(0xFF242424),
+          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                key: const Key('add_message_text_box'),
+                controller: _controller,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Describe what you\'re looking for...',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
+                  ),
+                ),
+                onChanged: _updateMessage,
+                enabled: !widget.isLoading,
+                onSubmitted: (_) => _message.isNotEmpty ? _addMessage() : null,
               ),
-              onChanged: _updateMessage,
-              enabled: !widget.isLoading,
             ),
-          ),
-          if (widget.isLoading)
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: _message.isNotEmpty
+                    ? const Color(0xFF6366F1)
+                    : Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
               ),
-            )
-          else
-            IconButton(
-              key: Key('add_message_button'),
-              icon: Icon(Icons.send),
-              onPressed: _message.isNotEmpty ? _addMessage : null,
+              child: IconButton(
+                key: const Key('add_message_button'),
+                icon: Icon(
+                  Icons.arrow_forward_rounded,
+                  color: _message.isNotEmpty
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.2),
+                ),
+                onPressed: _message.isNotEmpty ? _addMessage : null,
+              ),
             ),
-        ],
+          ],
+        ),
       ),
       if (_validationError != null)
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(top: 12, left: 4),
           child: Text(
             _validationError!,
-            key: Key('add_message_validation_error'),
-            style: TextStyle(color: Colors.red, fontSize: 12),
+            key: const Key('add_message_validation_error'),
+            style: TextStyle(
+              color: const Color(0xFFEF4444).withOpacity(0.9),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
     ],
