@@ -51,7 +51,10 @@ class ConversationNotifier extends StateNotifier<AsyncValue<Conversation?>> {
       createdAt: currentConversation.createdAt,
     );
 
-    state = AsyncValue.data(updatedConversation);
+    // Set loading state while keeping the conversation with pending message
+    state = const AsyncLoading<Conversation?>().copyWithPrevious(
+      AsyncValue.data(updatedConversation),
+    );
 
     try {
       final conversation = await repository.addMessage(id, messageContent);

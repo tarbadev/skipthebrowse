@@ -74,9 +74,13 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
       Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: const Color(0xFF242424),
+          color: widget.isLoading
+              ? const Color(0xFF1A1A1A)
+              : const Color(0xFF242424),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: widget.isLoading
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.white.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),
@@ -86,13 +90,17 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
               child: TextField(
                 key: const Key('add_message_text_box'),
                 controller: _controller,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: widget.isLoading
+                      ? Colors.white.withValues(alpha: 0.4)
+                      : Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Describe what you\'re looking for...',
+                  hintText: widget.isLoading
+                      ? 'Sending message...'
+                      : 'Describe what you\'re looking for...',
                   hintStyle: TextStyle(
                     color: Colors.white.withValues(alpha: 0.3),
                     fontSize: 16,
@@ -112,20 +120,33 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
             Container(
               margin: const EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
-                color: _message.isNotEmpty
+                color: _message.isNotEmpty && !widget.isLoading
                     ? const Color(0xFF6366F1)
                     : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 key: const Key('add_message_button'),
-                icon: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: _message.isNotEmpty
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.2),
-                ),
-                onPressed: _message.isNotEmpty ? _addMessage : null,
+                icon: widget.isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      )
+                    : Icon(
+                        Icons.arrow_forward_rounded,
+                        color: _message.isNotEmpty
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.2),
+                      ),
+                onPressed: _message.isNotEmpty && !widget.isLoading
+                    ? _addMessage
+                    : null,
               ),
             ),
           ],
