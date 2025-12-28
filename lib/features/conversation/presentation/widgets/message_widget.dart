@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
 
 class MessageWidget extends StatelessWidget {
@@ -9,22 +10,38 @@ class MessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.author == 'user';
+    final responsive = context.responsive;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.8,
+          maxWidth:
+              responsive.width *
+              responsive.responsive(mobile: 0.8, tablet: 0.7, desktop: 0.6),
         ),
-        margin: const EdgeInsets.only(bottom: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: EdgeInsets.only(
+          bottom: responsive.responsive(mobile: 4.0, tablet: 6.0, desktop: 8.0),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.responsive(
+            mobile: 16.0,
+            tablet: 18.0,
+            desktop: 20.0,
+          ),
+          vertical: responsive.responsive(
+            mobile: 12.0,
+            tablet: 14.0,
+            desktop: 16.0,
+          ),
+        ),
         decoration: BoxDecoration(
           color: isUser ? const Color(0xFF6366F1) : const Color(0xFF242424),
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
+            topLeft: Radius.circular(responsive.borderRadius),
+            topRight: Radius.circular(responsive.borderRadius),
+            bottomLeft: Radius.circular(isUser ? responsive.borderRadius : 4),
+            bottomRight: Radius.circular(isUser ? 4 : responsive.borderRadius),
           ),
           border: Border.all(
             color: isUser
@@ -43,17 +60,31 @@ class MessageWidget extends StatelessWidget {
                   color: message.status == MessageStatus.failed
                       ? const Color(0xFFEF4444)
                       : Colors.white.withValues(alpha: isUser ? 1.0 : 0.9),
-                  fontSize: 15,
+                  fontSize: responsive.fontSize(15),
                   fontWeight: isUser ? FontWeight.w600 : FontWeight.w400,
                   height: 1.4,
                 ),
               ),
             ),
             if (message.status == MessageStatus.pending) ...[
-              const SizedBox(width: 8),
               SizedBox(
-                width: 14,
-                height: 14,
+                width: responsive.responsive(
+                  mobile: 8.0,
+                  tablet: 10.0,
+                  desktop: 12.0,
+                ),
+              ),
+              SizedBox(
+                width: responsive.responsive(
+                  mobile: 14.0,
+                  tablet: 16.0,
+                  desktop: 18.0,
+                ),
+                height: responsive.responsive(
+                  mobile: 14.0,
+                  tablet: 16.0,
+                  desktop: 18.0,
+                ),
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -65,11 +96,21 @@ class MessageWidget extends StatelessWidget {
               ),
             ],
             if (message.status == MessageStatus.failed) ...[
-              const SizedBox(width: 8),
-              const Icon(
+              SizedBox(
+                width: responsive.responsive(
+                  mobile: 8.0,
+                  tablet: 10.0,
+                  desktop: 12.0,
+                ),
+              ),
+              Icon(
                 Icons.error_outline_rounded,
-                size: 16,
-                color: Color(0xFFEF4444),
+                size: responsive.responsive(
+                  mobile: 16.0,
+                  tablet: 18.0,
+                  desktop: 20.0,
+                ),
+                color: const Color(0xFFEF4444),
               ),
             ],
           ],

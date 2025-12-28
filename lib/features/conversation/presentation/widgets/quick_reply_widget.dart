@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 
 typedef OnReplyTapCallback = void Function(String);
 
@@ -18,11 +19,32 @@ class QuickReplyWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final responsive = context.responsive;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.responsive(
+          mobile: 16.0,
+          tablet: 20.0,
+          desktop: 24.0,
+        ),
+        vertical: responsive.responsive(
+          mobile: 12.0,
+          tablet: 14.0,
+          desktop: 16.0,
+        ),
+      ),
       child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+        spacing: responsive.responsive(
+          mobile: 8.0,
+          tablet: 10.0,
+          desktop: 12.0,
+        ),
+        runSpacing: responsive.responsive(
+          mobile: 8.0,
+          tablet: 10.0,
+          desktop: 12.0,
+        ),
         children: replies.map((reply) {
           return _QuickReplyChip(reply: reply, onTap: () => onReplyTap(reply));
         }).toList(),
@@ -44,12 +66,26 @@ class _QuickReplyChip extends StatefulWidget {
 class _QuickReplyChipState extends State<_QuickReplyChip> {
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+    final fontSize = responsive.fontSize(14);
+
     return OutlinedButton(
       key: Key('quick_reply_${widget.reply}'),
       onPressed: widget.onTap,
       style:
           OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.responsive(
+                mobile: 16.0,
+                tablet: 18.0,
+                desktop: 20.0,
+              ),
+              vertical: responsive.responsive(
+                mobile: 10.0,
+                tablet: 11.0,
+                desktop: 12.0,
+              ),
+            ),
             backgroundColor: const Color(0xFF242424),
             foregroundColor: Colors.white.withValues(alpha: 0.85),
             side: BorderSide(
@@ -91,14 +127,14 @@ class _QuickReplyChipState extends State<_QuickReplyChip> {
               Set<WidgetState> states,
             ) {
               if (states.contains(WidgetState.hovered)) {
-                return const TextStyle(
-                  fontSize: 14,
+                return TextStyle(
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.2,
                 );
               }
-              return const TextStyle(
-                fontSize: 14,
+              return TextStyle(
+                fontSize: fontSize,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.2,
               );

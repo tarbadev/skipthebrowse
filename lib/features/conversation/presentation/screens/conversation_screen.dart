@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/recommendation_widget.dart';
@@ -64,6 +65,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     final conversationState = ref.watch(conversationStateProvider);
     final currentConversation = conversationState.value ?? widget.conversation;
     final isLoading = conversationState.isLoading;
+    final responsive = context.responsive;
 
     // Listen for new messages and auto-scroll
     ref.listen<AsyncValue<Conversation?>>(conversationStateProvider, (
@@ -89,16 +91,23 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(
+            horizontal: responsive.responsive(
+              mobile: 10.0,
+              tablet: 12.0,
+              desktop: 12.0,
+            ),
+            vertical: 6,
+          ),
           decoration: BoxDecoration(
             color: const Color(0xFF6366F1),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Text(
+          child: Text(
             'Conversation',
-            key: Key('conversation_screen_title'),
+            key: const Key('conversation_screen_title'),
             style: TextStyle(
-              fontSize: 14,
+              fontSize: responsive.fontSize(14),
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
               color: Colors.white,
@@ -125,62 +134,92 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             ),
           ),
           // Main content
-          Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.only(top: 100, bottom: 20),
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: currentConversation.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = currentConversation.messages[index];
-                    return Column(
-                      key: Key('message_column_${message.id}'),
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+          responsive.centerMaxWidth(
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.only(
+                      top: responsive.responsive(
+                        mobile: 100.0,
+                        tablet: 110.0,
+                        desktop: 120.0,
+                      ),
+                      bottom: 20,
+                    ),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: currentConversation.messages.length,
+                    itemBuilder: (context, index) {
+                      final message = currentConversation.messages[index];
+                      return Column(
+                        key: Key('message_column_${message.id}'),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: responsive.responsive(
+                                mobile: 16.0,
+                                tablet: 20.0,
+                                desktop: 24.0,
+                              ),
+                              vertical: responsive.responsive(
+                                mobile: 8.0,
+                                tablet: 10.0,
+                                desktop: 12.0,
+                              ),
+                            ),
+                            child: MessageWidget(message),
                           ),
-                          child: MessageWidget(message),
-                        ),
-                        if (message.type == MessageType.recommendation &&
-                            message.recommendation != null)
-                          RecommendationWidget(
-                            recommendation: message.recommendation!,
-                          ),
-                        if (message.author == 'assistant' &&
-                            message.quickReplies != null &&
-                            message.quickReplies!.isNotEmpty)
-                          QuickReplyWidget(
-                            replies: message.quickReplies!,
-                            onReplyTap: (reply) => _addMessage(reply),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF181818).withValues(alpha: 0.0),
-                      const Color(0xFF181818),
-                    ],
+                          if (message.type == MessageType.recommendation &&
+                              message.recommendation != null)
+                            RecommendationWidget(
+                              recommendation: message.recommendation!,
+                            ),
+                          if (message.author == 'assistant' &&
+                              message.quickReplies != null &&
+                              message.quickReplies!.isNotEmpty)
+                            QuickReplyWidget(
+                              replies: message.quickReplies!,
+                              onReplyTap: (reply) => _addMessage(reply),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                child: AddMessageWidget(
-                  onSubmit: _addMessage,
-                  isLoading: isLoading,
-                  minLength: 2,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF181818).withValues(alpha: 0.0),
+                        const Color(0xFF181818),
+                      ],
+                    ),
+                  ),
+                  padding: EdgeInsets.fromLTRB(
+                    responsive.responsive(
+                      mobile: 16.0,
+                      tablet: 20.0,
+                      desktop: 24.0,
+                    ),
+                    16,
+                    responsive.responsive(
+                      mobile: 16.0,
+                      tablet: 20.0,
+                      desktop: 24.0,
+                    ),
+                    24,
+                  ),
+                  child: AddMessageWidget(
+                    onSubmit: _addMessage,
+                    isLoading: isLoading,
+                    minLength: 2,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
