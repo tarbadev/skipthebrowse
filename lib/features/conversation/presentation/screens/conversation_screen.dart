@@ -21,13 +21,37 @@ class ConversationScreen extends ConsumerStatefulWidget {
 }
 
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
+  final ScrollController _scrollController = ScrollController();
+  int _previousMessageCount = 0;
+
   @override
   void initState() {
     super.initState();
+    _previousMessageCount = widget.conversation.messages.length;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(conversationStateProvider.notifier)
           .setConversation(widget.conversation);
+      _scrollToBottom();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -40,6 +64,18 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     final conversationState = ref.watch(conversationStateProvider);
     final currentConversation = conversationState.value ?? widget.conversation;
     final isLoading = conversationState.isLoading;
+
+    // Listen for new messages and auto-scroll
+    ref.listen<AsyncValue<Conversation?>>(conversationStateProvider, (
+      previous,
+      next,
+    ) {
+      final nextCount = next.value?.messages.length ?? 0;
+      if (nextCount > _previousMessageCount) {
+        _previousMessageCount = nextCount;
+        _scrollToBottom();
+      }
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFF181818),
@@ -93,6 +129,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.only(top: 100, bottom: 20),
                   physics: const BouncingScrollPhysics(),
                   itemCount: currentConversation.messages.length,

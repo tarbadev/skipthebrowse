@@ -27,18 +27,21 @@ class ConversationScreenTester extends BaseWidgetTester {
   }
 
   List<String> getConversation() {
-    final Finder messageFinders = find.byType(MessageWidget);
-    final Iterable<Widget> textWidgets = messageFinders.evaluate().map(
-      (element) => element.widget,
+    final Finder messageFinders = find.byType(
+      MessageWidget,
+      skipOffstage: false,
     );
-
-    return textWidgets
-        .map((Widget message) => (message as MessageWidget).message.content)
+    return tester
+        .widgetList<MessageWidget>(messageFinders)
+        .map((widget) => widget.message.content)
         .toList();
   }
 
   List<Map<String, dynamic>> getRecommendations() {
-    final Finder recommendationFinders = find.byType(RecommendationWidget);
+    final Finder recommendationFinders = find.byType(
+      RecommendationWidget,
+      skipOffstage: false,
+    );
     final List<Map<String, dynamic>> recommendations = [];
 
     for (final element in recommendationFinders.evaluate()) {

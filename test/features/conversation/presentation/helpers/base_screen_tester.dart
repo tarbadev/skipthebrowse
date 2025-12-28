@@ -29,7 +29,7 @@ class BaseWidgetTester {
   }
 
   String getTextByKey(String key) {
-    var textFinder = find.byKey(Key(key));
+    var textFinder = find.byKey(Key(key), skipOffstage: false);
     expect(textFinder, findsOneWidget);
 
     Text text = tester.widget(textFinder);
