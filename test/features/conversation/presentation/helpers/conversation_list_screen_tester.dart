@@ -25,6 +25,24 @@ class ConversationListScreenTester extends BaseWidgetTester {
     return title.data!;
   }
 
+  String? getMatchedContent(int index) {
+    final listItems = find.byType(ListTile);
+    final listTile = tester.widget<ListTile>(listItems.at(index));
+    final subtitle = listTile.subtitle;
+
+    if (subtitle is Padding) {
+      final child = subtitle.child;
+      if (child is Column) {
+        // Search mode: Column with matched content and timestamp
+        final firstChild = child.children.first;
+        if (firstChild is Text) {
+          return firstChild.data;
+        }
+      }
+    }
+    return null;
+  }
+
   String getConversationMessageCount(int index) {
     final listItems = find.byType(ListTile);
     final listTile = tester.widget<ListTile>(listItems.at(index));
@@ -53,4 +71,30 @@ class ConversationListScreenTester extends BaseWidgetTester {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pumpAndSettle(const Duration(seconds: 10));
   }
+
+  bool get hasSearchBar => find.byType(TextField).evaluate().isNotEmpty;
+
+  Future<void> enterSearchQuery(String query) async {
+    final searchField = find.byType(TextField);
+    expect(searchField, findsOneWidget);
+    await tester.enterText(searchField, query);
+    await tester.pump();
+    // Wait for search to complete
+    await tester.pumpAndSettle(const Duration(seconds: 10));
+  }
+
+  Future<void> clearSearch() async {
+    final clearButton = find.byIcon(Icons.clear_rounded);
+    if (clearButton.evaluate().isNotEmpty) {
+      await tester.tap(clearButton);
+      await tester.pump();
+      await tester.pumpAndSettle(const Duration(seconds: 10));
+    }
+  }
+
+  bool get hasNoResultsMessage =>
+      find.text('No results found').evaluate().isNotEmpty;
+
+  bool get hasEmptyStateMessage =>
+      find.text('No conversations yet').evaluate().isNotEmpty;
 }

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/state/conversation_list_notifier.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -16,10 +15,7 @@ void main() {
 
   group('ConversationListNotifier', () {
     test('initial state is AsyncValue.loading()', () {
-      expect(
-        subject.state,
-        const AsyncValue<List<ConversationSummary>>.loading(),
-      );
+      expect(subject.state, const AsyncValue<ConversationListState>.loading());
     });
 
     test('sets state to loading then data on successful load', () async {
@@ -34,7 +30,7 @@ void main() {
         ),
       ).thenAnswer((_) async => expectedSummaries);
 
-      final states = <AsyncValue<List<ConversationSummary>>>[];
+      final states = <AsyncValue<ConversationListState>>[];
       subject.addListener((state) {
         states.add(state);
       });
@@ -43,8 +39,8 @@ void main() {
 
       expect(states.length, 2);
       expect(states[0].isLoading, isTrue);
-      expect(states[1].asData?.value, expectedSummaries);
-      expect(subject.state.asData?.value, expectedSummaries);
+      expect(states[1].asData?.value.conversations, expectedSummaries);
+      expect(subject.state.asData?.value.conversations, expectedSummaries);
     });
 
     test('sets state to loading then error on failed load', () async {
@@ -56,7 +52,7 @@ void main() {
         ),
       ).thenThrow(exception);
 
-      final states = <AsyncValue<List<ConversationSummary>>>[];
+      final states = <AsyncValue<ConversationListState>>[];
       subject.addListener((state) {
         states.add(state);
       });
@@ -82,7 +78,7 @@ void main() {
         () =>
             mockConversationRepository.listConversations(limit: 10, offset: 20),
       ).called(1);
-      expect(subject.state.asData?.value, expectedSummaries);
+      expect(subject.state.asData?.value.conversations, expectedSummaries);
     });
 
     test('clear resets state to loading', () async {
@@ -99,10 +95,7 @@ void main() {
 
       subject.clear();
 
-      expect(
-        subject.state,
-        const AsyncValue<List<ConversationSummary>>.loading(),
-      );
+      expect(subject.state, const AsyncValue<ConversationListState>.loading());
     });
   });
 }

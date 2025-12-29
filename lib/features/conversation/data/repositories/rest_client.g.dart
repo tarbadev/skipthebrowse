@@ -83,6 +83,41 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<ConversationSearchResponse> searchConversations(
+    String query,
+    int limit,
+    int offset,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'q': query,
+      r'limit': limit,
+      r'offset': offset,
+    };
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ConversationSearchResponse>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/conversations/search',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ConversationSearchResponse _value;
+    try {
+      _value = ConversationSearchResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<ConversationResponse> getConversation(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

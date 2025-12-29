@@ -39,7 +39,7 @@ final conversationStateProvider =
 final conversationListStateProvider =
     StateNotifierProvider.autoDispose<
       ConversationListNotifier,
-      AsyncValue<List<ConversationSummary>>
+      AsyncValue<ConversationListState>
     >((ref) {
       return ConversationListNotifier(
         ref.watch(conversationRepositoryProvider),

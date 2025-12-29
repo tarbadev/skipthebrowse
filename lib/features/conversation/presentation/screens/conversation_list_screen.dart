@@ -16,12 +16,111 @@ class ConversationListScreen extends ConsumerStatefulWidget {
 
 class _ConversationListScreenState
     extends ConsumerState<ConversationListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(
       () =>
           ref.read(conversationListStateProvider.notifier).loadConversations(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (query.isEmpty) {
+      ref.read(conversationListStateProvider.notifier).loadConversations();
+    } else {
+      ref
+          .read(conversationListStateProvider.notifier)
+          .searchConversations(query);
+    }
+  }
+
+  Widget _buildSearchBar() {
+    final responsive = context.responsive;
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: responsive.responsive(
+          mobile: 16.0,
+          tablet: 20.0,
+          desktop: 24.0,
+        ),
+        vertical: responsive.responsive(
+          mobile: 8.0,
+          tablet: 10.0,
+          desktop: 12.0,
+        ),
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF242424),
+        borderRadius: BorderRadius.circular(responsive.borderRadius),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearchChanged,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.9),
+          fontSize: responsive.fontSize(15),
+        ),
+        decoration: InputDecoration(
+          hintText: 'Search conversations...',
+          hintStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.4),
+            fontSize: responsive.fontSize(15),
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Colors.white.withValues(alpha: 0.5),
+            size: responsive.responsive(
+              mobile: 20.0,
+              tablet: 22.0,
+              desktop: 24.0,
+            ),
+          ),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: Colors.white.withValues(alpha: 0.5),
+                    size: responsive.responsive(
+                      mobile: 20.0,
+                      tablet: 22.0,
+                      desktop: 24.0,
+                    ),
+                  ),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged('');
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: responsive.responsive(
+              mobile: 16.0,
+              tablet: 18.0,
+              desktop: 20.0,
+            ),
+            vertical: responsive.responsive(
+              mobile: 14.0,
+              tablet: 16.0,
+              desktop: 18.0,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -110,202 +209,236 @@ class _ConversationListScreenState
           // Content
           SafeArea(
             child: responsive.centerMaxWidth(
-              child: conversationListState.when(
-                loading: () => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: responsive.responsive(
-                          mobile: 40.0,
-                          tablet: 44.0,
-                          desktop: 48.0,
-                        ),
-                        height: responsive.responsive(
-                          mobile: 40.0,
-                          tablet: 44.0,
-                          desktop: 48.0,
-                        ),
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFF6366F1),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: responsive.spacing),
-                      Text(
-                        'Loading conversations...',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: responsive.fontSize(16),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                error: (error, _) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(
-                          responsive.responsive(
-                            mobile: 20.0,
-                            tablet: 22.0,
-                            desktop: 24.0,
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.2),
-                        ),
-                        child: Icon(
-                          Icons.error_outline_rounded,
-                          size: responsive.responsive(
-                            mobile: 48.0,
-                            tablet: 52.0,
-                            desktop: 56.0,
-                          ),
-                          color: const Color(0xFFEF4444),
-                        ),
-                      ),
-                      SizedBox(height: responsive.spacing),
-                      Text(
-                        'Oops! Something went wrong',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: responsive.fontSize(20),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: responsive.horizontalPadding,
-                        child: Text(
-                          error.toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
-                            fontSize: responsive.fontSize(14),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: responsive.spacing),
-                      GestureDetector(
-                        onTap: () => ref
-                            .read(conversationListStateProvider.notifier)
-                            .loadConversations(),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: responsive.responsive(
-                              mobile: 24.0,
-                              tablet: 28.0,
-                              desktop: 32.0,
-                            ),
-                            vertical: responsive.responsive(
-                              mobile: 14.0,
-                              tablet: 16.0,
-                              desktop: 18.0,
-                            ),
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text(
-                            'Try Again',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: responsive.fontSize(16),
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                data: (conversations) {
-                  if (conversations.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(
-                              responsive.responsive(
-                                mobile: 24.0,
-                                tablet: 28.0,
-                                desktop: 32.0,
+              child: Column(
+                children: [
+                  _buildSearchBar(),
+                  Expanded(
+                    child: conversationListState.when(
+                      loading: () => Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: responsive.responsive(
+                                mobile: 40.0,
+                                tablet: 44.0,
+                                desktop: 48.0,
+                              ),
+                              height: responsive.responsive(
+                                mobile: 40.0,
+                                tablet: 44.0,
+                                desktop: 48.0,
+                              ),
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF6366F1),
+                                ),
                               ),
                             ),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.05),
-                            ),
-                            child: Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: responsive.responsive(
-                                mobile: 64.0,
-                                tablet: 72.0,
-                                desktop: 80.0,
+                            SizedBox(height: responsive.spacing),
+                            Text(
+                              'Loading conversations...',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontSize: responsive.fontSize(16),
                               ),
-                              color: Colors.white.withValues(alpha: 0.3),
                             ),
-                          ),
-                          SizedBox(height: responsive.spacing),
-                          Text(
-                            'No conversations yet',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: responsive.fontSize(22),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Start a conversation to discover\nyour perfect watch',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: responsive.fontSize(15),
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    );
-                  }
+                      error: (error, _) => Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(
+                                responsive.responsive(
+                                  mobile: 20.0,
+                                  tablet: 22.0,
+                                  desktop: 24.0,
+                                ),
+                              ),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(
+                                  0xFFEF4444,
+                                ).withValues(alpha: 0.2),
+                              ),
+                              child: Icon(
+                                Icons.error_outline_rounded,
+                                size: responsive.responsive(
+                                  mobile: 48.0,
+                                  tablet: 52.0,
+                                  desktop: 56.0,
+                                ),
+                                color: const Color(0xFFEF4444),
+                              ),
+                            ),
+                            SizedBox(height: responsive.spacing),
+                            Text(
+                              'Oops! Something went wrong',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: responsive.fontSize(20),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: responsive.horizontalPadding,
+                              child: Text(
+                                error.toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: responsive.fontSize(14),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: responsive.spacing),
+                            GestureDetector(
+                              onTap: () => ref
+                                  .read(conversationListStateProvider.notifier)
+                                  .loadConversations(),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: responsive.responsive(
+                                    mobile: 24.0,
+                                    tablet: 28.0,
+                                    desktop: 32.0,
+                                  ),
+                                  vertical: responsive.responsive(
+                                    mobile: 14.0,
+                                    tablet: 16.0,
+                                    desktop: 18.0,
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF6366F1),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Text(
+                                  'Try Again',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: responsive.fontSize(16),
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      data: (state) {
+                        final isEmpty = state.isSearchMode
+                            ? state.searchResults!.results.isEmpty
+                            : state.conversations!.isEmpty;
 
-                  return RefreshIndicator(
-                    onRefresh: () => ref
-                        .read(conversationListStateProvider.notifier)
-                        .loadConversations(),
-                    backgroundColor: const Color(0xFF242424),
-                    color: const Color(0xFF6366F1),
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(
-                        top: responsive.responsive(
-                          mobile: 80.0,
-                          tablet: 90.0,
-                          desktop: 100.0,
-                        ),
-                        bottom: 20,
-                      ),
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: conversations.length,
-                      itemBuilder: (context, index) {
-                        return _ConversationListItem(
-                          summary: conversations[index],
-                          key: Key(
-                            'conversation_item_${conversations[index].id}',
+                        if (isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(
+                                    responsive.responsive(
+                                      mobile: 24.0,
+                                      tablet: 28.0,
+                                      desktop: 32.0,
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withValues(alpha: 0.05),
+                                  ),
+                                  child: Icon(
+                                    state.isSearchMode
+                                        ? Icons.search_off_rounded
+                                        : Icons.chat_bubble_outline_rounded,
+                                    size: responsive.responsive(
+                                      mobile: 64.0,
+                                      tablet: 72.0,
+                                      desktop: 80.0,
+                                    ),
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                SizedBox(height: responsive.spacing),
+                                Text(
+                                  state.isSearchMode
+                                      ? 'No results found'
+                                      : 'No conversations yet',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: responsive.fontSize(22),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  state.isSearchMode
+                                      ? 'Try a different search term'
+                                      : 'Start a conversation to discover\nyour perfect watch',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: responsive.fontSize(15),
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        final itemCount = state.isSearchMode
+                            ? state.searchResults!.results.length
+                            : state.conversations!.length;
+
+                        return RefreshIndicator(
+                          onRefresh: () => ref
+                              .read(conversationListStateProvider.notifier)
+                              .loadConversations(),
+                          backgroundColor: const Color(0xFF242424),
+                          color: const Color(0xFF6366F1),
+                          child: ListView.builder(
+                            padding: EdgeInsets.only(
+                              top: responsive.responsive(
+                                mobile: 8.0,
+                                tablet: 12.0,
+                                desktop: 16.0,
+                              ),
+                              bottom: 20,
+                            ),
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: itemCount,
+                            itemBuilder: (context, index) {
+                              if (state.isSearchMode) {
+                                final searchResult =
+                                    state.searchResults!.results[index];
+                                return _ConversationListItem(
+                                  summary: searchResult.summary,
+                                  matchedContent: searchResult.matchedContent,
+                                  key: Key(
+                                    'conversation_item_${searchResult.summary.id}',
+                                  ),
+                                );
+                              } else {
+                                final summary = state.conversations![index];
+                                return _ConversationListItem(
+                                  summary: summary,
+                                  key: Key('conversation_item_${summary.id}'),
+                                );
+                              }
+                            },
                           ),
                         );
                       },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
           ),
@@ -317,8 +450,13 @@ class _ConversationListScreenState
 
 class _ConversationListItem extends ConsumerStatefulWidget {
   final ConversationSummary summary;
+  final String? matchedContent;
 
-  const _ConversationListItem({required this.summary, super.key});
+  const _ConversationListItem({
+    required this.summary,
+    this.matchedContent,
+    super.key,
+  });
 
   @override
   ConsumerState<_ConversationListItem> createState() =>
@@ -404,14 +542,40 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 6),
-          child: Text(
-            _formatTimestamp(widget.summary.updatedAt),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.4),
-              fontSize: responsive.fontSize(13),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          child: widget.matchedContent != null
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.matchedContent!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: responsive.fontSize(13),
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatTimestamp(widget.summary.updatedAt),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.4),
+                        fontSize: responsive.fontSize(13),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  _formatTimestamp(widget.summary.updatedAt),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: responsive.fontSize(13),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
         ),
         trailing: Icon(
           Icons.arrow_forward_rounded,

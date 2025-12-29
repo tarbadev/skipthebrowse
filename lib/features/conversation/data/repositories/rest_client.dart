@@ -5,6 +5,7 @@ import 'package:skipthebrowse/features/conversation/data/models/conversation_res
 import '../models/add_message_request.dart';
 import '../models/conversation_list_response.dart';
 import '../models/create_conversation_request.dart';
+import '../models/search_result_response.dart';
 
 part 'rest_client.g.dart';
 
@@ -23,6 +24,13 @@ abstract class RestClient {
 
   @GET('/api/v1/conversations')
   Future<ConversationListResponse> listConversations(
+    @Query('limit') int limit,
+    @Query('offset') int offset,
+  );
+
+  @GET('/api/v1/conversations/search')
+  Future<ConversationSearchResponse> searchConversations(
+    @Query('q') String query,
     @Query('limit') int limit,
     @Query('offset') int offset,
   );

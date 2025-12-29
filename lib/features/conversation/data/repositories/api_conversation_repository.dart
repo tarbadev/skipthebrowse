@@ -1,5 +1,6 @@
 import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
+import 'package:skipthebrowse/features/conversation/domain/entities/search_result.dart';
 import 'package:skipthebrowse/features/conversation/domain/repositories/conversation_repository.dart';
 
 import '../models/add_message_request.dart';
@@ -45,5 +46,16 @@ class ApiConversationRepository implements ConversationRepository {
     return response.conversations
         .map((summary) => summary.toConversationSummary())
         .toList();
+  }
+
+  @override
+  Future<ConversationSearchResults> searchConversations({
+    required String query,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final response = await restClient.searchConversations(query, limit, offset);
+
+    return response.toConversationSearchResults();
   }
 }
