@@ -13,7 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
-  retrofit: ^4.9.1
+  retrofit: ^4.9.2
   dio: ^5.9.0
   json_annotation: ^4.9.0
   equatable: ^2.0.7
