@@ -513,21 +513,65 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
             }
           }
         },
-        leading: CircleAvatar(
-          radius: responsive.responsive(
-            mobile: 24.0,
-            tablet: 26.0,
-            desktop: 28.0,
-          ),
-          backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.2),
-          child: Text(
-            widget.summary.messageCount.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: responsive.fontSize(16),
-              fontWeight: FontWeight.w800,
+        leading: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            CircleAvatar(
+              radius: responsive.responsive(
+                mobile: 24.0,
+                tablet: 26.0,
+                desktop: 28.0,
+              ),
+              backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.2),
+              child: Text(
+                widget.summary.messageCount.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: responsive.fontSize(16),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
-          ),
+            if (widget.summary.recommendationCount > 0)
+              Positioned(
+                top: responsive.responsive(
+                  mobile: -4.0,
+                  tablet: -5.0,
+                  desktop: -6.0,
+                ),
+                right: responsive.responsive(
+                  mobile: -4.0,
+                  tablet: -5.0,
+                  desktop: -6.0,
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(
+                    responsive.responsive(
+                      mobile: 4.0,
+                      tablet: 5.0,
+                      desktop: 6.0,
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF242424),
+                      width: 2,
+                    ),
+                  ),
+                  child: Text(
+                    widget.summary.recommendationCount.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: responsive.fontSize(11),
+                      fontWeight: FontWeight.w800,
+                      height: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         title: Text(
           widget.summary.previewText,

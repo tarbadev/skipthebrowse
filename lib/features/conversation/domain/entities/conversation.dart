@@ -23,6 +23,7 @@ class ConversationSummary extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int messageCount;
+  final int recommendationCount;
 
   const ConversationSummary({
     required this.id,
@@ -31,6 +32,7 @@ class ConversationSummary extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     required this.messageCount,
+    required this.recommendationCount,
   });
 
   @override
@@ -41,5 +43,6 @@ class ConversationSummary extends Equatable {
     createdAt,
     updatedAt,
     messageCount,
+    recommendationCount,
   ];
 }

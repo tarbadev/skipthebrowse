@@ -16,6 +16,8 @@ class ConversationSummaryResponse {
   final DateTime updatedAt;
   @JsonKey(name: 'message_count')
   final int messageCount;
+  @JsonKey(name: 'recommendation_count')
+  final int recommendationCount;
 
   ConversationSummaryResponse({
     required this.id,
@@ -24,6 +26,7 @@ class ConversationSummaryResponse {
     required this.createdAt,
     required this.updatedAt,
     required this.messageCount,
+    required this.recommendationCount,
   });
 
   factory ConversationSummaryResponse.fromJson(Map<String, dynamic> json) =>
@@ -39,6 +42,7 @@ class ConversationSummaryResponse {
       createdAt: createdAt,
       updatedAt: updatedAt,
       messageCount: messageCount,
+      recommendationCount: recommendationCount,
     );
   }
 }

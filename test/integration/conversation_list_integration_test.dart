@@ -35,6 +35,7 @@ void main() {
                   .subtract(const Duration(hours: 1))
                   .toIso8601String(),
               'message_count': 5,
+              'recommendation_count': 0,
             },
             {
               'id': 'conversation-2',
@@ -47,6 +48,7 @@ void main() {
                   .subtract(const Duration(days: 1))
                   .toIso8601String(),
               'message_count': 3,
+              'recommendation_count': 0,
             },
             {
               'id': 'conversation-3',
@@ -59,6 +61,7 @@ void main() {
                   .subtract(const Duration(days: 3))
                   .toIso8601String(),
               'message_count': 7,
+              'recommendation_count': 0,
             },
           ],
           total: 3,

@@ -40,6 +40,7 @@ ConversationSummary conversationSummary({
   DateTime createdAt = fixedDateTime,
   DateTime updatedAt = fixedDateTime,
   int messageCount = 4,
+  int recommendationCount = 0,
 }) => ConversationSummary(
   id: id,
   status: status,
@@ -47,6 +48,7 @@ ConversationSummary conversationSummary({
   createdAt: createdAt,
   updatedAt: updatedAt,
   messageCount: messageCount,
+  recommendationCount: recommendationCount,
 );
 
 Message message({

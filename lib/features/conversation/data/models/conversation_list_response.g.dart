@@ -15,6 +15,7 @@ ConversationSummaryResponse _$ConversationSummaryResponseFromJson(
   createdAt: DateTime.parse(json['created_at'] as String),
   updatedAt: DateTime.parse(json['updated_at'] as String),
   messageCount: (json['message_count'] as num).toInt(),
+  recommendationCount: (json['recommendation_count'] as num).toInt(),
 );
 
 Map<String, dynamic> _$ConversationSummaryResponseToJson(
@@ -26,6 +27,7 @@ Map<String, dynamic> _$ConversationSummaryResponseToJson(
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
   'message_count': instance.messageCount,
+  'recommendation_count': instance.recommendationCount,
 };
 
 ConversationListResponse _$ConversationListResponseFromJson(

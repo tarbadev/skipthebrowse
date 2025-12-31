@@ -46,9 +46,18 @@ class ConversationListScreenTester extends BaseWidgetTester {
   String getConversationMessageCount(int index) {
     final listItems = find.byType(ListTile);
     final listTile = tester.widget<ListTile>(listItems.at(index));
-    final leading = listTile.leading as CircleAvatar;
-    final text = leading.child as Text;
-    return text.data!;
+    final leading = listTile.leading;
+
+    if (leading is Stack) {
+      final circleAvatar = leading.children.first as CircleAvatar;
+      final text = circleAvatar.child as Text;
+      return text.data!;
+    } else if (leading is CircleAvatar) {
+      final text = leading.child as Text;
+      return text.data!;
+    }
+
+    throw Exception('Unexpected leading widget type: ${leading.runtimeType}');
   }
 
   String getConversationTimestamp(int index) {
