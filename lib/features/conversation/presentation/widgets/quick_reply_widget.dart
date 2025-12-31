@@ -123,22 +123,13 @@ class _QuickReplyChipState extends State<_QuickReplyChip> {
                 width: 1.5,
               );
             }),
-            textStyle: WidgetStateProperty.resolveWith<TextStyle>((
-              Set<WidgetState> states,
-            ) {
-              if (states.contains(WidgetState.hovered)) {
-                return TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
-                );
-              }
-              return TextStyle(
+            textStyle: WidgetStateProperty.all(
+              TextStyle(
                 fontSize: fontSize,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 letterSpacing: 0.2,
-              );
-            }),
+              ),
+            ),
           ),
       child: Text(widget.reply),
     );
