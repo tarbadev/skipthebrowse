@@ -24,6 +24,7 @@ class ConversationScreen extends ConsumerStatefulWidget {
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   int _previousMessageCount = 0;
+  bool _quickReplyTapped = false;
 
   @override
   void initState() {
@@ -60,6 +61,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       .read(conversationStateProvider.notifier)
       .addMessage(widget.conversation.id, message);
 
+  void _onQuickReplyTap(String reply) {
+    setState(() {
+      _quickReplyTapped = true;
+    });
+    _addMessage(reply);
+  }
+
   @override
   Widget build(BuildContext context) {
     final conversationState = ref.watch(conversationStateProvider);
@@ -76,6 +84,14 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       if (nextCount > _previousMessageCount) {
         _previousMessageCount = nextCount;
         _scrollToBottom();
+
+        // Reset quick reply flag when new assistant message arrives
+        final lastMessage = next.value?.messages.lastOrNull;
+        if (lastMessage?.author == 'assistant' && _quickReplyTapped) {
+          setState(() {
+            _quickReplyTapped = false;
+          });
+        }
       }
     });
 
@@ -177,10 +193,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                             ),
                           if (message.author == 'assistant' &&
                               message.quickReplies != null &&
-                              message.quickReplies!.isNotEmpty)
+                              message.quickReplies!.isNotEmpty &&
+                              !_quickReplyTapped)
                             QuickReplyWidget(
                               replies: message.quickReplies!,
-                              onReplyTap: (reply) => _addMessage(reply),
+                              onReplyTap: _onQuickReplyTap,
                             ),
                         ],
                       );
