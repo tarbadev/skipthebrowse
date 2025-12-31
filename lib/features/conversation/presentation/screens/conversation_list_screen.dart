@@ -398,9 +398,18 @@ class _ConversationListScreenState
                             : state.conversations!.length;
 
                         return RefreshIndicator(
-                          onRefresh: () => ref
-                              .read(conversationListStateProvider.notifier)
-                              .loadConversations(),
+                          onRefresh: () {
+                            final query = _searchController.text;
+                            if (query.isEmpty) {
+                              return ref
+                                  .read(conversationListStateProvider.notifier)
+                                  .loadConversations();
+                            } else {
+                              return ref
+                                  .read(conversationListStateProvider.notifier)
+                                  .searchConversations(query);
+                            }
+                          },
                           backgroundColor: const Color(0xFF242424),
                           color: const Color(0xFF6366F1),
                           child: ListView.builder(
