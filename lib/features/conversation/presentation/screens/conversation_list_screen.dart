@@ -17,10 +17,12 @@ class ConversationListScreen extends ConsumerStatefulWidget {
 class _ConversationListScreenState
     extends ConsumerState<ConversationListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     Future.microtask(
       () =>
           ref.read(conversationListStateProvider.notifier).loadConversations(),
@@ -29,8 +31,28 @@ class _ConversationListScreenState
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() {
+    final query = _searchController.text;
+    if (query.isEmpty) {
+      ref.read(conversationListStateProvider.notifier).loadMoreConversations();
+    } else {
+      ref
+          .read(conversationListStateProvider.notifier)
+          .loadMoreSearchResults(query);
+    }
   }
 
   void _onSearchChanged(String query) {
@@ -118,6 +140,36 @@ class _ConversationListScreenState
               tablet: 16.0,
               desktop: 18.0,
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator(ResponsiveUtils responsive) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: responsive.responsive(
+          mobile: 24.0,
+          tablet: 28.0,
+          desktop: 32.0,
+        ),
+      ),
+      child: Center(
+        child: SizedBox(
+          width: responsive.responsive(
+            mobile: 32.0,
+            tablet: 36.0,
+            desktop: 40.0,
+          ),
+          height: responsive.responsive(
+            mobile: 32.0,
+            tablet: 36.0,
+            desktop: 40.0,
+          ),
+          child: const CircularProgressIndicator(
+            strokeWidth: 3,
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
           ),
         ),
       ),
@@ -393,9 +445,13 @@ class _ConversationListScreenState
                           );
                         }
 
-                        final itemCount = state.isSearchMode
+                        final baseItemCount = state.isSearchMode
                             ? state.searchResults!.results.length
                             : state.conversations!.length;
+
+                        final itemCount = state.isLoadingMore || state.hasMore
+                            ? baseItemCount + 1
+                            : baseItemCount;
 
                         return RefreshIndicator(
                           onRefresh: () {
@@ -413,6 +469,7 @@ class _ConversationListScreenState
                           backgroundColor: const Color(0xFF242424),
                           color: const Color(0xFF6366F1),
                           child: ListView.builder(
+                            controller: _scrollController,
                             padding: EdgeInsets.only(
                               top: responsive.responsive(
                                 mobile: 8.0,
@@ -424,6 +481,10 @@ class _ConversationListScreenState
                             physics: const BouncingScrollPhysics(),
                             itemCount: itemCount,
                             itemBuilder: (context, index) {
+                              if (index == baseItemCount) {
+                                return _buildLoadingIndicator(responsive);
+                              }
+
                               if (state.isSearchMode) {
                                 final searchResult =
                                     state.searchResults!.results[index];
