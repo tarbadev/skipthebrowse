@@ -307,6 +307,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -317,10 +323,21 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Decode Keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
       - name: Build Android
         run: |
-          flutter build apk --release
-          flutter build appbundle --release
+          flutter build apk --release \
+            --build-name=${GITHUB_REF_NAME#v} \
+            --build-number=${GITHUB_RUN_NUMBER}
+          flutter build appbundle --release \
+            --build-name=${GITHUB_REF_NAME#v} \
+            --build-number=${GITHUB_RUN_NUMBER}
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ vars.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
 
       - name: Build Web
         run: flutter build web --release
@@ -340,6 +357,15 @@ jobs:
             skipthebrowse-web.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Google Play Internal Testing
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonRaw: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+          packageName: Skipthebrowse
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
 
   release-ios:
     name: Release iOS
