@@ -179,17 +179,6 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // Film grain texture overlay
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.03,
-              child: Image.asset(
-                'assets/grain.png',
-                repeat: ImageRepeat.repeat,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-              ),
-            ),
-          ),
           // Main content
           SafeArea(
             child: SingleChildScrollView(
