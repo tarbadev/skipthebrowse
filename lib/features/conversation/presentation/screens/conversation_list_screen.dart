@@ -46,7 +46,7 @@ class _ConversationListScreenState
 
   void _loadMore() {
     final query = _searchController.text;
-    if (query.isEmpty) {
+    if (query.length < 2) {
       ref.read(conversationListStateProvider.notifier).loadMoreConversations();
     } else {
       ref
@@ -56,7 +56,8 @@ class _ConversationListScreenState
   }
 
   void _onSearchChanged(String query) {
-    if (query.isEmpty) {
+    // Minimum 2 characters to trigger search (reduces noise)
+    if (query.length < 2) {
       ref.read(conversationListStateProvider.notifier).loadConversations();
     } else {
       ref
@@ -456,7 +457,7 @@ class _ConversationListScreenState
                         return RefreshIndicator(
                           onRefresh: () {
                             final query = _searchController.text;
-                            if (query.isEmpty) {
+                            if (query.length < 2) {
                               return ref
                                   .read(conversationListStateProvider.notifier)
                                   .loadConversations();
