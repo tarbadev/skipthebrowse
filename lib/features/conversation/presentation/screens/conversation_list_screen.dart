@@ -464,6 +464,8 @@ class _ConversationListItem extends ConsumerStatefulWidget {
 }
 
 class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
@@ -493,26 +495,38 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
         contentPadding: EdgeInsets.all(
           responsive.responsive(mobile: 16.0, tablet: 18.0, desktop: 20.0),
         ),
-        onTap: () async {
-          try {
-            final conversation = await ref
-                .read(conversationRepositoryProvider)
-                .getConversation(widget.summary.id);
+        onTap: _isLoading
+            ? null
+            : () async {
+                setState(() {
+                  _isLoading = true;
+                });
 
-            if (context.mounted) {
-              AppRoutes.goToConversation(context, conversation);
-            }
-          } catch (e) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error loading conversation: $e'),
-                  backgroundColor: const Color(0xFF242424),
-                ),
-              );
-            }
-          }
-        },
+                try {
+                  final conversation = await ref
+                      .read(conversationRepositoryProvider)
+                      .getConversation(widget.summary.id);
+
+                  if (context.mounted) {
+                    AppRoutes.goToConversation(context, conversation);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error loading conversation: $e'),
+                        backgroundColor: const Color(0xFF242424),
+                      ),
+                    );
+                  }
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
+              },
         leading: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -621,15 +635,34 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
                   ),
                 ),
         ),
-        trailing: Icon(
-          Icons.arrow_forward_rounded,
-          color: Colors.white.withValues(alpha: 0.3),
-          size: responsive.responsive(
-            mobile: 24.0,
-            tablet: 26.0,
-            desktop: 28.0,
-          ),
-        ),
+        trailing: _isLoading
+            ? SizedBox(
+                width: responsive.responsive(
+                  mobile: 24.0,
+                  tablet: 26.0,
+                  desktop: 28.0,
+                ),
+                height: responsive.responsive(
+                  mobile: 24.0,
+                  tablet: 26.0,
+                  desktop: 28.0,
+                ),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    const Color(0xFF6366F1),
+                  ),
+                ),
+              )
+            : Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white.withValues(alpha: 0.3),
+                size: responsive.responsive(
+                  mobile: 24.0,
+                  tablet: 26.0,
+                  desktop: 28.0,
+                ),
+              ),
       ),
     );
   }
