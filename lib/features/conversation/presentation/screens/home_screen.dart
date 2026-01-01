@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
+import 'package:skipthebrowse/core/widgets/grain_overlay.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 
 import '../../domain/providers/conversation_providers.dart';
@@ -179,6 +180,8 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
+          // Film grain texture overlay
+          const GrainOverlay(opacity: 0.03, density: 0.4),
           // Main content
           SafeArea(
             child: SingleChildScrollView(
