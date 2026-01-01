@@ -4,22 +4,18 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Load .env from root
 val envProperties = Properties()
 val envFile = rootProject.file("../.env")
 if (envFile.exists()) {
-    envFile.bufferedReader().use { reader ->
-        reader.lines().forEach { line ->
-            var cleanedLine = line.trim()
-            if (cleanedLine.startsWith("export ")) {
-                cleanedLine = cleanedLine.substring(7).trim()
-            }
-            if (cleanedLine.contains("=") && !cleanedLine.startsWith("#")) {
-                val parts = cleanedLine.split("=", limit = 2)
+    envFile.forEachLine { line ->
+        val trimmed = line.trim()
+        if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
+            val entry = if (trimmed.startsWith("export ")) trimmed.substring(7).trim() else trimmed
+            if (entry.contains("=")) {
+                val parts = entry.split("=", limit = 2)
                 val key = parts[0].trim()
                 val value = parts[1].trim().removeSurrounding("\"").removeSurrounding("'")
                 envProperties[key] = value
@@ -52,19 +48,25 @@ android {
 
     signingConfigs {
         create("release") {
-            val alias = envProperties["ANDROID_KEY_ALIAS"] as String? ?: System.getenv("ANDROID_KEY_ALIAS")
-            val keyPass = envProperties["ANDROID_KEY_PASSWORD"] as String? ?: System.getenv("ANDROID_KEY_PASSWORD")
-            val storePass = envProperties["ANDROID_KEYSTORE_PASSWORD"] as String? ?: System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            val alias = envProperties["ANDROID_KEY_ALIAS"]?.toString() ?: System.getenv("ANDROID_KEY_ALIAS")
+            val keyPass = envProperties["ANDROID_KEY_PASSWORD"]?.toString() ?: System.getenv("ANDROID_KEY_PASSWORD")
+            val storePass = envProperties["ANDROID_KEYSTORE_PASSWORD"]?.toString() ?: System.getenv("ANDROID_KEYSTORE_PASSWORD")
             val keystoreFile = file("upload-keystore.jks")
 
-            if (!keystoreFile.exists()) {
-                println("WARNING: Keystore file not found at ${keystoreFile.absolutePath}")
+            if (alias != null && keyPass != null && storePass != null && keystoreFile.exists()) {
+                keyAlias = alias
+                keyPassword = keyPass
+                storeFile = keystoreFile
+                storePassword = storePass
+            } else {
+                // Fallback to debug signing if release info is missing
+                // This allows `flutter run` to work without a setup keystore
+                val debugConfig = signingConfigs.getByName("debug")
+                keyAlias = debugConfig.keyAlias
+                keyPassword = debugConfig.keyPassword
+                storeFile = debugConfig.storeFile
+                storePassword = debugConfig.storePassword
             }
-
-            keyAlias = alias
-            keyPassword = keyPass
-            storeFile = keystoreFile
-            storePassword = storePass
         }
     }
 
@@ -74,6 +76,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
