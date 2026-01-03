@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
+import 'package:skipthebrowse/features/auth/data/models/create_anonymous_user_request.dart';
+import 'package:skipthebrowse/features/auth/data/models/auth_response_dto.dart';
 
 import '../models/add_message_request.dart';
 import '../models/conversation_list_response.dart';
@@ -42,5 +44,10 @@ abstract class RestClient {
   Future<ConversationResponse> addMessage(
     @Path('Id') String id,
     @Body() AddMessageRequest request,
+  );
+
+  @POST('/api/v1/auth/anonymous')
+  Future<AuthResponseDto> createAnonymousUser(
+    @Body() CreateAnonymousUserRequest request,
   );
 }

@@ -1,16 +1,28 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'core/config/env_config.dart';
 import 'core/providers/route_provider.dart';
+import 'features/auth/data/repositories/api_auth_repository.dart';
+import 'features/auth/domain/services/auth_initializer.dart';
+import 'features/conversation/data/repositories/rest_client.dart';
 import 'features/conversation/domain/providers/conversation_providers.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
+
+  // Initialize authentication (create anonymous user if needed)
+  final dio = Dio(BaseOptions(baseUrl: EnvConfig.apiBaseUrl));
+  final restClient = RestClient(dio);
+  final authRepository = ApiAuthRepository(restClient, sharedPreferences);
+  final authInitializer = AuthInitializer(authRepository);
+  await authInitializer.initialize();
   final bool isDesktopApp =
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.linux ||
