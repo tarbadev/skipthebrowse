@@ -317,35 +317,6 @@ class AccountSettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            // Logout button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () async {
-                  await authNotifier.logout();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: BorderSide(
-                    color: Colors.red.withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.logout),
-                label: const Text(
-                  'Log Out',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
           ],
         ),
       ),
