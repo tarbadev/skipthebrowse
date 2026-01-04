@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
+import 'package:skipthebrowse/features/auth/presentation/screens/account_settings_screen.dart';
+import 'package:skipthebrowse/features/auth/presentation/screens/register_login_screen.dart';
 
 import '../../features/conversation/presentation/screens/conversation_list_screen.dart';
 import '../../features/conversation/presentation/screens/conversation_screen.dart';
@@ -10,6 +12,8 @@ class AppRoutes {
   static const String home = '/';
   static const String conversation = '/conversation';
   static const String conversationList = '/conversations';
+  static const String accountSettings = '/account';
+  static const String registerLogin = '/auth/register-login';
 
   static void goToHome(BuildContext context) {
     context.go(home);
@@ -24,6 +28,21 @@ class AppRoutes {
 
   static void goToConversationList(BuildContext context) {
     context.push(conversationList);
+  }
+
+  static void goToAccountSettings(BuildContext context) {
+    context.push(accountSettings);
+  }
+
+  static void goToRegisterLogin(
+    BuildContext context, {
+    bool isRegister = true,
+    bool isMerge = false,
+  }) {
+    context.push(
+      registerLogin,
+      extra: {'isRegister': isRegister, 'isMerge': isMerge},
+    );
   }
 }
 
@@ -45,5 +64,18 @@ final routes = [
   GoRoute(
     path: AppRoutes.conversationList,
     builder: (context, state) => const ConversationListScreen(),
+  ),
+  GoRoute(
+    path: AppRoutes.accountSettings,
+    builder: (context, state) => const AccountSettingsScreen(),
+  ),
+  GoRoute(
+    path: AppRoutes.registerLogin,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      final isRegister = extra?['isRegister'] as bool? ?? true;
+      final isMerge = extra?['isMerge'] as bool? ?? false;
+      return RegisterLoginScreen(isRegister: isRegister, isMerge: isMerge);
+    },
   ),
 ];

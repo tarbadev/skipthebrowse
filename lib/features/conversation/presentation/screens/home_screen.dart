@@ -4,6 +4,7 @@ import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/core/widgets/grain_overlay.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
+import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 
 import '../../domain/providers/conversation_providers.dart';
 
@@ -110,6 +111,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final conversationState = ref.watch(conversationStateProvider);
     final isLoading = conversationState.isLoading;
+    final authState = ref.watch(authStateProvider);
 
     final conversationStarters = [
       ("🎬", "Something thrilling", "I want something thrilling to watch"),
@@ -146,7 +148,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 12),
+            margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
@@ -159,6 +161,88 @@ class HomeScreen extends ConsumerWidget {
               icon: const Icon(Icons.history_rounded, color: Colors.white70),
               onPressed: () => AppRoutes.goToConversationList(context),
               tooltip: 'View past conversations',
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: authState.when(
+              data: (session) {
+                final username = session?.user.username ?? 'Guest';
+                final isAnonymous = session?.user.isAnonymous ?? true;
+                return PopupMenuButton<String>(
+                  tooltip: 'Account',
+                  icon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isAnonymous ? Icons.person_outline : Icons.person,
+                        color: Colors.white70,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        username.length > 12
+                            ? '${username.substring(0, 12)}...'
+                            : username,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  color: const Color(0xFF242424),
+                  onSelected: (value) {
+                    if (value == 'account') {
+                      AppRoutes.goToAccountSettings(context);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'account',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_circle,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Account Settings',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+              loading: () => IconButton(
+                icon: const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
+                  ),
+                ),
+                onPressed: null,
+              ),
+              error: (error, stack) => IconButton(
+                icon: const Icon(Icons.error_outline, color: Colors.red),
+                onPressed: () => AppRoutes.goToAccountSettings(context),
+                tooltip: 'Account (Error)',
+              ),
             ),
           ),
         ],
