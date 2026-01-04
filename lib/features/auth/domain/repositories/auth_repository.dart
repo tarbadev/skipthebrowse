@@ -33,4 +33,10 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
+
+  /// Merge anonymous account with email and password
+  Future<AuthSession> mergeAnonymousAccount({
+    required String email,
+    required String password,
+  });
 }

@@ -10,6 +10,7 @@ import '../models/add_message_request.dart';
 import '../models/conversation_list_response.dart';
 import '../models/create_conversation_request.dart';
 import '../models/search_result_response.dart';
+import 'package:skipthebrowse/features/auth/data/models/merge_account_request.dart';
 
 part 'rest_client.g.dart';
 
@@ -58,4 +59,9 @@ abstract class RestClient {
 
   @POST('/api/v1/auth/login')
   Future<AuthResponseDto> loginUser(@Body() LoginRequest request);
+
+  @POST('/api/v1/auth/merge')
+  Future<AuthResponseDto> mergeAnonymousAccount(
+    @Body() MergeAccountRequest request,
+  );
 }

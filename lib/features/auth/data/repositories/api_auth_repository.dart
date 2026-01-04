@@ -8,6 +8,7 @@ import '../../../conversation/data/repositories/rest_client.dart';
 import '../models/create_anonymous_user_request.dart';
 import '../models/register_user_request.dart';
 import '../models/login_request.dart';
+import '../models/merge_account_request.dart';
 
 class ApiAuthRepository implements AuthRepository {
   final RestClient _restClient;
@@ -121,6 +122,21 @@ class ApiAuthRepository implements AuthRepository {
   }) async {
     final request = LoginRequest(email: email, password: password);
     final response = await _restClient.loginUser(request);
+    final session = response.toEntity();
+
+    // Save session to local storage
+    await saveSession(session);
+
+    return session;
+  }
+
+  @override
+  Future<AuthSession> mergeAnonymousAccount({
+    required String email,
+    required String password,
+  }) async {
+    final request = MergeAccountRequest(email: email, password: password);
+    final response = await _restClient.mergeAnonymousAccount(request);
     final session = response.toEntity();
 
     // Save session to local storage

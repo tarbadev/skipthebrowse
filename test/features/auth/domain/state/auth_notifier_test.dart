@@ -312,4 +312,67 @@ void main() {
       expect(notifier.state.hasError, true);
     });
   });
+
+  group('AuthNotifier - mergeAnonymousAccount', () {
+    test('should merge anonymous account and update state', () async {
+      const email = 'han@rebellion.org';
+      const password = 'ShotFirst123!';
+
+      const session = AuthSession(
+        user: User(
+          id: 'user-456',
+          username: 'han-solo-a3f2',
+          email: email,
+          isAnonymous: false,
+        ),
+        token: AuthToken(accessToken: 'merged-token', tokenType: 'bearer'),
+      );
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.mergeAnonymousAccount(
+          email: email,
+          password: password,
+        ),
+      ).thenAnswer((_) async => session);
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.mergeAnonymousAccount(email: email, password: password);
+
+      expect(notifier.state.value, session);
+      expect(notifier.isAuthenticated, true);
+      expect(notifier.currentUser?.email, email);
+      expect(notifier.currentUser?.isAnonymous, false);
+
+      verify(
+        () => mockRepository.mergeAnonymousAccount(
+          email: email,
+          password: password,
+        ),
+      ).called(1);
+    });
+
+    test('should handle error when merge fails', () async {
+      const email = 'test@example.com';
+      const password = 'Pass123!';
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.mergeAnonymousAccount(
+          email: email,
+          password: password,
+        ),
+      ).thenThrow(Exception('Account merge failed'));
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.mergeAnonymousAccount(email: email, password: password);
+
+      expect(notifier.state, isA<AsyncError>());
+      expect(notifier.state.hasError, true);
+    });
+  });
 }

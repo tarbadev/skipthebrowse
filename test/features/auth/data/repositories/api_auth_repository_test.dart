@@ -5,6 +5,7 @@ import 'package:skipthebrowse/features/auth/data/models/auth_response_dto.dart';
 import 'package:skipthebrowse/features/auth/data/models/create_anonymous_user_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/register_user_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/login_request.dart';
+import 'package:skipthebrowse/features/auth/data/models/merge_account_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/user_dto.dart';
 import 'package:skipthebrowse/features/auth/data/repositories/api_auth_repository.dart';
 import 'package:skipthebrowse/features/auth/domain/entities/auth_session.dart';
@@ -36,6 +37,12 @@ void main() {
     );
     registerFallbackValue(
       const LoginRequest(email: 'test@example.com', password: 'Test123!'),
+    );
+    registerFallbackValue(
+      const MergeAccountRequest(
+        email: 'test@example.com',
+        password: 'Test123!',
+      ),
     );
   });
 
@@ -263,6 +270,48 @@ void main() {
 
       verify(() => mockRestClient.loginUser(any())).called(1);
       verify(() => mockPrefs.setString('auth_token', 'login-token')).called(1);
+      verify(() => mockPrefs.setString('token_type', 'bearer')).called(1);
+      verify(() => mockPrefs.setString('user', any())).called(1);
+    });
+  });
+
+  group('ApiAuthRepository - mergeAnonymousAccount', () {
+    test('should merge anonymous account and save session', () async {
+      const email = 'han@rebellion.org';
+      const password = 'ShotFirst123!';
+
+      final authResponseDto = AuthResponseDto(
+        accessToken: 'merged-token',
+        tokenType: 'bearer',
+        user: UserDto(
+          id: 'user-existing-id',
+          username: 'han-solo-a3f2',
+          email: email,
+          isAnonymous: false,
+        ),
+      );
+
+      when(
+        () => mockRestClient.mergeAnonymousAccount(any()),
+      ).thenAnswer((_) async => authResponseDto);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
+
+      final session = await repository.mergeAnonymousAccount(
+        email: email,
+        password: password,
+      );
+
+      expect(session.user.id, 'user-existing-id');
+      expect(session.user.username, 'han-solo-a3f2');
+      expect(session.user.email, email);
+      expect(session.user.isAnonymous, false);
+      expect(session.token.accessToken, 'merged-token');
+      expect(session.token.tokenType, 'bearer');
+
+      verify(() => mockRestClient.mergeAnonymousAccount(any())).called(1);
+      verify(() => mockPrefs.setString('auth_token', 'merged-token')).called(1);
       verify(() => mockPrefs.setString('token_type', 'bearer')).called(1);
       verify(() => mockPrefs.setString('user', any())).called(1);
     });

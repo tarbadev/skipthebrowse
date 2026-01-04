@@ -74,6 +74,22 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthSession?>> {
     }
   }
 
+  Future<void> mergeAnonymousAccount({
+    required String email,
+    required String password,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final session = await repository.mergeAnonymousAccount(
+        email: email,
+        password: password,
+      );
+      state = AsyncValue.data(session);
+    } catch (err, stack) {
+      state = AsyncError<AuthSession?>(err, stack);
+    }
+  }
+
   User? get currentUser => state.value?.user;
   String? get token => state.value?.token.accessToken;
   String? get authorizationHeader => state.value?.token.authorizationHeader;
