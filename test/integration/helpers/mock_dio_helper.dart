@@ -102,4 +102,94 @@ class MockDioHelper {
       queryParameters: {'limit': limit, 'offset': offset},
     );
   }
+
+  void mockCreateAnonymousUser({
+    required String userId,
+    required String username,
+    required String accessToken,
+  }) {
+    dioAdapter.onPost(
+      '/api/v1/auth/anonymous',
+      (server) => server.reply(201, {
+        'access_token': accessToken,
+        'token_type': 'bearer',
+        'user': {
+          'id': userId,
+          'username': username,
+          'email': null,
+          'is_anonymous': true,
+        },
+      }),
+      data: {'username': username},
+    );
+  }
+
+  void mockRegisterUser({
+    required String userId,
+    required String username,
+    required String email,
+    required String password,
+    required String accessToken,
+  }) {
+    dioAdapter.onPost(
+      '/api/v1/auth/register',
+      (server) => server.reply(201, {
+        'access_token': accessToken,
+        'token_type': 'bearer',
+        'user': {
+          'id': userId,
+          'username': username,
+          'email': email,
+          'is_anonymous': false,
+        },
+      }),
+      data: {'email': email, 'password': password, 'username': username},
+    );
+  }
+
+  void mockLoginUser({
+    required String userId,
+    required String username,
+    required String email,
+    required String password,
+    required String accessToken,
+  }) {
+    dioAdapter.onPost(
+      '/api/v1/auth/login',
+      (server) => server.reply(200, {
+        'access_token': accessToken,
+        'token_type': 'bearer',
+        'user': {
+          'id': userId,
+          'username': username,
+          'email': email,
+          'is_anonymous': false,
+        },
+      }),
+      data: {'email': email, 'password': password},
+    );
+  }
+
+  void mockMergeAnonymousAccount({
+    required String userId,
+    required String username,
+    required String email,
+    required String password,
+    required String accessToken,
+  }) {
+    dioAdapter.onPost(
+      '/api/v1/auth/merge',
+      (server) => server.reply(200, {
+        'access_token': accessToken,
+        'token_type': 'bearer',
+        'user': {
+          'id': userId,
+          'username': username,
+          'email': email,
+          'is_anonymous': false,
+        },
+      }),
+      data: {'email': email, 'password': password},
+    );
+  }
 }
