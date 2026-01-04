@@ -3,6 +3,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/auth/data/models/auth_response_dto.dart';
 import 'package:skipthebrowse/features/auth/data/models/create_anonymous_user_request.dart';
+import 'package:skipthebrowse/features/auth/data/models/register_user_request.dart';
+import 'package:skipthebrowse/features/auth/data/models/login_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/user_dto.dart';
 import 'package:skipthebrowse/features/auth/data/repositories/api_auth_repository.dart';
 import 'package:skipthebrowse/features/auth/domain/entities/auth_session.dart';
@@ -25,6 +27,16 @@ void main() {
     repository = ApiAuthRepository(mockRestClient, mockPrefs);
 
     registerFallbackValue(CreateAnonymousUserRequest(username: 'test'));
+    registerFallbackValue(
+      const RegisterUserRequest(
+        email: 'test@example.com',
+        password: 'Test123!',
+        username: 'test-user',
+      ),
+    );
+    registerFallbackValue(
+      const LoginRequest(email: 'test@example.com', password: 'Test123!'),
+    );
   });
 
   group('ApiAuthRepository - createAnonymousUser', () {
@@ -167,6 +179,92 @@ void main() {
       final user = await repository.getUser();
 
       expect(user, isNull);
+    });
+  });
+
+  group('ApiAuthRepository - registerUser', () {
+    test('should register user and save session', () async {
+      const email = 'luke@skywalker.com';
+      const password = 'UseTheForce123!';
+      const username = 'luke-skywalker-42';
+
+      final authResponseDto = AuthResponseDto(
+        accessToken: 'new-token',
+        tokenType: 'bearer',
+        user: UserDto(
+          id: 'user-456',
+          username: username,
+          email: email,
+          isAnonymous: false,
+        ),
+      );
+
+      when(
+        () => mockRestClient.registerUser(any()),
+      ).thenAnswer((_) async => authResponseDto);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
+
+      final session = await repository.registerUser(
+        email: email,
+        password: password,
+        username: username,
+      );
+
+      expect(session.user.id, 'user-456');
+      expect(session.user.username, username);
+      expect(session.user.email, email);
+      expect(session.user.isAnonymous, false);
+      expect(session.token.accessToken, 'new-token');
+      expect(session.token.tokenType, 'bearer');
+
+      verify(() => mockRestClient.registerUser(any())).called(1);
+      verify(() => mockPrefs.setString('auth_token', 'new-token')).called(1);
+      verify(() => mockPrefs.setString('token_type', 'bearer')).called(1);
+      verify(() => mockPrefs.setString('user', any())).called(1);
+    });
+  });
+
+  group('ApiAuthRepository - loginUser', () {
+    test('should login user and save session', () async {
+      const email = 'obi-wan@jedi.com';
+      const password = 'HelloThere123!';
+
+      final authResponseDto = AuthResponseDto(
+        accessToken: 'login-token',
+        tokenType: 'bearer',
+        user: UserDto(
+          id: 'user-789',
+          username: 'obi-wan-kenobi-1',
+          email: email,
+          isAnonymous: false,
+        ),
+      );
+
+      when(
+        () => mockRestClient.loginUser(any()),
+      ).thenAnswer((_) async => authResponseDto);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
+
+      final session = await repository.loginUser(
+        email: email,
+        password: password,
+      );
+
+      expect(session.user.id, 'user-789');
+      expect(session.user.username, 'obi-wan-kenobi-1');
+      expect(session.user.email, email);
+      expect(session.user.isAnonymous, false);
+      expect(session.token.accessToken, 'login-token');
+      expect(session.token.tokenType, 'bearer');
+
+      verify(() => mockRestClient.loginUser(any())).called(1);
+      verify(() => mockPrefs.setString('auth_token', 'login-token')).called(1);
+      verify(() => mockPrefs.setString('token_type', 'bearer')).called(1);
+      verify(() => mockPrefs.setString('user', any())).called(1);
     });
   });
 }

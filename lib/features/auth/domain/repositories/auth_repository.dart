@@ -20,4 +20,17 @@ abstract class AuthRepository {
 
   /// Get the current user (if exists)
   Future<User?> getUser();
+
+  /// Register a new user with email and password
+  Future<AuthSession> registerUser({
+    required String email,
+    required String password,
+    required String username,
+  });
+
+  /// Login a user with email and password
+  Future<AuthSession> loginUser({
+    required String email,
+    required String password,
+  });
 }

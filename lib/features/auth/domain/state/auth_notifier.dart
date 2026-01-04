@@ -40,6 +40,40 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthSession?>> {
     }
   }
 
+  Future<void> registerUser({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final session = await repository.registerUser(
+        email: email,
+        password: password,
+        username: username,
+      );
+      state = AsyncValue.data(session);
+    } catch (err, stack) {
+      state = AsyncError<AuthSession?>(err, stack);
+    }
+  }
+
+  Future<void> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final session = await repository.loginUser(
+        email: email,
+        password: password,
+      );
+      state = AsyncValue.data(session);
+    } catch (err, stack) {
+      state = AsyncError<AuthSession?>(err, stack);
+    }
+  }
+
   User? get currentUser => state.value?.user;
   String? get token => state.value?.token.accessToken;
   String? get authorizationHeader => state.value?.token.authorizationHeader;

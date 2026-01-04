@@ -3,6 +3,8 @@ import 'package:retrofit/retrofit.dart';
 import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 import 'package:skipthebrowse/features/auth/data/models/create_anonymous_user_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/auth_response_dto.dart';
+import 'package:skipthebrowse/features/auth/data/models/register_user_request.dart';
+import 'package:skipthebrowse/features/auth/data/models/login_request.dart';
 
 import '../models/add_message_request.dart';
 import '../models/conversation_list_response.dart';
@@ -50,4 +52,10 @@ abstract class RestClient {
   Future<AuthResponseDto> createAnonymousUser(
     @Body() CreateAnonymousUserRequest request,
   );
+
+  @POST('/api/v1/auth/register')
+  Future<AuthResponseDto> registerUser(@Body() RegisterUserRequest request);
+
+  @POST('/api/v1/auth/login')
+  Future<AuthResponseDto> loginUser(@Body() LoginRequest request);
 }

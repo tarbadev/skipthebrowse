@@ -6,6 +6,8 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../conversation/data/repositories/rest_client.dart';
 import '../models/create_anonymous_user_request.dart';
+import '../models/register_user_request.dart';
+import '../models/login_request.dart';
 
 class ApiAuthRepository implements AuthRepository {
   final RestClient _restClient;
@@ -90,5 +92,40 @@ class ApiAuthRepository implements AuthRepository {
       email: userMap['email'] as String?,
       isAnonymous: userMap['is_anonymous'] as bool,
     );
+  }
+
+  @override
+  Future<AuthSession> registerUser({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
+    final request = RegisterUserRequest(
+      email: email,
+      password: password,
+      username: username,
+    );
+    final response = await _restClient.registerUser(request);
+    final session = response.toEntity();
+
+    // Save session to local storage
+    await saveSession(session);
+
+    return session;
+  }
+
+  @override
+  Future<AuthSession> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    final request = LoginRequest(email: email, password: password);
+    final response = await _restClient.loginUser(request);
+    final session = response.toEntity();
+
+    // Save session to local storage
+    await saveSession(session);
+
+    return session;
   }
 }

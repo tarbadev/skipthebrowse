@@ -183,4 +183,133 @@ void main() {
       expect(notifier.state.hasError, true);
     });
   });
+
+  group('AuthNotifier - registerUser', () {
+    test('should register user and update state', () async {
+      const email = 'luke@skywalker.com';
+      const password = 'UseTheForce123!';
+      const username = 'luke-skywalker-42';
+
+      const session = AuthSession(
+        user: User(
+          id: 'user-456',
+          username: username,
+          email: email,
+          isAnonymous: false,
+        ),
+        token: AuthToken(accessToken: 'register-token', tokenType: 'bearer'),
+      );
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.registerUser(
+          email: email,
+          password: password,
+          username: username,
+        ),
+      ).thenAnswer((_) async => session);
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.registerUser(
+        email: email,
+        password: password,
+        username: username,
+      );
+
+      expect(notifier.state.value, session);
+      expect(notifier.isAuthenticated, true);
+      expect(notifier.currentUser?.email, email);
+      expect(notifier.currentUser?.isAnonymous, false);
+
+      verify(
+        () => mockRepository.registerUser(
+          email: email,
+          password: password,
+          username: username,
+        ),
+      ).called(1);
+    });
+
+    test('should handle error when registration fails', () async {
+      const email = 'test@example.com';
+      const password = 'Test123!';
+      const username = 'test-user';
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.registerUser(
+          email: email,
+          password: password,
+          username: username,
+        ),
+      ).thenThrow(Exception('Registration failed'));
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.registerUser(
+        email: email,
+        password: password,
+        username: username,
+      );
+
+      expect(notifier.state, isA<AsyncError>());
+      expect(notifier.state.hasError, true);
+    });
+  });
+
+  group('AuthNotifier - loginUser', () {
+    test('should login user and update state', () async {
+      const email = 'obi-wan@jedi.com';
+      const password = 'HelloThere123!';
+
+      const session = AuthSession(
+        user: User(
+          id: 'user-789',
+          username: 'obi-wan-kenobi-1',
+          email: email,
+          isAnonymous: false,
+        ),
+        token: AuthToken(accessToken: 'login-token', tokenType: 'bearer'),
+      );
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.loginUser(email: email, password: password),
+      ).thenAnswer((_) async => session);
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.loginUser(email: email, password: password);
+
+      expect(notifier.state.value, session);
+      expect(notifier.isAuthenticated, true);
+      expect(notifier.currentUser?.email, email);
+
+      verify(
+        () => mockRepository.loginUser(email: email, password: password),
+      ).called(1);
+    });
+
+    test('should handle error when login fails', () async {
+      const email = 'test@example.com';
+      const password = 'WrongPassword';
+
+      when(() => mockRepository.getSession()).thenAnswer((_) async => null);
+      when(
+        () => mockRepository.loginUser(email: email, password: password),
+      ).thenThrow(Exception('Invalid credentials'));
+
+      final notifier = AuthNotifier(mockRepository);
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await notifier.loginUser(email: email, password: password);
+
+      expect(notifier.state, isA<AsyncError>());
+      expect(notifier.state.hasError, true);
+    });
+  });
 }
