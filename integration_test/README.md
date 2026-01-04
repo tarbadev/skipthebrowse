@@ -36,7 +36,7 @@ flutter test integration_test --dart-define=API_BASE_URL=https://skipthebrowse-b
 
 ### Run specific test file
 ```bash
-flutter test integration_test/auth_e2e_test.dart
+flutter test integration_test/auth_test.dart
 ```
 
 ### Run on specific device
