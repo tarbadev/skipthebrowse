@@ -15,7 +15,10 @@ class AuthInterceptor extends Interceptor {
     final tokenType = prefs.getString(_tokenTypeKey);
 
     if (accessToken != null && tokenType != null) {
-      options.headers['Authorization'] = '$tokenType $accessToken';
+      // Capitalize token type (backend sends "bearer" but expects "Bearer")
+      final capitalizedTokenType =
+          tokenType[0].toUpperCase() + tokenType.substring(1);
+      options.headers['Authorization'] = '$capitalizedTokenType $accessToken';
     }
 
     super.onRequest(options, handler);

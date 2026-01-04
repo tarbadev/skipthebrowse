@@ -36,7 +36,7 @@ void main() {
 
       interceptor.onRequest(requestOptions, mockHandler);
 
-      expect(requestOptions.headers['Authorization'], 'bearer test-token');
+      expect(requestOptions.headers['Authorization'], 'Bearer test-token');
       verify(() => mockHandler.next(requestOptions)).called(1);
     });
 
@@ -94,7 +94,7 @@ void main() {
 
       interceptor.onRequest(requestOptions, mockHandler);
 
-      expect(requestOptions.headers['Authorization'], 'bearer test-token');
+      expect(requestOptions.headers['Authorization'], 'Bearer test-token');
       expect(requestOptions.headers['Content-Type'], 'application/json');
       expect(requestOptions.headers['Custom-Header'], 'custom-value');
       verify(() => mockHandler.next(requestOptions)).called(1);
