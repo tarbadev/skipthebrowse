@@ -125,26 +125,24 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6366F1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'SkipTheBrowse',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                  color: Colors.white,
-                ),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6366F1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'SkipTheBrowse',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+                color: Colors.white,
               ),
             ),
-          ],
+          ),
         ),
         actions: [
           Container(
