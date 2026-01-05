@@ -3,11 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/core/config/env_config.dart';
+import 'package:skipthebrowse/features/auth/data/interceptors/auth_interceptor.dart';
+import 'package:skipthebrowse/features/auth/data/repositories/api_auth_repository.dart';
+import 'package:skipthebrowse/features/auth/domain/services/auth_initializer.dart';
+import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
 
 Future<void> pumpSkipTheBrowse(WidgetTester tester) async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+
   final dio = Dio(
     BaseOptions(
       baseUrl: EnvConfig.apiBaseUrl,
@@ -15,6 +21,9 @@ Future<void> pumpSkipTheBrowse(WidgetTester tester) async {
       receiveTimeout: const Duration(seconds: 30),
     ),
   );
+
+  // Add auth interceptor first to add Authorization header
+  dio.interceptors.add(AuthInterceptor(sharedPreferences));
 
   dio.interceptors.add(
     LogInterceptor(
@@ -26,7 +35,10 @@ Future<void> pumpSkipTheBrowse(WidgetTester tester) async {
     ),
   );
 
-  final sharedPreferences = await SharedPreferences.getInstance();
+  final restClient = RestClient(dio);
+  final authRepository = ApiAuthRepository(restClient, sharedPreferences);
+  final authInitializer = AuthInitializer(authRepository);
+  await authInitializer.initialize();
 
   await tester.pumpWidget(
     ProviderScope(
