@@ -205,36 +205,6 @@ class AccountSettingsScreen extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.schedule, size: 14, color: Colors.orange),
-                        SizedBox(width: 6),
-                        Text(
-                          'Temporary Account',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -264,13 +234,13 @@ class AccountSettingsScreen extends ConsumerWidget {
                   const Row(
                     children: [
                       Icon(
-                        Icons.star_rounded,
+                        Icons.sync_rounded,
                         color: Color(0xFF6366F1),
                         size: 24,
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'Upgrade Your Account',
+                        'Sync Your Data',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -281,7 +251,7 @@ class AccountSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Add email and password to save your conversations permanently and sync across devices.',
+                    'Create an account to save your conversations and access them from any device.',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -306,7 +276,7 @@ class AccountSettingsScreen extends ConsumerWidget {
                         ),
                       ),
                       child: const Text(
-                        'Upgrade Account',
+                        'Create Account',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

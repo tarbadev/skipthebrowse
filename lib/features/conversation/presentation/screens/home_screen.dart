@@ -173,56 +173,15 @@ class HomeScreen extends ConsumerWidget {
             ),
             child: authState.when(
               data: (session) {
-                final username = session?.user.username ?? 'Guest';
                 final isAnonymous = session?.user.isAnonymous ?? true;
-                return PopupMenuButton<String>(
+                return IconButton(
                   tooltip: 'Account',
-                  icon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isAnonymous ? Icons.person_outline : Icons.person,
-                        color: Colors.white70,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        username.length > 12
-                            ? '${username.substring(0, 12)}...'
-                            : username,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  icon: Icon(
+                    isAnonymous ? Icons.person_outline : Icons.person,
+                    color: Colors.white70,
+                    size: 24,
                   ),
-                  color: const Color(0xFF242424),
-                  onSelected: (value) {
-                    if (value == 'account') {
-                      AppRoutes.goToAccountSettings(context);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'account',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.account_circle,
-                            color: Colors.white.withValues(alpha: 0.7),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Account Settings',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  onPressed: () => AppRoutes.goToAccountSettings(context),
                 );
               },
               loading: () => IconButton(
