@@ -62,6 +62,7 @@ void main() async {
       // Configure Session Replay
       options.replay.sessionSampleRate = 0.1;
       options.replay.onErrorSampleRate = 1.0;
+      options.environment = EnvConfig.environment;
     },
     appRunner: () => runApp(
       SentryWidget(
