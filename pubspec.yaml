@@ -36,6 +36,7 @@ dev_dependencies:
   build_runner: ^2.10.2
   retrofit_generator: ^10.2.1
   json_serializable: ^6.11.3
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -48,3 +49,16 @@ sentry:
   upload_source_maps: true
   project: skipthebrowse-client
   org: tarbadev
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true
+  image_path: assets/images/app_icon_1024.png
+  adaptive_icon_background: "#000000"
