@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/core/widgets/grain_overlay.dart';
-import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
+import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 
 import '../../domain/providers/conversation_providers.dart';
 
@@ -226,7 +226,7 @@ class HomeScreen extends ConsumerWidget {
           // Main content
           SafeArea(
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               child: context.responsive.centerMaxWidth(
                 child: Padding(
                   padding: context.responsive.horizontalPadding,
