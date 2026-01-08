@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
+import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 import 'package:skipthebrowse/features/search/presentation/widgets/interaction_prompt_widget.dart';
 import 'package:skipthebrowse/features/search/presentation/widgets/recommendation_card_with_status.dart';
 
@@ -18,15 +19,15 @@ class SearchSessionScreen extends ConsumerStatefulWidget {
 
 class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
   final ScrollController _scrollController = ScrollController();
-  // TODO: Re-enable when state management tracks interaction updates
-  // int _previousInteractionCount = 0;
+  int _previousInteractionCount = 0;
 
   @override
   void initState() {
     super.initState();
-    // _previousInteractionCount = widget.session.interactions.length;
+    _previousInteractionCount = widget.session.interactions.length;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(searchSessionProvider.notifier).setSession(widget.session);
       _scrollToLastInteraction();
     });
   }
@@ -64,23 +65,35 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
   }
 
   void _handleInteractionSubmit(String choiceId, String? customInput) {
-    // TODO: Implement interaction submission via state management
-    // ref.read(searchSessionProvider.notifier).addInteraction(...)
+    ref
+        .read(searchSessionProvider.notifier)
+        .addInteraction(widget.session.id, choiceId, customInput: customInput);
   }
 
   void _handleStatusChange(String recommendationId, status) {
-    // TODO: Implement status update via state management
-    // ref.read(searchSessionProvider.notifier).updateRecommendationStatus(...)
+    ref
+        .read(recommendationHistoryProvider.notifier)
+        .updateStatus(recommendationId, status);
   }
 
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
-    final session = widget.session;
+    final sessionState = ref.watch(searchSessionProvider);
+    final currentSession = sessionState.value ?? widget.session;
+    final isLoading = sessionState.isLoading;
 
-    // TODO: Watch search session state
-    // final sessionState = ref.watch(searchSessionProvider);
-    // final currentSession = sessionState.value ?? widget.session;
+    // Listen for new interactions and auto-scroll
+    ref.listen<AsyncValue<SearchSession?>>(searchSessionProvider, (
+      previous,
+      next,
+    ) {
+      final nextCount = next.value?.interactions.length ?? 0;
+      if (nextCount > _previousInteractionCount) {
+        _previousInteractionCount = nextCount;
+        _scrollToLastInteraction();
+      }
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFF181818),
@@ -149,11 +162,12 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
               ),
               physics: const BouncingScrollPhysics(),
               itemCount:
-                  session.interactions.length + session.recommendations.length,
+                  currentSession.interactions.length +
+                  currentSession.recommendations.length,
               itemBuilder: (context, index) {
                 // Show interactions first, then recommendations
-                if (index < session.interactions.length) {
-                  final interaction = session.interactions[index];
+                if (index < currentSession.interactions.length) {
+                  final interaction = currentSession.interactions[index];
                   return Column(
                     key: Key('interaction_${interaction.id}'),
                     children: [
@@ -227,14 +241,17 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                       InteractionPromptWidget(
                         prompt: interaction.assistantPrompt,
                         onSubmit: _handleInteractionSubmit,
-                        isEnabled: index == session.interactions.length - 1,
+                        isEnabled:
+                            !isLoading &&
+                            index == currentSession.interactions.length - 1,
                       ),
                     ],
                   );
                 } else {
                   // Show recommendation
-                  final recIndex = index - session.interactions.length;
-                  final recommendation = session.recommendations[recIndex];
+                  final recIndex = index - currentSession.interactions.length;
+                  final recommendation =
+                      currentSession.recommendations[recIndex];
                   return RecommendationCardWithStatus(
                     recommendation: recommendation,
                     onStatusChange: (status) =>

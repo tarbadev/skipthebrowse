@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/features/search/domain/entities/recommendation_with_status.dart';
+import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 import 'package:skipthebrowse/features/search/presentation/widgets/recommendation_card_with_status.dart';
 
 class RecommendationHistoryScreen extends ConsumerStatefulWidget {
@@ -23,10 +24,9 @@ class _RecommendationHistoryScreenState
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    // TODO: Load recommendations on init
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   ref.read(recommendationHistoryProvider.notifier).loadHistory();
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recommendationHistoryProvider.notifier).loadHistory();
+    });
   }
 
   @override
@@ -36,57 +36,51 @@ class _RecommendationHistoryScreenState
     super.dispose();
   }
 
-  // TODO: Re-enable when state management is implemented
-  // RecommendationStatus? _getFilterStatus() {
-  //   switch (_tabController.index) {
-  //     case 0:
-  //       return null; // All
-  //     case 1:
-  //       return RecommendationStatus.willWatch;
-  //     case 2:
-  //       return RecommendationStatus.seen;
-  //     case 3:
-  //       return RecommendationStatus.declined;
-  //     default:
-  //       return null;
-  //   }
-  // }
+  RecommendationStatus? _getFilterStatus() {
+    switch (_tabController.index) {
+      case 0:
+        return null; // All
+      case 1:
+        return RecommendationStatus.willWatch;
+      case 2:
+        return RecommendationStatus.seen;
+      case 3:
+        return RecommendationStatus.declined;
+      default:
+        return null;
+    }
+  }
 
   void _handleSearch(String query) {
     setState(() {
       _searchQuery = query;
     });
-    // TODO: Implement search
-    // if (query.isNotEmpty) {
-    //   ref.read(recommendationHistoryProvider.notifier).search(query);
-    // } else {
-    //   ref.read(recommendationHistoryProvider.notifier).loadHistory(
-    //     status: _getFilterStatus(),
-    //   );
-    // }
+    if (query.isNotEmpty) {
+      ref.read(recommendationHistoryProvider.notifier).search(query);
+    } else {
+      ref
+          .read(recommendationHistoryProvider.notifier)
+          .loadHistory(status: _getFilterStatus());
+    }
   }
 
   void _handleStatusChange(
     String recommendationId,
     RecommendationStatus status,
   ) {
-    // TODO: Implement status update
-    // ref.read(recommendationHistoryProvider.notifier).updateStatus(
-    //   recommendationId,
-    //   status,
-    // );
+    ref
+        .read(recommendationHistoryProvider.notifier)
+        .updateStatus(recommendationId, status);
   }
 
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
 
-    // TODO: Watch recommendation history state
-    // final historyState = ref.watch(recommendationHistoryProvider);
-    // Mock data for now
-    final recommendations = <RecommendationWithStatus>[];
-    final isLoading = false;
-    final hasError = false;
+    final historyState = ref.watch(recommendationHistoryProvider);
+    final recommendations = historyState.value?.recommendations ?? [];
+    final isLoading = historyState.isLoading;
+    final hasError = historyState.hasError;
 
     return Scaffold(
       backgroundColor: const Color(0xFF181818),
@@ -214,10 +208,9 @@ class _RecommendationHistoryScreenState
                 ),
                 onTap: (index) {
                   if (_searchQuery.isEmpty) {
-                    // TODO: Reload with new filter
-                    // ref.read(recommendationHistoryProvider.notifier).loadHistory(
-                    //   status: _getFilterStatus(),
-                    // );
+                    ref
+                        .read(recommendationHistoryProvider.notifier)
+                        .loadHistory(status: _getFilterStatus());
                   }
                 },
                 tabs: const [
