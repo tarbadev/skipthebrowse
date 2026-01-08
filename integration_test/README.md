@@ -58,6 +58,15 @@ flutter test integration_test -d "iPhone 15 Pro"
 - **Authenticated requests**: Verifies that API requests succeed with authentication (proves Authorization header is working)
 - **End-to-end conversation flow**: Verifies that the entire flow from auth to conversation creation works
 
+### Search Session E2E Tests (`search_session_flow_test.dart`)
+- **Complete search session flow**: Verifies search session creation with structured interactions and recommendations
+- **Interactive choice selection**: Tests structured choice buttons and submission flow
+- **Recommendation history**: Verifies recommendation history screen with status filtering and search
+- **Status updates**: Tests updating recommendation status (proposed, seen, willWatch, declined)
+- **Optional text input**: Verifies that text input is optional for choices that accept custom input
+- **Scroll behavior**: Tests that last interaction appears at top of viewport
+- **Navigation flow**: Tests navigation between HomeScreen → SearchSessionScreen → RecommendationHistoryScreen
+
 ## Test Structure
 
 E2E tests differ from unit tests:
