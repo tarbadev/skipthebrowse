@@ -88,7 +88,13 @@ class SkipTheBrowse extends ConsumerWidget {
       title: 'SkipTheBrowse',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF181818),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+          surface: const Color(0xFF181818),
+        ),
       ),
       routerConfig: router,
     );
