@@ -5,23 +5,23 @@ import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/core/widgets/grain_overlay.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
-
-import '../../domain/providers/conversation_providers.dart';
+import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  Future<void> _createConversation(
+  Future<void> _createSearchSession(
     String message,
     WidgetRef ref,
     BuildContext context,
   ) async {
-    final conversation = await ref
-        .read(conversationStateProvider.notifier)
-        .createConversation(message);
+    await ref.read(searchSessionProvider.notifier).createSession(message);
 
-    if (conversation != null && context.mounted) {
-      AppRoutes.goToConversation(context, conversation);
+    final sessionState = ref.read(searchSessionProvider);
+    final session = sessionState.value;
+
+    if (session != null && context.mounted) {
+      AppRoutes.goToSearchSession(context, session);
     }
   }
 
@@ -61,7 +61,7 @@ class HomeScreen extends ConsumerWidget {
                 label: label,
                 prompt: prompt,
                 isLoading: isLoading,
-                onTap: () => _createConversation(prompt, ref, context),
+                onTap: () => _createSearchSession(prompt, ref, context),
               ),
             ),
           );
@@ -101,7 +101,7 @@ class HomeScreen extends ConsumerWidget {
               label: label,
               prompt: prompt,
               isLoading: isLoading,
-              onTap: () => _createConversation(prompt, ref, context),
+              onTap: () => _createSearchSession(prompt, ref, context),
             ),
           ),
         );
@@ -111,8 +111,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final conversationState = ref.watch(conversationStateProvider);
-    final isLoading = conversationState.isLoading;
+    final sessionState = ref.watch(searchSessionProvider);
+    final isLoading = sessionState.isLoading;
     final authState = ref.watch(authStateProvider);
     final responsive = context.responsive;
 
@@ -148,6 +148,25 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.movie_filter_rounded,
+                color: Colors.white70,
+              ),
+              onPressed: () => AppRoutes.goToRecommendationHistory(context),
+              tooltip: 'My Recommendations',
+            ),
+          ),
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
@@ -325,7 +344,7 @@ class HomeScreen extends ConsumerWidget {
                                 SizedBox(height: responsive.spacing),
                                 AddMessageWidget(
                                   onSubmit: (String message) =>
-                                      _createConversation(
+                                      _createSearchSession(
                                         message,
                                         ref,
                                         context,

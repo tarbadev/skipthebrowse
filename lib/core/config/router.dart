@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
+import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
 import 'package:skipthebrowse/features/auth/presentation/screens/account_settings_screen.dart';
 import 'package:skipthebrowse/features/auth/presentation/screens/register_login_screen.dart';
 
 import '../../features/conversation/presentation/screens/conversation_list_screen.dart';
 import '../../features/conversation/presentation/screens/conversation_screen.dart';
 import '../../features/conversation/presentation/screens/home_screen.dart';
+import '../../features/search/presentation/screens/search_session_screen.dart';
+import '../../features/search/presentation/screens/recommendation_history_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
   static const String conversation = '/conversation';
   static const String conversationList = '/conversations';
+  static const String searchSession = '/search-session';
+  static const String recommendationHistory = '/recommendation-history';
   static const String accountSettings = '/account';
   static const String registerLogin = '/auth/register-login';
 
@@ -28,6 +33,14 @@ class AppRoutes {
 
   static void goToConversationList(BuildContext context) {
     context.push(conversationList);
+  }
+
+  static void goToSearchSession(BuildContext context, SearchSession session) {
+    context.push(searchSession, extra: session);
+  }
+
+  static void goToRecommendationHistory(BuildContext context) {
+    context.push(recommendationHistory);
   }
 
   static void goToAccountSettings(BuildContext context) {
@@ -77,5 +90,19 @@ final routes = [
       final isMerge = extra?['isMerge'] as bool? ?? false;
       return RegisterLoginScreen(isRegister: isRegister, isMerge: isMerge);
     },
+  ),
+  GoRoute(
+    path: AppRoutes.searchSession,
+    builder: (context, state) {
+      final session = state.extra as SearchSession?;
+      if (session == null) {
+        return const HomeScreen();
+      }
+      return SearchSessionScreen(session: session);
+    },
+  ),
+  GoRoute(
+    path: AppRoutes.recommendationHistory,
+    builder: (context, state) => const RecommendationHistoryScreen(),
   ),
 ];
