@@ -11,6 +11,9 @@ import 'mocks.dart';
 
 extension TestX on WidgetTester {
   Future<void> pumpProviderWidget(Widget widget) async {
+    // Set a consistent surface size for responsive testing (1280x1000)
+    await binding.setSurfaceSize(const Size(1280, 1000));
+
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -35,6 +38,9 @@ extension TestX on WidgetTester {
     String initialRoute = AppRoutes.home,
     Object? initialExtra,
   }) async {
+    // Set a consistent surface size for responsive testing (1280x1000)
+    await binding.setSurfaceSize(const Size(1280, 1000));
+
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -60,5 +66,10 @@ extension TestX on WidgetTester {
         child: MaterialApp.router(routerConfig: goRouter),
       ),
     );
+  }
+
+  /// Helper to reset the surface size if needed
+  Future<void> resetSurfaceSize() async {
+    await binding.setSurfaceSize(null);
   }
 }

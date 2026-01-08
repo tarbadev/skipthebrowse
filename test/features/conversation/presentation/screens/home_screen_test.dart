@@ -100,8 +100,8 @@ void main() {
     ) async {
       await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
-      expect(find.text('Try one of these:'), findsOneWidget);
-      expect(find.text('Or start your own:'), findsOneWidget);
+      expect(find.text('Start your conversation:'), findsOneWidget);
+      expect(find.text('Or try a quick starter:'), findsOneWidget);
     });
 
     testWidgets('tapping first starter chip creates conversation', (

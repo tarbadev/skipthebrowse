@@ -225,172 +225,193 @@ class HomeScreen extends ConsumerWidget {
           ),
           const GrainOverlay(opacity: 0.03, density: 0.4),
           SafeArea(
-            child: Center(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: responsive.contentMaxWidth ?? responsive.width,
+                  minHeight:
+                      responsive.height -
+                      MediaQuery.of(context).padding.vertical,
                 ),
-                child: Padding(
-                  padding: responsive.horizontalPadding,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Hero section
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: 1.0),
-                        duration: const Duration(milliseconds: 800),
-                        curve: Curves.easeOut,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 20 * (1 - value)),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Color(0xFFFFFFFF), Color(0xFFE0E0E0)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ).createShader(bounds),
-                              child: Text(
-                                'Looking for something to watch?',
-                                key: const Key('home_page_title'),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: responsive.fontSize(48),
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.1,
-                                  letterSpacing: -1.5,
-                                  color: Colors.white,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: responsive.contentMaxWidth ?? responsive.width,
+                    ),
+                    child: Padding(
+                      padding: responsive.horizontalPadding,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Hero section
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 800),
+                            curve: Curves.easeOut,
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)),
+                                  child: child,
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Let AI be your personal curator',
-                              style: TextStyle(
-                                fontSize: responsive.fontSize(16),
-                                color: Colors.white.withValues(alpha: 0.5),
-                                letterSpacing: 1.2,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: responsive.spacing * 2.5),
-
-                      // Search bar first
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: 1.0),
-                        duration: const Duration(milliseconds: 1000),
-                        curve: Curves.easeOut,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 20 * (1 - value)),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            Text(
-                              'Start your conversation:',
-                              style: TextStyle(
-                                fontSize: responsive.fontSize(14),
-                                color: Colors.white.withValues(alpha: 0.4),
-                                letterSpacing: 1.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: responsive.spacing),
-                            AddMessageWidget(
-                              onSubmit: (String message) =>
-                                  _createConversation(message, ref, context),
-                              isLoading: isLoading,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: responsive.spacing * 2),
-
-                      // Quick starters below
-                      if (!isLoading) ...[
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 1200),
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Or try a quick starter:',
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                ShaderMask(
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
+                                        colors: [
+                                          Color(0xFFFFFFFF),
+                                          Color(0xFFE0E0E0),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ).createShader(bounds),
+                                  child: Text(
+                                    'Looking for something to watch?',
+                                    key: const Key('home_page_title'),
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: responsive.fontSize(14),
-                                      color: Colors.white.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      letterSpacing: 1.0,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: responsive.fontSize(48),
+                                      fontWeight: FontWeight.w900,
+                                      height: 1.1,
+                                      letterSpacing: -1.5,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: responsive.spacing),
-                                  _buildConversationStarters(
-                                    context,
-                                    conversationStarters,
-                                    isLoading,
-                                    ref,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Let AI be your personal curator',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(16),
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing * 2.5),
+
+                          // Search bar first
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 1000),
+                            curve: Curves.easeOut,
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Start your conversation:',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(14),
+                                    color: Colors.white.withValues(alpha: 0.4),
+                                    letterSpacing: 1.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: responsive.spacing),
+                                AddMessageWidget(
+                                  onSubmit: (String message) =>
+                                      _createConversation(
+                                        message,
+                                        ref,
+                                        context,
+                                      ),
+                                  isLoading: isLoading,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: responsive.spacing * 2),
+
+                          // Quick starters below
+                          if (!isLoading) ...[
+                            TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 1200),
+                              builder: (context, value, child) {
+                                return Opacity(
+                                  opacity: value,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Or try a quick starter:',
+                                        style: TextStyle(
+                                          fontSize: responsive.fontSize(14),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          letterSpacing: 1.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(height: responsive.spacing),
+                                      _buildConversationStarters(
+                                        context,
+                                        conversationStarters,
+                                        isLoading,
+                                        ref,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ] else
+                            Center(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(
+                                        0xFF6366F1,
+                                      ).withValues(alpha: 0.15),
+                                    ),
+                                    child: const SizedBox(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Color(0xFF6366F1),
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'Finding the perfect match...',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                        ),
-                      ] else
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(
-                                    0xFF6366F1,
-                                  ).withValues(alpha: 0.15),
-                                ),
-                                child: const SizedBox(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF6366F1),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'Finding the perfect match...',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
