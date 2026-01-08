@@ -40,6 +40,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
@@ -89,6 +90,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
@@ -140,6 +142,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
@@ -195,6 +198,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
@@ -242,6 +246,7 @@ void main() {
       // First container - register user
       container = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
@@ -259,6 +264,7 @@ void main() {
       // Second container - simulate app restart
       final container2 = ProviderContainer(
         overrides: [
+          baseDioProvider.overrideWithValue(mockDioHelper.dio),
           dioProvider.overrideWithValue(mockDioHelper.dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],

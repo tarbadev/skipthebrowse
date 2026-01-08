@@ -4,6 +4,26 @@ import 'package:skipthebrowse/core/config/env_config.dart';
 import 'package:skipthebrowse/features/auth/data/interceptors/auth_interceptor.dart';
 import 'conversation_providers.dart';
 
+/// Base Dio instance without the AuthInterceptor to avoid circular dependencies
+final baseDioProvider = Provider<Dio>((ref) {
+  return Dio(
+      BaseOptions(
+        baseUrl: EnvConfig.apiBaseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    )
+    ..interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+      ),
+    );
+});
+
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
@@ -15,7 +35,7 @@ final dioProvider = Provider<Dio>((ref) {
 
   // Add auth interceptor first to add Authorization header
   final prefs = ref.watch(sharedPreferencesProvider);
-  dio.interceptors.add(AuthInterceptor(prefs));
+  dio.interceptors.add(AuthInterceptor(prefs, ref));
 
   dio.interceptors.add(
     LogInterceptor(

@@ -22,7 +22,8 @@ Future<void> pumpSkipTheBrowse(WidgetTester tester) async {
     ),
   );
 
-  // Add auth interceptor first to add Authorization header
+  // We can't easily pass a Ref here in the helper,
+  // but the interceptor now handles optional Ref gracefully.
   dio.interceptors.add(AuthInterceptor(sharedPreferences));
 
   dio.interceptors.add(

@@ -8,7 +8,8 @@ import 'package:skipthebrowse/features/conversation/domain/providers/dio_provide
 import '../entities/auth_session.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final dio = ref.watch(dioProvider);
+  // Use baseDioProvider to avoid circular dependency with AuthInterceptor
+  final dio = ref.watch(baseDioProvider);
   final restClient = RestClient(dio, baseUrl: dio.options.baseUrl);
   final prefs = ref.watch(sharedPreferencesProvider);
 

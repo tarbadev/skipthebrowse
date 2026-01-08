@@ -42,6 +42,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            baseDioProvider.overrideWithValue(mockDioHelper.dio),
             dioProvider.overrideWithValue(mockDioHelper.dio),
             sharedPreferencesProvider.overrideWithValue(sharedPreferences),
           ],
