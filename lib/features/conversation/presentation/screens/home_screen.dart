@@ -37,6 +37,7 @@ class HomeScreen extends ConsumerWidget {
     if (columns == 1) {
       // Single column layout for mobile
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: starters.asMap().entries.map((entry) {
           final index = entry.key;
           final (emoji, label, prompt) = entry.value;
@@ -72,6 +73,7 @@ class HomeScreen extends ConsumerWidget {
     return Wrap(
       spacing: 16,
       runSpacing: 16,
+      alignment: WrapAlignment.center,
       children: starters.asMap().entries.map((entry) {
         final index = entry.key;
         final (emoji, label, prompt) = entry.value;
@@ -112,6 +114,7 @@ class HomeScreen extends ConsumerWidget {
     final conversationState = ref.watch(conversationStateProvider);
     final isLoading = conversationState.isLoading;
     final authState = ref.watch(authStateProvider);
+    final responsive = context.responsive;
 
     final conversationStarters = [
       ("🎬", "Something thrilling", "I want something thrilling to watch"),
@@ -206,7 +209,6 @@ class HomeScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          // Atmospheric background
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -221,18 +223,18 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // Film grain texture overlay
           const GrainOverlay(opacity: 0.03, density: 0.4),
-          // Main content
           SafeArea(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: context.responsive.centerMaxWidth(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: responsive.contentMaxWidth ?? responsive.width,
+                ),
                 child: Padding(
-                  padding: context.responsive.horizontalPadding,
+                  padding: responsive.horizontalPadding,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: context.responsive.spacing * 2),
                       // Hero section
                       TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0.0, end: 1.0),
@@ -260,7 +262,7 @@ class HomeScreen extends ConsumerWidget {
                                 key: const Key('home_page_title'),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: context.responsive.fontSize(48),
+                                  fontSize: responsive.fontSize(48),
                                   fontWeight: FontWeight.w900,
                                   height: 1.1,
                                   letterSpacing: -1.5,
@@ -272,7 +274,7 @@ class HomeScreen extends ConsumerWidget {
                             Text(
                               'Let AI be your personal curator',
                               style: TextStyle(
-                                fontSize: context.responsive.fontSize(16),
+                                fontSize: responsive.fontSize(16),
                                 color: Colors.white.withValues(alpha: 0.5),
                                 letterSpacing: 1.2,
                                 fontWeight: FontWeight.w300,
@@ -281,22 +283,79 @@ class HomeScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      SizedBox(height: context.responsive.spacing * 2),
-                      // Quick starters label
-                      if (!isLoading)
-                        Text(
-                          'Try one of these:',
-                          style: TextStyle(
-                            fontSize: context.responsive.fontSize(14),
-                            color: Colors.white.withValues(alpha: 0.4),
-                            letterSpacing: 1.0,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      SizedBox(height: responsive.spacing * 2.5),
+
+                      // Search bar first
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 1000),
+                        curve: Curves.easeOut,
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 20 * (1 - value)),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              'Start your conversation:',
+                              style: TextStyle(
+                                fontSize: responsive.fontSize(14),
+                                color: Colors.white.withValues(alpha: 0.4),
+                                letterSpacing: 1.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: responsive.spacing),
+                            AddMessageWidget(
+                              onSubmit: (String message) =>
+                                  _createConversation(message, ref, context),
+                              isLoading: isLoading,
+                            ),
+                          ],
                         ),
-                      if (!isLoading)
-                        SizedBox(height: context.responsive.spacing),
-                      // Quick starters with staggered animation or loading spinner
-                      if (isLoading)
+                      ),
+
+                      SizedBox(height: responsive.spacing * 2),
+
+                      // Quick starters below
+                      if (!isLoading) ...[
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 1200),
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Or try a quick starter:',
+                                    style: TextStyle(
+                                      fontSize: responsive.fontSize(14),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      letterSpacing: 1.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: responsive.spacing),
+                                  _buildConversationStarters(
+                                    context,
+                                    conversationStarters,
+                                    isLoading,
+                                    ref,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ] else
                         Center(
                           child: Column(
                             children: [
@@ -330,83 +389,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                        )
-                      else
-                        _buildConversationStarters(
-                          context,
-                          conversationStarters,
-                          isLoading,
-                          ref,
                         ),
-                      if (!isLoading) ...[
-                        SizedBox(height: context.responsive.spacing * 1.5),
-                        // Divider
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 1000),
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value * 0.3,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 1,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.white.withValues(
-                                              alpha: 0.3 * value,
-                                            ),
-                                            Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 40),
-                        // Custom input
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: const Duration(milliseconds: 1200),
-                          curve: Curves.easeOut,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Transform.translate(
-                                offset: Offset(0, 20 * (1 - value)),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              Text(
-                                'Or start your own:',
-                                style: TextStyle(
-                                  fontSize: context.responsive.fontSize(14),
-                                  color: Colors.white.withValues(alpha: 0.4),
-                                  letterSpacing: 1.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: context.responsive.spacing),
-                              AddMessageWidget(
-                                onSubmit: (String message) =>
-                                    _createConversation(message, ref, context),
-                                isLoading: isLoading,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      SizedBox(height: context.responsive.spacing * 2),
                     ],
                   ),
                 ),
