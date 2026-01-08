@@ -5,7 +5,6 @@ import 'package:skipthebrowse/features/search/data/repositories/search_rest_clie
 import 'package:skipthebrowse/features/search/data/models/create_search_session_request.dart';
 import 'package:skipthebrowse/features/search/data/models/add_interaction_request.dart';
 import 'package:skipthebrowse/features/search/data/models/update_recommendation_status_request.dart';
-import 'package:skipthebrowse/features/search/data/models/recommendation_with_status_response.dart';
 
 class ApiSearchRepository implements SearchRepository {
   final SearchRestClient restClient;
@@ -84,12 +83,7 @@ class ApiSearchRepository implements SearchRepository {
     int limit = 50,
   }) async {
     final response = await restClient.searchRecommendations(query, limit);
-
-    final results = response['results'] as List;
-    return results
-        .map((json) => RecommendationWithStatusResponse.fromJson(json))
-        .map((r) => r.toEntity())
-        .toList();
+    return response.recommendations.map((r) => r.toEntity()).toList();
   }
 
   String _statusToString(RecommendationStatus status) {

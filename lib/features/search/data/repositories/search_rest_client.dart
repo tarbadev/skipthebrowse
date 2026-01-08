@@ -32,7 +32,7 @@ abstract class SearchRestClient {
   Future<SearchSessionResponse> getSearchSession(@Path('id') String sessionId);
 
   @PATCH('/api/v1/recommendations/{id}/status')
-  Future<Map<String, dynamic>> updateRecommendationStatus(
+  Future<void> updateRecommendationStatus(
     @Path('id') String recommendationId,
     @Body() UpdateRecommendationStatusRequest request,
   );
@@ -45,7 +45,7 @@ abstract class SearchRestClient {
   );
 
   @GET('/api/v1/recommendations/search')
-  Future<Map<String, dynamic>> searchRecommendations(
+  Future<SearchRecommendationsResponse> searchRecommendations(
     @Query('q') String query,
     @Query('limit') int limit,
   );
@@ -69,4 +69,16 @@ class RecommendationHistoryResponse {
       _$RecommendationHistoryResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$RecommendationHistoryResponseToJson(this);
+}
+
+@JsonSerializable()
+class SearchRecommendationsResponse {
+  final List<RecommendationWithStatusResponse> recommendations;
+
+  SearchRecommendationsResponse({required this.recommendations});
+
+  factory SearchRecommendationsResponse.fromJson(Map<String, dynamic> json) =>
+      _$SearchRecommendationsResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SearchRecommendationsResponseToJson(this);
 }

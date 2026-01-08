@@ -30,6 +30,22 @@ Map<String, dynamic> _$RecommendationHistoryResponseToJson(
   'offset': instance.offset,
 };
 
+SearchRecommendationsResponse _$SearchRecommendationsResponseFromJson(
+  Map<String, dynamic> json,
+) => SearchRecommendationsResponse(
+  recommendations: (json['recommendations'] as List<dynamic>)
+      .map(
+        (e) => RecommendationWithStatusResponse.fromJson(
+          e as Map<String, dynamic>,
+        ),
+      )
+      .toList(),
+);
+
+Map<String, dynamic> _$SearchRecommendationsResponseToJson(
+  SearchRecommendationsResponse instance,
+) => <String, dynamic>{'recommendations': instance.recommendations};
+
 // dart format off
 
 // **************************************************************************
@@ -136,7 +152,7 @@ class _SearchRestClient implements SearchRestClient {
   }
 
   @override
-  Future<Map<String, dynamic>> updateRecommendationStatus(
+  Future<void> updateRecommendationStatus(
     String recommendationId,
     UpdateRecommendationStatusRequest request,
   ) async {
@@ -145,7 +161,7 @@ class _SearchRestClient implements SearchRestClient {
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<Map<String, dynamic>>(
+    final _options = _setStreamType<void>(
       Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -155,18 +171,7 @@ class _SearchRestClient implements SearchRestClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late Map<String, dynamic> _value;
-    try {
-      _value = _result.data!.map(
-        (k, dynamic v) =>
-            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
-      );
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options, response: _result);
-      rethrow;
-    }
-    return _value;
+    await _dio.fetch<void>(_options);
   }
 
   @override
@@ -206,7 +211,7 @@ class _SearchRestClient implements SearchRestClient {
   }
 
   @override
-  Future<Map<String, dynamic>> searchRecommendations(
+  Future<SearchRecommendationsResponse> searchRecommendations(
     String query,
     int limit,
   ) async {
@@ -214,7 +219,7 @@ class _SearchRestClient implements SearchRestClient {
     final queryParameters = <String, dynamic>{r'q': query, r'limit': limit};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<Map<String, dynamic>>(
+    final _options = _setStreamType<SearchRecommendationsResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -225,12 +230,9 @@ class _SearchRestClient implements SearchRestClient {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late Map<String, dynamic> _value;
+    late SearchRecommendationsResponse _value;
     try {
-      _value = _result.data!.map(
-        (k, dynamic v) =>
-            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
-      );
+      _value = SearchRecommendationsResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
