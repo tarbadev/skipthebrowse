@@ -165,7 +165,8 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
               itemCount:
                   (currentSession.initialMessage != null ? 1 : 0) +
                   currentSession.interactions.length +
-                  currentSession.recommendations.length,
+                  currentSession.recommendations.length +
+                  (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
                 // Show initial message first
                 if (currentSession.initialMessage != null && index == 0) {
@@ -320,7 +321,9 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                         ),
                     ],
                   );
-                } else {
+                } else if (adjustedIndex <
+                    currentSession.interactions.length +
+                        currentSession.recommendations.length) {
                   // Show recommendation
                   final recIndex =
                       adjustedIndex - currentSession.interactions.length;
@@ -331,55 +334,38 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                     onStatusChange: (status) =>
                         _handleStatusChange(recommendation.id, status),
                   );
+                } else {
+                  // Show loading spinner at the end
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.responsive(
+                        mobile: 16.0,
+                        tablet: 20.0,
+                        desktop: 24.0,
+                      ),
+                      vertical: responsive.responsive(
+                        mobile: 12.0,
+                        tablet: 14.0,
+                        desktop: 16.0,
+                      ),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
                 }
               },
             ),
           ),
-          // Loading overlay
-          if (isLoading)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.5),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF242424),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF6366F1),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Finding your perfect match...',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

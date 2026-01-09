@@ -51,18 +51,21 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
         ? '${selectedChoice.displayText}: $customInput'
         : selectedChoice.displayText;
 
-    // Optimistic update: Add pending interaction with display text
-    final pendingInteraction = Interaction(
-      id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+    // Optimistic update: Update last interaction with user's response
+    final updatedInteractions = List<Interaction>.from(
+      currentSession.interactions,
+    );
+    updatedInteractions[updatedInteractions.length - 1] = Interaction(
+      id: updatedInteractions.last.id,
       userInput: userInputText,
-      assistantPrompt: currentSession.interactions.last.assistantPrompt,
-      timestamp: DateTime.now(),
+      assistantPrompt: updatedInteractions.last.assistantPrompt,
+      timestamp: updatedInteractions.last.timestamp,
     );
 
     final updatedSession = SearchSession(
       id: currentSession.id,
       initialMessage: currentSession.initialMessage,
-      interactions: [...currentSession.interactions, pendingInteraction],
+      interactions: updatedInteractions,
       recommendations: currentSession.recommendations,
       createdAt: currentSession.createdAt,
     );
