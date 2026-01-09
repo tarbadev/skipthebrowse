@@ -34,10 +34,27 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
     final currentSession = state.value;
     if (currentSession == null) return;
 
-    // Optimistic update: Add pending interaction
+    // Find the display text for the selected choice
+    final selectedChoice = currentSession
+        .interactions
+        .last
+        .assistantPrompt
+        .choices
+        .firstWhere(
+          (c) => c.id == choiceId,
+          orElse: () =>
+              currentSession.interactions.last.assistantPrompt.choices.first,
+        );
+
+    // Build user input with display text (not ID)
+    final userInputText = customInput != null
+        ? '${selectedChoice.displayText}: $customInput'
+        : selectedChoice.displayText;
+
+    // Optimistic update: Add pending interaction with display text
     final pendingInteraction = Interaction(
       id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-      userInput: customInput != null ? '$choiceId: $customInput' : choiceId,
+      userInput: userInputText,
       assistantPrompt: currentSession.interactions.last.assistantPrompt,
       timestamp: DateTime.now(),
     );
