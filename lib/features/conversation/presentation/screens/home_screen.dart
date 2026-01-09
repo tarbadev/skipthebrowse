@@ -15,10 +15,9 @@ class HomeScreen extends ConsumerWidget {
     WidgetRef ref,
     BuildContext context,
   ) async {
-    await ref.read(searchSessionProvider.notifier).createSession(message);
-
-    final sessionState = ref.read(searchSessionProvider);
-    final session = sessionState.value;
+    final session = await ref
+        .read(searchSessionProvider.notifier)
+        .createSession(message);
 
     if (session != null && context.mounted) {
       AppRoutes.goToSearchSession(context, session);

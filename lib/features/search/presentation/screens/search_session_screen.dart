@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
@@ -42,22 +41,9 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
 
-      final interactionCount = widget.session.interactions.length;
-      if (interactionCount == 0) return;
-
-      // Calculate position to show last interaction at top of viewport
-      final viewportHeight = _scrollController.position.viewportDimension;
-      final estimatedInteractionHeight = 120.0; // Approximate height
-      final targetOffset = max(
-        0.0,
-        _scrollController.position.maxScrollExtent -
-            viewportHeight +
-            estimatedInteractionHeight +
-            100,
-      );
-
+      // Scroll to bottom to show latest interaction
       _scrollController.animateTo(
-        targetOffset,
+        _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
