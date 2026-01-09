@@ -55,7 +55,7 @@ void main() {
       expect(homeScreenTester.isVisible, true);
       expect(homeScreenTester.title, 'Looking for something to watch?');
 
-      await homeScreenTester.createConversation(initialMessage);
+      await homeScreenTester.createSearchSession(initialMessage);
       await tester.pumpAndSettle();
 
       final conversationScreenTester = ConversationScreenTester(tester);

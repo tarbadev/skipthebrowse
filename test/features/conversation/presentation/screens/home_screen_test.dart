@@ -53,7 +53,7 @@ void main() {
     expect(find.text('Looking for something to watch?'), findsOneWidget);
     expect(conversationScreenTester.isVisible, isFalse);
 
-    await homeScreenTester.createConversation(question);
+    await homeScreenTester.createSearchSession(question);
 
     verify(
       () => mockConversationRepository.createConversation(question),
@@ -121,7 +121,7 @@ void main() {
       final homeScreenTester = HomeScreenTester(tester);
       final starterText = "I want something thrilling to watch";
 
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
         () => mockConversationRepository.createConversation(starterText),
@@ -149,7 +149,7 @@ void main() {
       final homeScreenTester = HomeScreenTester(tester);
       final starterText = "Looking for a comedy series to binge";
 
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
         () => mockConversationRepository.createConversation(starterText),
@@ -177,7 +177,7 @@ void main() {
       final homeScreenTester = HomeScreenTester(tester);
       final starterText = "Recommend me something like Inception";
 
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
         () => mockConversationRepository.createConversation(starterText),
@@ -205,7 +205,7 @@ void main() {
       final homeScreenTester = HomeScreenTester(tester);
       final customMessage = "I want to watch a documentary about nature";
 
-      await homeScreenTester.createConversation(customMessage);
+      await homeScreenTester.createSearchSession(customMessage);
 
       verify(
         () => mockConversationRepository.createConversation(customMessage),

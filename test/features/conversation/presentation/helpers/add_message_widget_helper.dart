@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'base_screen_tester.dart';
+import '../../../../helpers/base_screen_tester.dart';
 
 class AddMessageWidgetHelper extends BaseWidgetTester {
   String textBoxKey = 'add_message_text_box';

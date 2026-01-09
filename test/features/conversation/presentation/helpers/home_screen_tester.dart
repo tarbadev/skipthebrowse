@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'add_message_widget_helper.dart';
-import 'base_screen_tester.dart';
+import '../../../../helpers/base_screen_tester.dart';
 
 class HomeScreenTester extends BaseWidgetTester {
   String titleKey = 'home_page_title';
@@ -15,7 +15,7 @@ class HomeScreenTester extends BaseWidgetTester {
 
   String get title => getTextByKey(titleKey);
 
-  Future<void> createConversation(String initialMessage) async {
+  Future<void> createSearchSession(String initialMessage) async {
     await _addMessageWidgetHelper.enterMessage(initialMessage);
     await _addMessageWidgetHelper.submit();
   }
@@ -25,7 +25,7 @@ class HomeScreenTester extends BaseWidgetTester {
     await tester.pumpAndSettle();
   }
 
-  Future<void> tapConversationStarter(String starterText) async {
+  Future<void> tapSearchSessionStarter(String starterText) async {
     await tester.ensureVisible(find.text(starterText));
     await tester.pumpAndSettle();
     await tester.tap(find.text(starterText));

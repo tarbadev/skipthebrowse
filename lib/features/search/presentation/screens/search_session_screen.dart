@@ -121,6 +121,7 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
           ),
           child: Text(
             'Search Session',
+            key: Key('search_session_screen_title'),
             style: TextStyle(
               fontSize: responsive.fontSize(14),
               fontWeight: FontWeight.w800,
@@ -162,16 +163,96 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
               ),
               physics: const BouncingScrollPhysics(),
               itemCount:
+                  (currentSession.initialMessage != null ? 1 : 0) +
                   currentSession.interactions.length +
                   currentSession.recommendations.length,
               itemBuilder: (context, index) {
+                // Show initial message first
+                if (currentSession.initialMessage != null && index == 0) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.responsive(
+                        mobile: 16.0,
+                        tablet: 20.0,
+                        desktop: 24.0,
+                      ),
+                      vertical: responsive.responsive(
+                        mobile: 8.0,
+                        tablet: 10.0,
+                        desktop: 12.0,
+                      ),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth:
+                              responsive.width *
+                              responsive.responsive(
+                                mobile: 0.8,
+                                tablet: 0.7,
+                                desktop: 0.6,
+                              ),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: responsive.responsive(
+                            mobile: 16.0,
+                            tablet: 18.0,
+                            desktop: 20.0,
+                          ),
+                          vertical: responsive.responsive(
+                            mobile: 12.0,
+                            tablet: 14.0,
+                            desktop: 16.0,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6366F1),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(responsive.borderRadius),
+                            topRight: Radius.circular(responsive.borderRadius),
+                            bottomLeft: Radius.circular(
+                              responsive.borderRadius,
+                            ),
+                            bottomRight: const Radius.circular(4),
+                          ),
+                        ),
+                        child: Text(
+                          currentSession.initialMessage!,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: responsive.fontSize(15),
+                            fontWeight: FontWeight.w600,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Adjust index for interactions and recommendations
+                final adjustedIndex = currentSession.initialMessage != null
+                    ? index - 1
+                    : index;
+
                 // Show interactions first, then recommendations
-                if (index < currentSession.interactions.length) {
-                  final interaction = currentSession.interactions[index];
+                if (adjustedIndex < currentSession.interactions.length) {
+                  final interaction =
+                      currentSession.interactions[adjustedIndex];
                   return Column(
                     key: Key('interaction_${interaction.id}'),
                     children: [
-                      // Show user input if exists
+                      // Show assistant prompt first
+                      InteractionPromptWidget(
+                        prompt: interaction.assistantPrompt,
+                        onSubmit: _handleInteractionSubmit,
+                        isEnabled:
+                            !isLoading &&
+                            adjustedIndex ==
+                                currentSession.interactions.length - 1,
+                      ),
+                      // Show user input after (if exists)
                       if (interaction.userInput != null)
                         Padding(
                           padding: EdgeInsets.symmetric(
@@ -237,19 +318,12 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                             ),
                           ),
                         ),
-                      // Show assistant prompt
-                      InteractionPromptWidget(
-                        prompt: interaction.assistantPrompt,
-                        onSubmit: _handleInteractionSubmit,
-                        isEnabled:
-                            !isLoading &&
-                            index == currentSession.interactions.length - 1,
-                      ),
                     ],
                   );
                 } else {
                   // Show recommendation
-                  final recIndex = index - currentSession.interactions.length;
+                  final recIndex =
+                      adjustedIndex - currentSession.interactions.length;
                   final recommendation =
                       currentSession.recommendations[recIndex];
                   return RecommendationCardWithStatus(

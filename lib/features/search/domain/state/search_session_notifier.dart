@@ -61,6 +61,7 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
 
     final updatedSession = SearchSession(
       id: currentSession.id,
+      initialMessage: currentSession.initialMessage,
       interactions: [...currentSession.interactions, pendingInteraction],
       recommendations: currentSession.recommendations,
       createdAt: currentSession.createdAt,

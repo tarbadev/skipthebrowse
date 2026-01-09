@@ -8,6 +8,8 @@ part 'search_session_response.g.dart';
 @JsonSerializable()
 class SearchSessionResponse {
   final String id;
+  @JsonKey(name: 'initial_message')
+  final String? initialMessage;
   final List<InteractionResponse> interactions;
   final List<RecommendationWithStatusResponse> recommendations;
   @JsonKey(name: 'created_at')
@@ -18,6 +20,7 @@ class SearchSessionResponse {
 
   SearchSessionResponse({
     required this.id,
+    this.initialMessage,
     required this.interactions,
     required this.recommendations,
     required this.createdAt,
@@ -27,6 +30,7 @@ class SearchSessionResponse {
 
   SearchSession toEntity() => SearchSession(
     id: id,
+    initialMessage: initialMessage,
     interactions: interactions.map((i) => i.toEntity()).toList(),
     recommendations: recommendations.map((r) => r.toEntity()).toList(),
     createdAt: createdAt,

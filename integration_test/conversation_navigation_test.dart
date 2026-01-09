@@ -21,7 +21,7 @@ void main() {
 
       // Step 2: Create first conversation
       final firstMessage = "I want to watch a comedy";
-      await homeScreenTester.createConversation(firstMessage);
+      await homeScreenTester.createSearchSession(firstMessage);
 
       // Step 3: Verify conversation screen is displayed (waitForIsVisible will handle pumping)
       await conversationScreenTester.waitForIsVisible();
@@ -59,7 +59,7 @@ void main() {
 
       // Step 7: Create second conversation (this is where the bug might occur)
       final secondMessage = "Looking for a thriller";
-      await homeScreenTester.createConversation(secondMessage);
+      await homeScreenTester.createSearchSession(secondMessage);
 
       // Step 8: Verify second conversation screen is displayed (waitForIsVisible will handle pumping)
       await conversationScreenTester.waitForIsVisible();

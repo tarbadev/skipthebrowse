@@ -10,6 +10,7 @@ SearchSessionResponse _$SearchSessionResponseFromJson(
   Map<String, dynamic> json,
 ) => SearchSessionResponse(
   id: json['id'] as String,
+  initialMessage: json['initial_message'] as String?,
   interactions: (json['interactions'] as List<dynamic>)
       .map((e) => InteractionResponse.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -27,6 +28,7 @@ Map<String, dynamic> _$SearchSessionResponseToJson(
   SearchSessionResponse instance,
 ) => <String, dynamic>{
   'id': instance.id,
+  'initial_message': instance.initialMessage,
   'interactions': instance.interactions,
   'recommendations': instance.recommendations,
   'created_at': instance.createdAt.toIso8601String(),

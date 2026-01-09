@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:skipthebrowse/features/conversation/presentation/widgets/message_widget.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/recommendation_widget.dart';
+import 'package:skipthebrowse/features/search/presentation/widgets/interaction_prompt_widget.dart';
 
 import '../../../../helpers/base_screen_tester.dart';
 
-class ConversationScreenTester extends BaseWidgetTester {
-  String titleKey = 'conversation_screen_title';
+class SearchSessionScreenTester extends BaseWidgetTester {
+  String titleKey = 'search_session_screen_title';
   String textBoxKey = 'add_message_text_box';
   String buttonKey = 'add_message_button';
 
-  ConversationScreenTester(super.tester);
+  SearchSessionScreenTester(super.tester);
 
   bool get isVisible => widgetExists(titleKey);
 
@@ -26,14 +26,14 @@ class ConversationScreenTester extends BaseWidgetTester {
     expect(find.byKey(Key(titleKey)), findsOneWidget);
   }
 
-  List<String> getConversation() {
+  List<String> getSearchSession() {
     final Finder messageFinders = find.byType(
-      MessageWidget,
+      InteractionPromptWidget,
       skipOffstage: false,
     );
     return tester
-        .widgetList<MessageWidget>(messageFinders)
-        .map((widget) => widget.message.content)
+        .widgetList<InteractionPromptWidget>(messageFinders)
+        .map((widget) => widget.prompt.promptPrefix)
         .toList();
   }
 

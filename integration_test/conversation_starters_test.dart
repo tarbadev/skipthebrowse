@@ -41,7 +41,7 @@ void main() {
       expect(homeScreenTester.isVisible, true);
 
       final starterText = "I want something thrilling to watch";
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       final conversationPageTester = ConversationScreenTester(tester);
       await conversationPageTester.waitForIsVisible();
@@ -59,7 +59,7 @@ void main() {
       expect(homeScreenTester.isVisible, true);
 
       final starterText = "Looking for a comedy series to binge";
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       final conversationPageTester = ConversationScreenTester(tester);
       await conversationPageTester.waitForIsVisible();
@@ -77,7 +77,7 @@ void main() {
       expect(homeScreenTester.isVisible, true);
 
       final starterText = "Recommend me something like Inception";
-      await homeScreenTester.tapConversationStarter(starterText);
+      await homeScreenTester.tapSearchSessionStarter(starterText);
 
       final conversationPageTester = ConversationScreenTester(tester);
       await conversationPageTester.waitForIsVisible();

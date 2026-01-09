@@ -19,7 +19,7 @@ void main() {
       // Step 1: Create first conversation with "action" keyword
       expect(homeScreenTester.isVisible, true);
       final firstMessage = "I want to watch action movies";
-      await homeScreenTester.createConversation(firstMessage);
+      await homeScreenTester.createSearchSession(firstMessage);
       await conversationScreenTester.waitForIsVisible();
       expect(conversationScreenTester.isVisible, true);
 
@@ -30,7 +30,7 @@ void main() {
 
       // Step 2: Create second conversation with "comedy" keyword
       final secondMessage = "Looking for comedy shows";
-      await homeScreenTester.createConversation(secondMessage);
+      await homeScreenTester.createSearchSession(secondMessage);
       await conversationScreenTester.waitForIsVisible();
       expect(conversationScreenTester.isVisible, true);
 
@@ -94,7 +94,7 @@ void main() {
       final uniqueTerm =
           "zzztestunique${DateTime.now().millisecondsSinceEpoch}";
       final message = "I want $uniqueTerm recommendations";
-      await homeScreenTester.createConversation(message);
+      await homeScreenTester.createSearchSession(message);
       await conversationScreenTester.waitForIsVisible();
 
       // Go back to home and then to conversation list
