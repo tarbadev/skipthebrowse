@@ -54,6 +54,9 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
     ref
         .read(searchSessionProvider.notifier)
         .addInteraction(widget.session.id, choiceId, customInput: customInput);
+
+    // Scroll after submitting to show user response
+    _scrollToLastInteraction();
   }
 
   void _handleStatusChange(String recommendationId, status) {
@@ -238,6 +241,7 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                             !isLoading &&
                             adjustedIndex ==
                                 currentSession.interactions.length - 1,
+                        onChoiceSelected: _scrollToLastInteraction,
                       ),
                       // Show user input after (if exists)
                       if (interaction.userInput != null)

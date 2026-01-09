@@ -6,12 +6,14 @@ class InteractionPromptWidget extends StatefulWidget {
   final InteractionPrompt prompt;
   final Function(String choiceId, String? customInput) onSubmit;
   final bool isEnabled;
+  final VoidCallback? onChoiceSelected;
 
   const InteractionPromptWidget({
     super.key,
     required this.prompt,
     required this.onSubmit,
     this.isEnabled = true,
+    this.onChoiceSelected,
   });
 
   @override
@@ -33,6 +35,11 @@ class _InteractionPromptWidgetState extends State<InteractionPromptWidget> {
     setState(() {
       _selectedChoiceId = choiceId;
       _textController.clear();
+    });
+
+    // Trigger scroll callback after state is updated
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onChoiceSelected?.call();
     });
   }
 

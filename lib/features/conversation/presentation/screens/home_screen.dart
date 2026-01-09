@@ -15,12 +15,32 @@ class HomeScreen extends ConsumerWidget {
     WidgetRef ref,
     BuildContext context,
   ) async {
-    final session = await ref
-        .read(searchSessionProvider.notifier)
-        .createSession(message);
+    try {
+      final session = await ref
+          .read(searchSessionProvider.notifier)
+          .createSession(message);
 
-    if (session != null && context.mounted) {
-      AppRoutes.goToSearchSession(context, session);
+      if (session != null && context.mounted) {
+        // Navigate to search session
+        AppRoutes.goToSearchSession(context, session);
+      } else if (context.mounted) {
+        // Show error if session creation failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create search session. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
