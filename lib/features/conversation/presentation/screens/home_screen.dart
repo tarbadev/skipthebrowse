@@ -21,7 +21,6 @@ class HomeScreen extends ConsumerWidget {
           .createSession(message);
 
       if (session != null && context.mounted) {
-        // Navigate to search session
         AppRoutes.goToSearchSession(context, session);
       } else if (context.mounted) {
         // Show error if session creation failed
@@ -130,8 +129,11 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionState = ref.watch(searchSessionProvider);
-    final isLoading = sessionState.isLoading;
+    // Don't watch searchSessionProvider here - it causes context to unmount during navigation
+    // final sessionState = ref.watch(searchSessionProvider);
+    // final isLoading = sessionState.isLoading;
+    final isLoading =
+        false; // We'll show loading state within the button itself
     final authState = ref.watch(authStateProvider);
     final responsive = context.responsive;
 
@@ -377,76 +379,37 @@ class HomeScreen extends ConsumerWidget {
                           SizedBox(height: responsive.spacing * 2),
 
                           // Quick starters below
-                          if (!isLoading) ...[
-                            TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 0.0, end: 1.0),
-                              duration: const Duration(milliseconds: 1200),
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Or try a quick starter:',
-                                        style: TextStyle(
-                                          fontSize: responsive.fontSize(14),
-                                          color: Colors.white.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                          letterSpacing: 1.0,
-                                          fontWeight: FontWeight.w500,
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 1200),
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Or try a quick starter:',
+                                      style: TextStyle(
+                                        fontSize: responsive.fontSize(14),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.4,
                                         ),
-                                      ),
-                                      SizedBox(height: responsive.spacing),
-                                      _buildConversationStarters(
-                                        context,
-                                        conversationStarters,
-                                        isLoading,
-                                        ref,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ] else
-                            Center(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(24),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: const Color(
-                                        0xFF6366F1,
-                                      ).withValues(alpha: 0.15),
-                                    ),
-                                    child: const SizedBox(
-                                      width: 40,
-                                      height: 40,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Color(0xFF6366F1),
-                                            ),
+                                        letterSpacing: 1.0,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Text(
-                                    'Finding the perfect match...',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      letterSpacing: 0.5,
+                                    SizedBox(height: responsive.spacing),
+                                    _buildConversationStarters(
+                                      context,
+                                      conversationStarters,
+                                      isLoading,
+                                      ref,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
