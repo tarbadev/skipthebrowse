@@ -1,4 +1,5 @@
 import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
+import 'package:skipthebrowse/features/search/domain/entities/search_session_summary.dart';
 import 'package:skipthebrowse/features/search/domain/entities/recommendation_with_status.dart';
 
 abstract class SearchRepository {
@@ -14,6 +15,11 @@ abstract class SearchRepository {
   });
 
   Future<SearchSession> getSearchSession(String sessionId);
+
+  Future<List<SearchSessionSummary>> listSearchSessions({
+    int limit = 50,
+    int offset = 0,
+  });
 
   Future<void> updateRecommendationStatus(
     String recommendationId,

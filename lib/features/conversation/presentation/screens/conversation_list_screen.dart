@@ -3,8 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/core/utils/responsive_utils.dart';
-import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
+import 'package:skipthebrowse/features/search/domain/entities/search_session_summary.dart';
+import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
+
+final searchSessionListProvider = FutureProvider<List<SearchSessionSummary>>((
+  ref,
+) async {
+  final repository = ref.watch(searchRepositoryProvider);
+  return repository.listSearchSessions();
+});
 
 class ConversationListScreen extends ConsumerStatefulWidget {
   const ConversationListScreen({super.key});
@@ -20,50 +27,10 @@ class _ConversationListScreenState
   final ScrollController _scrollController = ScrollController();
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-    Future.microtask(
-      () =>
-          ref.read(conversationListStateProvider.notifier).loadConversations(),
-    );
-  }
-
-  @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent * 0.9) {
-      _loadMore();
-    }
-  }
-
-  void _loadMore() {
-    final query = _searchController.text;
-    if (query.length < 2) {
-      ref.read(conversationListStateProvider.notifier).loadMoreConversations();
-    } else {
-      ref
-          .read(conversationListStateProvider.notifier)
-          .loadMoreSearchResults(query);
-    }
-  }
-
-  void _onSearchChanged(String query) {
-    // Minimum 2 characters to trigger search (reduces noise)
-    if (query.length < 2) {
-      ref.read(conversationListStateProvider.notifier).loadConversations();
-    } else {
-      ref
-          .read(conversationListStateProvider.notifier)
-          .searchConversations(query);
-    }
   }
 
   Widget _buildSearchBar() {
@@ -92,7 +59,10 @@ class _ConversationListScreenState
       ),
       child: TextField(
         controller: _searchController,
-        onChanged: _onSearchChanged,
+        onChanged: (value) {
+          // TODO: Implement search for sessions
+          setState(() {});
+        },
         style: TextStyle(
           color: Colors.white.withValues(alpha: 0.9),
           fontSize: responsive.fontSize(15),
@@ -125,7 +95,7 @@ class _ConversationListScreenState
                   ),
                   onPressed: () {
                     _searchController.clear();
-                    _onSearchChanged('');
+                    setState(() {});
                   },
                 )
               : null,
@@ -147,39 +117,9 @@ class _ConversationListScreenState
     );
   }
 
-  Widget _buildLoadingIndicator(ResponsiveUtils responsive) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: responsive.responsive(
-          mobile: 24.0,
-          tablet: 28.0,
-          desktop: 32.0,
-        ),
-      ),
-      child: Center(
-        child: SizedBox(
-          width: responsive.responsive(
-            mobile: 32.0,
-            tablet: 36.0,
-            desktop: 40.0,
-          ),
-          height: responsive.responsive(
-            mobile: 32.0,
-            tablet: 36.0,
-            desktop: 40.0,
-          ),
-          child: const CircularProgressIndicator(
-            strokeWidth: 3,
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final conversationListState = ref.watch(conversationListStateProvider);
+    final sessionsAsync = ref.watch(searchSessionListProvider);
     final responsive = context.responsive;
 
     return Scaffold(
@@ -207,7 +147,7 @@ class _ConversationListScreenState
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            'My Conversations',
+            'My Searches',
             style: TextStyle(
               fontSize: responsive.fontSize(14),
               fontWeight: FontWeight.w800,
@@ -266,7 +206,7 @@ class _ConversationListScreenState
                 children: [
                   _buildSearchBar(),
                   Expanded(
-                    child: conversationListState.when(
+                    child: sessionsAsync.when(
                       loading: () => Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -291,7 +231,7 @@ class _ConversationListScreenState
                             ),
                             SizedBox(height: responsive.spacing),
                             Text(
-                              'Loading conversations...',
+                              'Loading search sessions...',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.6),
                                 fontSize: responsive.fontSize(16),
@@ -351,9 +291,8 @@ class _ConversationListScreenState
                             ),
                             SizedBox(height: responsive.spacing),
                             GestureDetector(
-                              onTap: () => ref
-                                  .read(conversationListStateProvider.notifier)
-                                  .loadConversations(),
+                              onTap: () =>
+                                  ref.refresh(searchSessionListProvider),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: responsive.responsive(
@@ -384,12 +323,8 @@ class _ConversationListScreenState
                           ],
                         ),
                       ),
-                      data: (state) {
-                        final isEmpty = state.isSearchMode
-                            ? state.searchResults!.results.isEmpty
-                            : state.conversations!.isEmpty;
-
-                        if (isEmpty) {
+                      data: (sessions) {
+                        if (sessions.isEmpty) {
                           return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -407,9 +342,7 @@ class _ConversationListScreenState
                                     color: Colors.white.withValues(alpha: 0.05),
                                   ),
                                   child: Icon(
-                                    state.isSearchMode
-                                        ? Icons.search_off_rounded
-                                        : Icons.chat_bubble_outline_rounded,
+                                    Icons.search_off_rounded,
                                     size: responsive.responsive(
                                       mobile: 64.0,
                                       tablet: 72.0,
@@ -420,9 +353,7 @@ class _ConversationListScreenState
                                 ),
                                 SizedBox(height: responsive.spacing),
                                 Text(
-                                  state.isSearchMode
-                                      ? 'No results found'
-                                      : 'No conversations yet',
+                                  'No search sessions yet',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: responsive.fontSize(22),
@@ -431,9 +362,7 @@ class _ConversationListScreenState
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  state.isSearchMode
-                                      ? 'Try a different search term'
-                                      : 'Start a conversation to discover\nyour perfect watch',
+                                  'Start a new search to discover\nyour perfect watch',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.5),
@@ -446,26 +375,10 @@ class _ConversationListScreenState
                           );
                         }
 
-                        final baseItemCount = state.isSearchMode
-                            ? state.searchResults!.results.length
-                            : state.conversations!.length;
-
-                        final itemCount = state.isLoadingMore || state.hasMore
-                            ? baseItemCount + 1
-                            : baseItemCount;
-
                         return RefreshIndicator(
-                          onRefresh: () {
-                            final query = _searchController.text;
-                            if (query.length < 2) {
-                              return ref
-                                  .read(conversationListStateProvider.notifier)
-                                  .loadConversations();
-                            } else {
-                              return ref
-                                  .read(conversationListStateProvider.notifier)
-                                  .searchConversations(query);
-                            }
+                          onRefresh: () async {
+                            ref.invalidate(searchSessionListProvider);
+                            await ref.read(searchSessionListProvider.future);
                           },
                           backgroundColor: const Color(0xFF242424),
                           color: const Color(0xFF6366F1),
@@ -480,29 +393,13 @@ class _ConversationListScreenState
                               bottom: 20,
                             ),
                             physics: const BouncingScrollPhysics(),
-                            itemCount: itemCount,
+                            itemCount: sessions.length,
                             itemBuilder: (context, index) {
-                              if (index == baseItemCount) {
-                                return _buildLoadingIndicator(responsive);
-                              }
-
-                              if (state.isSearchMode) {
-                                final searchResult =
-                                    state.searchResults!.results[index];
-                                return _ConversationListItem(
-                                  summary: searchResult.summary,
-                                  matchedContent: searchResult.matchedContent,
-                                  key: Key(
-                                    'conversation_item_${searchResult.summary.id}',
-                                  ),
-                                );
-                              } else {
-                                final summary = state.conversations![index];
-                                return _ConversationListItem(
-                                  summary: summary,
-                                  key: Key('conversation_item_${summary.id}'),
-                                );
-                              }
+                              final session = sessions[index];
+                              return _SearchSessionListItem(
+                                session: session,
+                                key: Key('search_session_item_${session.id}'),
+                              );
                             },
                           ),
                         );
@@ -519,22 +416,18 @@ class _ConversationListScreenState
   }
 }
 
-class _ConversationListItem extends ConsumerStatefulWidget {
-  final ConversationSummary summary;
-  final String? matchedContent;
+class _SearchSessionListItem extends ConsumerStatefulWidget {
+  final SearchSessionSummary session;
 
-  const _ConversationListItem({
-    required this.summary,
-    this.matchedContent,
-    super.key,
-  });
+  const _SearchSessionListItem({required this.session, super.key});
 
   @override
-  ConsumerState<_ConversationListItem> createState() =>
-      _ConversationListItemState();
+  ConsumerState<_SearchSessionListItem> createState() =>
+      _SearchSessionListItemState();
 }
 
-class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
+class _SearchSessionListItemState
+    extends ConsumerState<_SearchSessionListItem> {
   bool _isLoading = false;
 
   @override
@@ -574,18 +467,18 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
                 });
 
                 try {
-                  final conversation = await ref
-                      .read(conversationRepositoryProvider)
-                      .getConversation(widget.summary.id);
+                  final searchSession = await ref
+                      .read(searchRepositoryProvider)
+                      .getSearchSession(widget.session.id);
 
                   if (context.mounted) {
-                    AppRoutes.goToConversation(context, conversation);
+                    AppRoutes.goToSearchSession(context, searchSession);
                   }
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error loading conversation: $e'),
+                        content: Text('Error loading search session: $e'),
                         backgroundColor: const Color(0xFF242424),
                       ),
                     );
@@ -609,7 +502,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
               ),
               backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.2),
               child: Text(
-                widget.summary.messageCount.toString(),
+                widget.session.interactionCount.toString(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: responsive.fontSize(16),
@@ -617,7 +510,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
                 ),
               ),
             ),
-            if (widget.summary.recommendationCount > 0)
+            if (widget.session.recommendationCount > 0)
               Positioned(
                 top: responsive.responsive(
                   mobile: -4.0,
@@ -646,7 +539,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
                     ),
                   ),
                   child: Text(
-                    widget.summary.recommendationCount.toString(),
+                    widget.session.recommendationCount.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: responsive.fontSize(11),
@@ -659,7 +552,7 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
           ],
         ),
         title: Text(
-          widget.summary.previewText,
+          widget.session.previewText,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -671,40 +564,14 @@ class _ConversationListItemState extends ConsumerState<_ConversationListItem> {
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 6),
-          child: widget.matchedContent != null
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.matchedContent!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: responsive.fontSize(13),
-                        fontWeight: FontWeight.w400,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatTimestamp(widget.summary.updatedAt),
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
-                        fontSize: responsive.fontSize(13),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                )
-              : Text(
-                  _formatTimestamp(widget.summary.updatedAt),
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    fontSize: responsive.fontSize(13),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+          child: Text(
+            _formatTimestamp(widget.session.updatedAt),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.4),
+              fontSize: responsive.fontSize(13),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
         trailing: _isLoading
             ? SizedBox(

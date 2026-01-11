@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test/features/conversation/presentation/helpers/conversation_list_screen_tester.dart';
-import '../test/features/conversation/presentation/helpers/conversation_screen_tester.dart';
 import '../test/features/conversation/presentation/helpers/home_screen_tester.dart';
+import '../test/features/search/presentation/helpers/search_session_screen_tester.dart';
 import 'test_helper.dart';
 
 void main() {
@@ -13,15 +13,17 @@ void main() {
       await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
-      final conversationScreenTester = ConversationScreenTester(tester);
+      final searchSessionConversationStarter = SearchSessionScreenTester(
+        tester,
+      );
       final conversationListTester = ConversationListScreenTester(tester);
 
       // Step 1: Create first conversation with "action" keyword
       expect(homeScreenTester.isVisible, true);
       final firstMessage = "I want to watch action movies";
       await homeScreenTester.createSearchSession(firstMessage);
-      await conversationScreenTester.waitForIsVisible();
-      expect(conversationScreenTester.isVisible, true);
+      await searchSessionConversationStarter.waitForIsVisible();
+      expect(searchSessionConversationStarter.isVisible, true);
 
       // Go back to home
       await tester.tap(find.byTooltip('Back'));
@@ -31,8 +33,8 @@ void main() {
       // Step 2: Create second conversation with "comedy" keyword
       final secondMessage = "Looking for comedy shows";
       await homeScreenTester.createSearchSession(secondMessage);
-      await conversationScreenTester.waitForIsVisible();
-      expect(conversationScreenTester.isVisible, true);
+      await searchSessionConversationStarter.waitForIsVisible();
+      expect(searchSessionConversationStarter.isVisible, true);
 
       // Go back to home
       await tester.tap(find.byTooltip('Back'));
@@ -86,7 +88,9 @@ void main() {
       await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
-      final conversationScreenTester = ConversationScreenTester(tester);
+      final searchSessionConversationStarter = SearchSessionScreenTester(
+        tester,
+      );
       final conversationListTester = ConversationListScreenTester(tester);
 
       // Create a conversation with a unique search term
@@ -95,7 +99,7 @@ void main() {
           "zzztestunique${DateTime.now().millisecondsSinceEpoch}";
       final message = "I want $uniqueTerm recommendations";
       await homeScreenTester.createSearchSession(message);
-      await conversationScreenTester.waitForIsVisible();
+      await searchSessionConversationStarter.waitForIsVisible();
 
       // Go back to home and then to conversation list
       await tester.tap(find.byTooltip('Back'));
@@ -114,11 +118,11 @@ void main() {
 
       // Tap on the search result
       await conversationListTester.tapConversation(0);
-      await conversationScreenTester.waitForIsVisible();
+      await searchSessionConversationStarter.waitForIsVisible();
 
       // Verify we're on the correct conversation screen
-      expect(conversationScreenTester.isVisible, true);
-      final conversation = conversationScreenTester.getConversation();
+      expect(searchSessionConversationStarter.isVisible, true);
+      final conversation = searchSessionConversationStarter.getSearchSession();
       expect(conversation[0], message);
     });
   });

@@ -1,4 +1,5 @@
 import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
+import 'package:skipthebrowse/features/search/domain/entities/search_session_summary.dart';
 import 'package:skipthebrowse/features/search/domain/entities/recommendation_with_status.dart';
 import 'package:skipthebrowse/features/search/domain/repositories/search_repository.dart';
 import 'package:skipthebrowse/features/search/data/repositories/search_rest_client.dart';
@@ -44,6 +45,15 @@ class ApiSearchRepository implements SearchRepository {
   Future<SearchSession> getSearchSession(String sessionId) async {
     final response = await restClient.getSearchSession(sessionId);
     return response.toEntity();
+  }
+
+  @override
+  Future<List<SearchSessionSummary>> listSearchSessions({
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    final response = await restClient.listSearchSessions(limit, offset);
+    return response.sessions.map((s) => s.toEntity()).toList();
   }
 
   @override

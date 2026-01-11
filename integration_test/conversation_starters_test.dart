@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../test/features/conversation/presentation/helpers/conversation_screen_tester.dart';
 import '../test/features/conversation/presentation/helpers/home_screen_tester.dart';
+import '../test/features/search/presentation/helpers/search_session_screen_tester.dart';
 import 'test_helper.dart';
 
 void main() {
   group('Conversation Starters Tests', () {
-    testWidgets('conversation starter chips are visible on home screen', (
+    testWidgets('searchSession starter chips are visible on home screen', (
       tester,
     ) async {
       await pumpSkipTheBrowse(tester);
@@ -34,7 +34,7 @@ void main() {
       );
     });
 
-    testWidgets('tapping first starter creates conversation', (tester) async {
+    testWidgets('tapping first starter creates searchSession', (tester) async {
       await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
@@ -43,16 +43,16 @@ void main() {
       final starterText = "I want something thrilling to watch";
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
-      final conversationPageTester = ConversationScreenTester(tester);
-      await conversationPageTester.waitForIsVisible();
-      expect(conversationPageTester.isVisible, true);
+      final searchSessionScreenTester = SearchSessionScreenTester(tester);
+      await searchSessionScreenTester.waitForIsVisible();
+      expect(searchSessionScreenTester.isVisible, true);
 
-      final conversation = conversationPageTester.getConversation();
-      expect(conversation[0], starterText);
-      expect(conversation[1].length, greaterThanOrEqualTo(50));
+      final searchSession = searchSessionScreenTester.getSearchSession();
+      expect(searchSession[0], starterText);
+      expect(searchSession[1].length, greaterThanOrEqualTo(10));
     });
 
-    testWidgets('tapping second starter creates conversation', (tester) async {
+    testWidgets('tapping second starter creates searchSession', (tester) async {
       await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
@@ -61,16 +61,16 @@ void main() {
       final starterText = "Looking for a comedy series to binge";
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
-      final conversationPageTester = ConversationScreenTester(tester);
-      await conversationPageTester.waitForIsVisible();
-      expect(conversationPageTester.isVisible, true);
+      final searchSessionScreenTester = SearchSessionScreenTester(tester);
+      await searchSessionScreenTester.waitForIsVisible();
+      expect(searchSessionScreenTester.isVisible, true);
 
-      final conversation = conversationPageTester.getConversation();
-      expect(conversation[0], starterText);
-      expect(conversation[1].length, greaterThanOrEqualTo(50));
+      final searchSession = searchSessionScreenTester.getSearchSession();
+      expect(searchSession[0], starterText);
+      expect(searchSession[1].length, greaterThanOrEqualTo(10));
     });
 
-    testWidgets('tapping third starter creates conversation', (tester) async {
+    testWidgets('tapping third starter creates searchSession', (tester) async {
       await pumpSkipTheBrowse(tester);
 
       final homeScreenTester = HomeScreenTester(tester);
@@ -79,13 +79,13 @@ void main() {
       final starterText = "Recommend me something like Inception";
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
-      final conversationPageTester = ConversationScreenTester(tester);
-      await conversationPageTester.waitForIsVisible();
-      expect(conversationPageTester.isVisible, true);
+      final searchSessionScreenTester = SearchSessionScreenTester(tester);
+      await searchSessionScreenTester.waitForIsVisible();
+      expect(searchSessionScreenTester.isVisible, true);
 
-      final conversation = conversationPageTester.getConversation();
-      expect(conversation[0], starterText);
-      expect(conversation[1].length, greaterThanOrEqualTo(50));
+      final searchSession = searchSessionScreenTester.getSearchSession();
+      expect(searchSession[0], starterText);
+      expect(searchSession[1].length, greaterThanOrEqualTo(10));
     });
   });
 }

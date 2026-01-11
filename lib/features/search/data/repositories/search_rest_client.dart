@@ -6,6 +6,7 @@ import 'package:skipthebrowse/features/search/data/models/create_search_session_
 import 'package:skipthebrowse/features/search/data/models/add_interaction_request.dart';
 import 'package:skipthebrowse/features/search/data/models/update_recommendation_status_request.dart';
 import 'package:skipthebrowse/features/search/data/models/recommendation_with_status_response.dart';
+import 'package:skipthebrowse/features/search/data/models/search_session_summary_dto.dart';
 
 part 'search_rest_client.g.dart';
 
@@ -30,6 +31,12 @@ abstract class SearchRestClient {
 
   @GET('/api/v1/search-sessions/{id}')
   Future<SearchSessionResponse> getSearchSession(@Path('id') String sessionId);
+
+  @GET('/api/v1/search-sessions')
+  Future<SearchSessionListResponseDto> listSearchSessions(
+    @Query('limit') int limit,
+    @Query('offset') int offset,
+  );
 
   @PATCH('/api/v1/recommendations/{id}/status')
   Future<void> updateRecommendationStatus(
