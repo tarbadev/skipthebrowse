@@ -461,8 +461,12 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
     );
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: widget.isLoading
+          ? null
+          : (_) => setState(() => _isHovered = true),
+      onExit: widget.isLoading
+          ? null
+          : (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.isLoading ? null : widget.onTap,
         child: AnimatedContainer(
@@ -470,16 +474,20 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
           curve: Curves.easeOut,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(responsive.borderRadius),
-            color: _isHovered
+            color: widget.isLoading
+                ? const Color(0xFF1A1A1A)
+                : _isHovered
                 ? const Color(0xFF2A2A2A)
                 : const Color(0xFF242424),
             border: Border.all(
-              color: _isHovered
+              color: widget.isLoading
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : _isHovered
                   ? const Color(0xFF6366F1).withValues(alpha: 0.5)
                   : Colors.white.withValues(alpha: 0.1),
               width: 1.5,
             ),
-            boxShadow: _isHovered
+            boxShadow: _isHovered && !widget.isLoading
                 ? [
                     BoxShadow(
                       color: const Color(0xFF6366F1).withValues(alpha: 0.2),
@@ -489,73 +497,76 @@ class _GlowingStarterCardState extends State<_GlowingStarterCard> {
                   ]
                 : [],
           ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: responsive.responsive(
-                mobile: 20.0,
-                tablet: 22.0,
-                desktop: 24.0,
+          child: Opacity(
+            opacity: widget.isLoading ? 0.4 : 1.0,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: responsive.responsive(
+                  mobile: 20.0,
+                  tablet: 22.0,
+                  desktop: 24.0,
+                ),
+                vertical: responsive.responsive(
+                  mobile: 16.0,
+                  tablet: 18.0,
+                  desktop: 20.0,
+                ),
               ),
-              vertical: responsive.responsive(
-                mobile: 16.0,
-                tablet: 18.0,
-                desktop: 20.0,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: emojiSize,
-                  height: emojiSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF6366F1).withValues(alpha: 0.15),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.emoji,
-                      style: TextStyle(
-                        fontSize: responsive.responsive(
-                          mobile: 20.0,
-                          tablet: 22.0,
-                          desktop: 24.0,
+              child: Row(
+                children: [
+                  Container(
+                    width: emojiSize,
+                    height: emojiSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.emoji,
+                        style: TextStyle(
+                          fontSize: responsive.responsive(
+                            mobile: 20.0,
+                            tablet: 22.0,
+                            desktop: 24.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: responsive.responsive(
-                    mobile: 12.0,
-                    tablet: 14.0,
-                    desktop: 16.0,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    widget.prompt,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(16),
-                      fontWeight: FontWeight.w600,
-                      color: _isHovered
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.9),
-                      letterSpacing: 0.3,
+                  SizedBox(
+                    width: responsive.responsive(
+                      mobile: 12.0,
+                      tablet: 14.0,
+                      desktop: 16.0,
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: _isHovered
-                      ? const Color(0xFF6366F1)
-                      : Colors.white.withValues(alpha: 0.3),
-                  size: responsive.responsive(
-                    mobile: 20.0,
-                    tablet: 22.0,
-                    desktop: 24.0,
+                  Expanded(
+                    child: Text(
+                      widget.prompt,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(16),
+                        fontWeight: FontWeight.w600,
+                        color: _isHovered
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.9),
+                        letterSpacing: 0.3,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: _isHovered
+                        ? const Color(0xFF6366F1)
+                        : Colors.white.withValues(alpha: 0.3),
+                    size: responsive.responsive(
+                      mobile: 20.0,
+                      tablet: 22.0,
+                      desktop: 24.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
