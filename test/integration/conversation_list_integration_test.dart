@@ -111,38 +111,38 @@ void main() {
         await homeScreenTester.tapHistoryButton();
 
         // Verify conversation list screen is visible
-        final conversationListTester = ConversationListScreenTester(tester);
-        await conversationListTester.waitForIsVisible();
+        final searchSessionListTester = SearchSessionListScreenTester(tester);
+        await searchSessionListTester.waitForIsVisible();
 
         // Verify 3 conversations are displayed
-        expect(conversationListTester.conversationCount, 3);
+        expect(searchSessionListTester.conversationCount, 3);
 
         // Verify conversation 1 details
         expect(
-          conversationListTester.getConversationPreviewText(0),
+          searchSessionListTester.getConversationPreviewText(0),
           'I want to watch something funny tonight',
         );
-        expect(conversationListTester.getConversationMessageCount(0), '5');
-        expect(conversationListTester.getConversationTimestamp(0), '1h ago');
+        expect(searchSessionListTester.getConversationMessageCount(0), '5');
+        expect(searchSessionListTester.getConversationTimestamp(0), '1h ago');
 
         // Verify conversation 2 details
         expect(
-          conversationListTester.getConversationPreviewText(1),
+          searchSessionListTester.getConversationPreviewText(1),
           'Looking for a good thriller',
         );
-        expect(conversationListTester.getConversationMessageCount(1), '3');
-        expect(conversationListTester.getConversationTimestamp(1), '1d ago');
+        expect(searchSessionListTester.getConversationMessageCount(1), '3');
+        expect(searchSessionListTester.getConversationTimestamp(1), '1d ago');
 
         // Verify conversation 3 details
         expect(
-          conversationListTester.getConversationPreviewText(2),
+          searchSessionListTester.getConversationPreviewText(2),
           'Any recommendations for a family movie?',
         );
-        expect(conversationListTester.getConversationMessageCount(2), '7');
-        expect(conversationListTester.getConversationTimestamp(2), '3d ago');
+        expect(searchSessionListTester.getConversationMessageCount(2), '7');
+        expect(searchSessionListTester.getConversationTimestamp(2), '3d ago');
 
         // Tap on the first conversation
-        await conversationListTester.tapConversation(0);
+        await searchSessionListTester.tapConversation(0);
 
         // Verify conversation screen is displayed
         final conversationScreenTester = ConversationScreenTester(tester);
@@ -163,8 +163,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify we're back at the conversation list screen
-        expect(conversationListTester.isVisible, true);
-        expect(conversationListTester.conversationCount, 3);
+        expect(searchSessionListTester.isVisible, true);
+        expect(searchSessionListTester.conversationCount, 3);
       },
     );
   });

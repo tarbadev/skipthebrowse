@@ -14,7 +14,7 @@ void main() {
 
       final homeScreenTester = HomeScreenTester(tester);
       final searchSessionScreenTester = SearchSessionScreenTester(tester);
-      final conversationListTester = ConversationListScreenTester(tester);
+      final searchSessionListTester = SearchSessionListScreenTester(tester);
 
       // Step 1: Verify we're on home screen
       expect(homeScreenTester.isVisible, true);
@@ -37,20 +37,23 @@ void main() {
 
       // Step 5: Navigate to conversation list
       await homeScreenTester.tapHistoryButton();
-      await conversationListTester.waitForIsVisible();
+      await searchSessionListTester.waitForIsVisible();
       expect(homeScreenTester.isVisible, false);
-      expect(conversationListTester.isVisible, true);
-      expect(conversationListTester.conversationCount, greaterThanOrEqualTo(1));
+      expect(searchSessionListTester.isVisible, true);
+      expect(
+        searchSessionListTester.conversationCount,
+        greaterThanOrEqualTo(1),
+      );
 
       // Tap first conversation in list
-      await conversationListTester.tapConversation(0);
+      await searchSessionListTester.tapConversation(0);
       await searchSessionScreenTester.waitForIsVisible();
       expect(searchSessionScreenTester.isVisible, true);
 
       // Back to list
       await tester.tap(find.byTooltip('Back'));
       await tester.pumpAndSettle();
-      expect(conversationListTester.isVisible, true);
+      expect(searchSessionListTester.isVisible, true);
 
       // Step 6: Go back to home screen
       await tester.tap(find.byTooltip('Back'));

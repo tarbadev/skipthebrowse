@@ -3,10 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/base_screen_tester.dart';
 
-class ConversationListScreenTester extends BaseWidgetTester {
-  ConversationListScreenTester(super.tester);
+class SearchSessionListScreenTester extends BaseWidgetTester {
+  SearchSessionListScreenTester(super.tester);
 
-  bool get isVisible => find.text('My Conversations').evaluate().isNotEmpty;
+  bool get isVisible => find.text('My Searches').evaluate().isNotEmpty;
 
   Future<void> waitForIsVisible() async {
     await tester.pumpAndSettle();
@@ -26,21 +26,8 @@ class ConversationListScreenTester extends BaseWidgetTester {
   }
 
   String? getMatchedContent(int index) {
-    final listItems = find.byType(ListTile);
-    final listTile = tester.widget<ListTile>(listItems.at(index));
-    final subtitle = listTile.subtitle;
-
-    if (subtitle is Padding) {
-      final child = subtitle.child;
-      if (child is Column) {
-        // Search mode: Column with matched content and timestamp
-        final firstChild = child.children.first;
-        if (firstChild is Text) {
-          return firstChild.data;
-        }
-      }
-    }
-    return null;
+    // For search sessions, the preview text is in the title
+    return getConversationPreviewText(index);
   }
 
   String getConversationMessageCount(int index) {
@@ -58,6 +45,27 @@ class ConversationListScreenTester extends BaseWidgetTester {
     }
 
     throw Exception('Unexpected leading widget type: ${leading.runtimeType}');
+  }
+
+  int getInteractionCount(int index) {
+    final count = getConversationMessageCount(index);
+    return int.parse(count);
+  }
+
+  int getRecommendationCount(int index) {
+    final listItems = find.byType(ListTile);
+    final listTile = tester.widget<ListTile>(listItems.at(index));
+    final leading = listTile.leading;
+
+    if (leading is Stack && leading.children.length > 1) {
+      // There's a recommendation badge
+      final badge = leading.children[1] as Positioned;
+      final container = badge.child as Container;
+      final text = container.child as Text;
+      return int.parse(text.data!);
+    }
+
+    return 0;
   }
 
   String getConversationTimestamp(int index) {
@@ -105,5 +113,5 @@ class ConversationListScreenTester extends BaseWidgetTester {
       find.text('No results found').evaluate().isNotEmpty;
 
   bool get hasEmptyStateMessage =>
-      find.text('No conversations yet').evaluate().isNotEmpty;
+      find.text('No search sessions yet').evaluate().isNotEmpty;
 }
