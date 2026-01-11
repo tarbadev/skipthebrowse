@@ -7,14 +7,24 @@ import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
 import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _isCreatingSession = false;
 
   Future<void> _createSearchSession(
     String message,
-    WidgetRef ref,
     BuildContext context,
   ) async {
+    setState(() {
+      _isCreatingSession = true;
+    });
+
     try {
       final session = await ref
           .read(searchSessionProvider.notifier)
@@ -40,6 +50,12 @@ class HomeScreen extends ConsumerWidget {
           ),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreatingSession = false;
+        });
+      }
     }
   }
 
@@ -47,7 +63,6 @@ class HomeScreen extends ConsumerWidget {
     BuildContext context,
     List<(String, String, String)> starters,
     bool isLoading,
-    WidgetRef ref,
   ) {
     final responsive = context.responsive;
     final columns = responsive.gridColumns;
@@ -79,7 +94,7 @@ class HomeScreen extends ConsumerWidget {
                 label: label,
                 prompt: prompt,
                 isLoading: isLoading,
-                onTap: () => _createSearchSession(prompt, ref, context),
+                onTap: () => _createSearchSession(prompt, context),
               ),
             ),
           );
@@ -119,7 +134,7 @@ class HomeScreen extends ConsumerWidget {
               label: label,
               prompt: prompt,
               isLoading: isLoading,
-              onTap: () => _createSearchSession(prompt, ref, context),
+              onTap: () => _createSearchSession(prompt, context),
             ),
           ),
         );
@@ -128,12 +143,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Don't watch searchSessionProvider here - it causes context to unmount during navigation
-    // final sessionState = ref.watch(searchSessionProvider);
-    // final isLoading = sessionState.isLoading;
-    final isLoading =
-        false; // We'll show loading state within the button itself
+  Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
     final responsive = context.responsive;
 
@@ -365,12 +375,8 @@ class HomeScreen extends ConsumerWidget {
                                 SizedBox(height: responsive.spacing),
                                 AddMessageWidget(
                                   onSubmit: (String message) =>
-                                      _createSearchSession(
-                                        message,
-                                        ref,
-                                        context,
-                                      ),
-                                  isLoading: isLoading,
+                                      _createSearchSession(message, context),
+                                  isLoading: _isCreatingSession,
                                 ),
                               ],
                             ),
@@ -402,8 +408,7 @@ class HomeScreen extends ConsumerWidget {
                                     _buildConversationStarters(
                                       context,
                                       conversationStarters,
-                                      isLoading,
-                                      ref,
+                                      _isCreatingSession,
                                     ),
                                   ],
                                 ),
