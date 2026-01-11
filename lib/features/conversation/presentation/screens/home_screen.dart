@@ -5,6 +5,7 @@ import 'package:skipthebrowse/core/utils/responsive_utils.dart';
 import 'package:skipthebrowse/core/widgets/grain_overlay.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/presentation/widgets/add_message_widget.dart';
+import 'package:skipthebrowse/features/conversation/presentation/screens/conversation_list_screen.dart';
 import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -31,6 +32,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .createSession(message);
 
       if (session != null && context.mounted) {
+        // Invalidate the session list cache so it refreshes
+        ref.invalidate(searchSessionListProvider);
         AppRoutes.goToSearchSession(context, session);
       } else if (context.mounted) {
         // Show error if session creation failed
