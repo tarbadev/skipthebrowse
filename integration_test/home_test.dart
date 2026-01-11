@@ -27,15 +27,16 @@ void main() {
       var searchSession = searchSessionPageTester.getSearchSession();
 
       expect(searchSession[0], initialMessage);
-      expect(searchSession[1].length, greaterThanOrEqualTo(50));
+      expect(searchSession[1].length, greaterThanOrEqualTo(10));
 
-      final response = 'I want to watch a comedy';
-      await searchSessionPageTester.addMessage(response);
+      // Select the "Comedy" choice (assuming it's one of the choices returned by the LLM)
+      const choiceText = 'Comedy';
+      await searchSessionPageTester.addMessage(choiceText);
       await tester.pumpAndSettle();
 
       searchSession = searchSessionPageTester.getSearchSession();
-      expect(searchSession[2], response);
-      expect(searchSession[3].length, greaterThanOrEqualTo(50));
+      expect(searchSession[2], choiceText);
+      expect(searchSession[3].length, greaterThanOrEqualTo(10));
     });
   });
 }

@@ -27,14 +27,62 @@ class SearchSessionScreenTester extends BaseWidgetTester {
   }
 
   List<String> getSearchSession() {
-    final Finder messageFinders = find.byType(
-      InteractionPromptWidget,
-      skipOffstage: false,
+    final List<String> messages = [];
+
+    // 1. Add initial message if it exists
+    final initialMessageFinder = find.byKey(
+      const Key('search_session_initial_message'),
     );
-    return tester
-        .widgetList<InteractionPromptWidget>(messageFinders)
-        .map((widget) => widget.prompt.promptPrefix)
-        .toList();
+    if (tester.any(initialMessageFinder)) {
+      final initialMessageWidget = tester.widget<Text>(initialMessageFinder);
+      messages.add(initialMessageWidget.data!);
+    }
+
+    // 2. Find all interaction Columns (they have keys like 'interaction_{id}')
+    final allColumns = find.byType(Column, skipOffstage: false);
+    final interactionColumns = <Column>[];
+
+    for (var columnElement in tester.widgetList<Column>(allColumns)) {
+      if (columnElement.key != null) {
+        final key = columnElement.key;
+        if (key is ValueKey &&
+            key.value.toString().startsWith('interaction_')) {
+          interactionColumns.add(columnElement);
+        }
+      }
+    }
+
+    // 3. For each interaction Column, extract the prompt and response
+    for (var column in interactionColumns) {
+      // Find InteractionPromptWidget within this column
+      final promptWidgets = column.children
+          .whereType<InteractionPromptWidget>()
+          .toList();
+
+      if (promptWidgets.isNotEmpty) {
+        messages.add(promptWidgets.first.prompt.promptPrefix);
+      }
+
+      // Find user response Text widget within this column
+      // It's nested in Padding > Align > Container > Text
+      // The Text has key 'user_response_{id}'
+      final keyString = (column.key as ValueKey).value.toString();
+      final interactionId = keyString.replaceFirst('interaction_', '');
+      final userResponseKey = Key('user_response_$interactionId');
+      final userResponseFinder = find.descendant(
+        of: find.byWidget(column),
+        matching: find.byKey(userResponseKey),
+      );
+
+      if (tester.any(userResponseFinder)) {
+        final userResponseWidget = tester.widget<Text>(userResponseFinder);
+        if (userResponseWidget.data != null) {
+          messages.add(userResponseWidget.data!);
+        }
+      }
+    }
+
+    return messages;
   }
 
   List<Map<String, dynamic>> getRecommendations() {
@@ -81,12 +129,26 @@ class SearchSessionScreenTester extends BaseWidgetTester {
     return recommendations;
   }
 
-  Future<void> addMessage(String response) async {
-    expect(find.byKey(Key(textBoxKey)), findsOneWidget);
-    await enterText(textBoxKey, response);
-    await tester.pump();
+  Future<void> addMessage(String choiceText) async {
+    // Find and tap the choice button with matching text
+    // The choice buttons are ElevatedButtons with Text children
+    final choiceFinder = find.widgetWithText(ElevatedButton, choiceText);
+    expect(
+      choiceFinder,
+      findsOneWidget,
+      reason: 'Could not find choice button with text: $choiceText',
+    );
+    await tester.tap(choiceFinder);
+    await tester.pumpAndSettle();
 
-    expect(find.byKey(Key(buttonKey)), findsOneWidget);
-    await tapOnWidgetByKey(buttonKey);
+    // After selecting a choice, a "Continue" button should appear
+    final continueFinder = find.widgetWithText(ElevatedButton, 'Continue');
+    expect(
+      continueFinder,
+      findsOneWidget,
+      reason: 'Continue button not found after selecting choice',
+    );
+    await tester.tap(continueFinder);
+    await tester.pumpAndSettle();
   }
 }

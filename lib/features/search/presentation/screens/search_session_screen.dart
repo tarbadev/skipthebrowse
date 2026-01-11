@@ -209,6 +209,7 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                         ),
                         child: Text(
                           currentSession.initialMessage!,
+                          key: const Key('search_session_initial_message'),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: responsive.fontSize(15),
@@ -299,6 +300,7 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                               ),
                               child: Text(
                                 interaction.userInput!,
+                                key: Key('user_response_${interaction.id}'),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: responsive.fontSize(15),

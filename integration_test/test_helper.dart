@@ -14,6 +14,9 @@ import 'package:skipthebrowse/main.dart';
 Future<void> pumpSkipTheBrowse(WidgetTester tester) async {
   final sharedPreferences = await SharedPreferences.getInstance();
 
+  // Clear any cached auth tokens to ensure fresh anonymous user creation
+  await sharedPreferences.clear();
+
   final dio = Dio(
     BaseOptions(
       baseUrl: EnvConfig.apiBaseUrl,
