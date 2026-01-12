@@ -201,4 +201,54 @@ class MockDioHelper {
       data: {'email': email, 'password': password},
     );
   }
+
+  void mockCreateSearchSession({
+    required String sessionId,
+    required String initialMessage,
+    required List<Map<String, dynamic>> interactions,
+    required DateTime timestamp,
+  }) {
+    dioAdapter.onPost(
+      '/api/v1/search-sessions',
+      (server) => server.reply(201, {
+        'id': sessionId,
+        'initial_message': initialMessage,
+        'interactions': interactions,
+        'recommendations': [],
+        'created_at': timestamp.toIso8601String(),
+      }),
+      data: {'message': initialMessage, 'region': 'US'},
+    );
+  }
+
+  void mockGetSearchSession({
+    required String sessionId,
+    required String? initialMessage,
+    required List<Map<String, dynamic>> interactions,
+    required DateTime timestamp,
+  }) {
+    dioAdapter.onGet(
+      '/api/v1/search-sessions/$sessionId',
+      (server) => server.reply(200, {
+        'id': sessionId,
+        'initial_message': initialMessage,
+        'interactions': interactions,
+        'recommendations': [],
+        'created_at': timestamp.toIso8601String(),
+      }),
+    );
+  }
+
+  void mockListSearchSessions({
+    required List<Map<String, dynamic>> sessions,
+    int total = 0,
+    int limit = 50,
+    int offset = 0,
+  }) {
+    dioAdapter.onGet(
+      '/api/v1/search-sessions',
+      (server) => server.reply(200, {'sessions': sessions, 'total': total}),
+      queryParameters: {'limit': limit, 'offset': offset},
+    );
+  }
 }

@@ -5,38 +5,94 @@ import 'package:skipthebrowse/features/conversation/domain/providers/conversatio
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
 
-import '../features/conversation/presentation/helpers/conversation_screen_tester.dart';
 import '../features/conversation/presentation/helpers/home_screen_tester.dart';
+import '../features/search/presentation/helpers/search_session_screen_tester.dart';
 import 'helpers/mock_dio_helper.dart';
 
 void main() {
   group('Integration Tests - Home Screen', () {
-    // TODO: Update this test to use search sessions API instead of conversations
     testWidgets(
-      'creates a conversation and navigates to conversation screen',
-      skip: true,
+      'creates a search session and navigates to search session screen',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final sharedPreferences = await SharedPreferences.getInstance();
 
         final mockDioHelper = MockDioHelper();
         final initialMessage = "I'm looking for a movie to watch";
-        final assistantResponse = 'What genre are you interested in?';
-        final conversationId = 'test-conversation-id';
+        final promptPrefix = 'What genre are you interested in?';
+        final sessionId = 'test-session-id';
         final timestamp = DateTime(2025, 1, 1);
 
-        mockDioHelper.mockCreateConversation(
-          conversationId: conversationId,
-          userMessage: initialMessage,
-          assistantResponse: assistantResponse,
+        mockDioHelper.mockCreateSearchSession(
+          sessionId: sessionId,
+          initialMessage: initialMessage,
+          interactions: [
+            {
+              'id': 'interaction-1',
+              'user_input': null,
+              'assistant_prompt': {
+                'prompt_prefix': promptPrefix,
+                'choices': [
+                  {
+                    'id': 'action',
+                    'display_text': 'Action',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                  {
+                    'id': 'comedy',
+                    'display_text': 'Comedy',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                  {
+                    'id': 'drama',
+                    'display_text': 'Drama',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                ],
+                'allow_skip': false,
+              },
+              'timestamp': timestamp.toIso8601String(),
+            },
+          ],
           timestamp: timestamp,
         );
 
-        mockDioHelper.mockGetConversation(
-          conversationId: conversationId,
-          messages: [
-            {'content': initialMessage, 'author': 'user'},
-            {'content': assistantResponse, 'author': 'assistant'},
+        mockDioHelper.mockGetSearchSession(
+          sessionId: sessionId,
+          initialMessage: initialMessage,
+          interactions: [
+            {
+              'id': 'interaction-1',
+              'user_input': null,
+              'assistant_prompt': {
+                'prompt_prefix': promptPrefix,
+                'choices': [
+                  {
+                    'id': 'action',
+                    'display_text': 'Action',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                  {
+                    'id': 'comedy',
+                    'display_text': 'Comedy',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                  {
+                    'id': 'drama',
+                    'display_text': 'Drama',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                ],
+                'allow_skip': false,
+              },
+              'timestamp': timestamp.toIso8601String(),
+            },
           ],
           timestamp: timestamp,
         );
@@ -60,13 +116,13 @@ void main() {
         await homeScreenTester.createSearchSession(initialMessage);
         await tester.pumpAndSettle();
 
-        final conversationScreenTester = ConversationScreenTester(tester);
-        await conversationScreenTester.waitForIsVisible();
-        expect(conversationScreenTester.isVisible, true);
+        final searchSessionScreenTester = SearchSessionScreenTester(tester);
+        await searchSessionScreenTester.waitForIsVisible();
+        expect(searchSessionScreenTester.isVisible, true);
 
-        final conversation = conversationScreenTester.getConversation();
-        expect(conversation[0], initialMessage);
-        expect(conversation[1], assistantResponse);
+        final session = searchSessionScreenTester.getSearchSession();
+        expect(session[0], initialMessage);
+        expect(session[1], promptPrefix);
       },
     );
   });

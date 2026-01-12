@@ -6,16 +6,14 @@ import 'package:skipthebrowse/features/conversation/domain/providers/dio_provide
 import 'package:skipthebrowse/main.dart';
 
 import '../features/conversation/presentation/helpers/conversation_list_screen_tester.dart';
-import '../features/conversation/presentation/helpers/conversation_screen_tester.dart';
 import '../features/conversation/presentation/helpers/home_screen_tester.dart';
+import '../features/search/presentation/helpers/search_session_screen_tester.dart';
 import 'helpers/mock_dio_helper.dart';
 
 void main() {
-  group('Integration Tests - Conversation List', () {
-    // TODO: Update this test to use search sessions API instead of conversations
+  group('Integration Tests - Search Session List', () {
     testWidgets(
-      'displays conversation list with 3 conversations and navigates to conversation on tap',
-      skip: true,
+      'displays search session list with 3 sessions and navigates to session on tap',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final sharedPreferences = await SharedPreferences.getInstance();
@@ -23,12 +21,12 @@ void main() {
         final mockDioHelper = MockDioHelper();
         final now = DateTime.now();
 
-        // Mock 3 conversations in the list
-        mockDioHelper.mockListConversations(
-          conversations: [
+        // Mock 3 search sessions in the list
+        mockDioHelper.mockListSearchSessions(
+          sessions: [
             {
-              'id': 'conversation-1',
-              'status': 'active',
+              'id': 'session-1',
+              'initial_message': 'I want to watch something funny tonight',
               'preview_text': 'I want to watch something funny tonight',
               'created_at': now
                   .subtract(const Duration(hours: 2))
@@ -36,12 +34,12 @@ void main() {
               'updated_at': now
                   .subtract(const Duration(hours: 1))
                   .toIso8601String(),
-              'message_count': 5,
+              'interaction_count': 5,
               'recommendation_count': 0,
             },
             {
-              'id': 'conversation-2',
-              'status': 'active',
+              'id': 'session-2',
+              'initial_message': 'Looking for a good thriller',
               'preview_text': 'Looking for a good thriller',
               'created_at': now
                   .subtract(const Duration(days: 1))
@@ -49,12 +47,12 @@ void main() {
               'updated_at': now
                   .subtract(const Duration(days: 1))
                   .toIso8601String(),
-              'message_count': 3,
+              'interaction_count': 3,
               'recommendation_count': 0,
             },
             {
-              'id': 'conversation-3',
-              'status': 'active',
+              'id': 'session-3',
+              'initial_message': 'Any recommendations for a family movie?',
               'preview_text': 'Any recommendations for a family movie?',
               'created_at': now
                   .subtract(const Duration(days: 3))
@@ -62,33 +60,83 @@ void main() {
               'updated_at': now
                   .subtract(const Duration(days: 3))
                   .toIso8601String(),
-              'message_count': 7,
+              'interaction_count': 7,
               'recommendation_count': 0,
             },
           ],
           total: 3,
-          limit: 20,
+          limit: 50,
           offset: 0,
         );
 
-        // Mock get conversation for conversation-1 (the one we'll tap)
-        mockDioHelper.mockGetConversation(
-          conversationId: 'conversation-1',
-          messages: [
+        // Mock get search session for session-1 (the one we'll tap)
+        mockDioHelper.mockGetSearchSession(
+          sessionId: 'session-1',
+          initialMessage: 'I want to watch something funny tonight',
+          interactions: [
             {
-              'content': 'I want to watch something funny tonight',
-              'author': 'user',
+              'id': 'int-1',
+              'user_input': 'Comedy',
+              'assistant_prompt': {
+                'prompt_prefix': 'I want to watch...',
+                'choices': [
+                  {
+                    'id': 'comedy',
+                    'display_text': 'Comedy',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                ],
+                'allow_skip': false,
+              },
+              'timestamp': now
+                  .subtract(const Duration(hours: 2))
+                  .toIso8601String(),
             },
             {
-              'content': 'Great! What kind of comedy do you prefer?',
-              'author': 'assistant',
+              'id': 'int-2',
+              'user_input': 'Slapstick humor',
+              'assistant_prompt': {
+                'prompt_prefix': 'What kind of comedy?',
+                'choices': [
+                  {
+                    'id': 'slapstick',
+                    'display_text': 'Slapstick humor',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                ],
+                'allow_skip': false,
+              },
+              'timestamp': now
+                  .subtract(const Duration(hours: 2))
+                  .toIso8601String(),
             },
-            {'content': 'Something with slapstick humor', 'author': 'user'},
             {
-              'content': 'How about romantic comedies vs pure comedy?',
-              'author': 'assistant',
+              'id': 'int-3',
+              'user_input': null,
+              'assistant_prompt': {
+                'prompt_prefix': 'I prefer...',
+                'choices': [
+                  {
+                    'id': 'romantic',
+                    'display_text': 'Romantic comedy',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                  {
+                    'id': 'pure',
+                    'display_text': 'Pure comedy',
+                    'accepts_text_input': false,
+                    'input_placeholder': null,
+                  },
+                ],
+                'allow_skip': false,
+              },
+              'timestamp': now
+                  .subtract(const Duration(hours: 2))
+                  .toIso8601String(),
             },
-            {'content': 'Pure comedy please', 'author': 'user'},
           ],
           timestamp: now.subtract(const Duration(hours: 2)),
         );
@@ -112,59 +160,57 @@ void main() {
         // Tap the history button
         await homeScreenTester.tapHistoryButton();
 
-        // Verify conversation list screen is visible
+        // Verify search session list screen is visible
         final searchSessionListTester = SearchSessionListScreenTester(tester);
         await searchSessionListTester.waitForIsVisible();
 
-        // Verify 3 conversations are displayed
+        // Verify 3 search sessions are displayed
         expect(searchSessionListTester.conversationCount, 3);
 
-        // Verify conversation 1 details
+        // Verify session 1 details
         expect(
           searchSessionListTester.getConversationPreviewText(0),
           'I want to watch something funny tonight',
         );
-        expect(searchSessionListTester.getConversationMessageCount(0), '5');
+        expect(searchSessionListTester.getInteractionCount(0), 5);
         expect(searchSessionListTester.getConversationTimestamp(0), '1h ago');
 
-        // Verify conversation 2 details
+        // Verify session 2 details
         expect(
           searchSessionListTester.getConversationPreviewText(1),
           'Looking for a good thriller',
         );
-        expect(searchSessionListTester.getConversationMessageCount(1), '3');
+        expect(searchSessionListTester.getInteractionCount(1), 3);
         expect(searchSessionListTester.getConversationTimestamp(1), '1d ago');
 
-        // Verify conversation 3 details
+        // Verify session 3 details
         expect(
           searchSessionListTester.getConversationPreviewText(2),
           'Any recommendations for a family movie?',
         );
-        expect(searchSessionListTester.getConversationMessageCount(2), '7');
+        expect(searchSessionListTester.getInteractionCount(2), 7);
         expect(searchSessionListTester.getConversationTimestamp(2), '3d ago');
 
-        // Tap on the first conversation
+        // Tap on the first session
         await searchSessionListTester.tapConversation(0);
 
-        // Verify conversation screen is displayed
-        final conversationScreenTester = ConversationScreenTester(tester);
-        await conversationScreenTester.waitForIsVisible();
-        expect(conversationScreenTester.isVisible, true);
+        // Verify search session screen is displayed
+        final searchSessionScreenTester = SearchSessionScreenTester(tester);
+        await searchSessionScreenTester.waitForIsVisible();
+        expect(searchSessionScreenTester.isVisible, true);
 
-        // Verify the conversation content is displayed
-        final conversation = conversationScreenTester.getConversation();
-        expect(conversation.length, 5);
-        expect(conversation[0], 'I want to watch something funny tonight');
-        expect(conversation[1], 'Great! What kind of comedy do you prefer?');
-        expect(conversation[2], 'Something with slapstick humor');
-        expect(conversation[3], 'How about romantic comedies vs pure comedy?');
-        expect(conversation[4], 'Pure comedy please');
+        // Verify the session content is displayed
+        final session = searchSessionScreenTester.getSearchSession();
+        expect(session.length, greaterThanOrEqualTo(3));
+        expect(session[0], 'I want to watch something funny tonight');
+        expect(session[1], 'I want to watch...');
+        expect(session[2], 'Comedy');
 
         // Tap back button
         await tester.tap(find.byTooltip('Back'));
         await tester.pumpAndSettle();
 
-        // Verify we're back at the conversation list screen
+        // Verify we're back at the search session list screen
         expect(searchSessionListTester.isVisible, true);
         expect(searchSessionListTester.conversationCount, 3);
       },
