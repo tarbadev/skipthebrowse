@@ -45,34 +45,29 @@ void main() async {
     });
   }
 
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://cacb736d46c7c03dbc9ee7ac6db6bb39@o379974.ingest.us.sentry.io/4510638315929600';
-      // Adds request headers and IP for users, for more info visit:
-      // https://docs.sentry.io/platforms/dart/guides/flutter/data-management/data-collected/
+  if (EnvConfig.isSentryEnabled) {
+    await SentryFlutter.init((options) {
+      options.dsn = EnvConfig.sentryDsn;
       options.sendDefaultPii = true;
       options.enableLogs = true;
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-      // We recommend adjusting this value in production.
       options.tracesSampleRate = 1.0;
-      // The sampling rate for profiling is relative to tracesSampleRate
-      // Setting to 1.0 will profile 100% of sampled transactions:
       options.profilesSampleRate = 1.0;
-      // Configure Session Replay
       options.replay.sessionSampleRate = 0.1;
       options.replay.onErrorSampleRate = 1.0;
       options.environment = EnvConfig.environment;
-    },
-    appRunner: () => runApp(
-      SentryWidget(
-        child: ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-          ],
-          child: const SkipTheBrowse(),
-        ),
-      ),
+    }, appRunner: () => _runApp(sharedPreferences));
+  } else {
+    _runApp(sharedPreferences);
+  }
+}
+
+void _runApp(SharedPreferences sharedPreferences) {
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const SkipTheBrowse(),
     ),
   );
 }

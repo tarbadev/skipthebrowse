@@ -321,6 +321,7 @@ jobs:
           flutter build appbundle \
             --dart-define=API_BASE_URL=https://skipthebrowse-backend.onrender.com \
             --dart-define=ENVIRONMENT=dev \
+            --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} \
             --release \
             --build-name=${{ steps.get_version.outputs.version }} \
             --build-number=${GITHUB_RUN_NUMBER} \
@@ -338,7 +339,6 @@ jobs:
 
       - name: Get Commits
         id: get_commits
-        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -z "$PREVIOUS_TAG" ]; then
