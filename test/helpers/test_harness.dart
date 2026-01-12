@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 
 import 'mocks.dart';
 
@@ -23,6 +24,7 @@ extension TestX on WidgetTester {
           conversationRepositoryProvider.overrideWithValue(
             mockConversationRepository,
           ),
+          searchRepositoryProvider.overrideWithValue(mockSearchRepository),
           pendingMessageQueueProvider.overrideWithValue(
             mockPendingMessageQueue,
           ),
@@ -57,6 +59,7 @@ extension TestX on WidgetTester {
           conversationRepositoryProvider.overrideWithValue(
             mockConversationRepository,
           ),
+          searchRepositoryProvider.overrideWithValue(mockSearchRepository),
           pendingMessageQueueProvider.overrideWithValue(
             mockPendingMessageQueue,
           ),

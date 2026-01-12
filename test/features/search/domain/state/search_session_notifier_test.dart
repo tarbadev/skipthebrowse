@@ -114,10 +114,15 @@ void main() {
       final updatedSession = SearchSession(
         id: 'session-1',
         interactions: [
-          ...session.interactions,
+          Interaction(
+            id: 'int-1',
+            userInput: 'Action',
+            assistantPrompt: session.interactions.first.assistantPrompt,
+            timestamp: session.interactions.first.timestamp,
+          ),
           Interaction(
             id: 'int-2',
-            userInput: 'action',
+            userInput: null,
             assistantPrompt: const InteractionPrompt(
               promptPrefix: "Preference?",
               choices: [
@@ -142,15 +147,17 @@ void main() {
 
       final future = notifier.addInteraction('session-1', 'action');
 
-      // Should show optimistic update
+      // Should show optimistic update: Last interaction now has userInput
       expect(notifier.state.isLoading, true);
-      expect(notifier.state.value?.interactions.length, 2);
+      expect(notifier.state.value?.interactions.length, 1);
+      expect(notifier.state.value?.interactions.first.userInput, 'Action');
 
       await future;
 
-      // Should have real data
+      // Should have real data with new interaction from server
       expect(notifier.state.value?.interactions.length, 2);
-      expect(notifier.state.value?.interactions[1].userInput, 'action');
+      expect(notifier.state.value?.interactions[0].userInput, 'Action');
+      expect(notifier.state.value?.interactions[1].userInput, null);
     });
 
     test('refreshSession fetches latest session data', () async {

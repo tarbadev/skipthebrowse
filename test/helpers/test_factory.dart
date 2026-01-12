@@ -3,6 +3,10 @@ import 'package:skipthebrowse/features/conversation/data/models/conversation_res
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/message.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/recommendation.dart';
+import 'package:skipthebrowse/features/search/domain/entities/interaction.dart';
+import 'package:skipthebrowse/features/search/domain/entities/interaction_prompt.dart';
+import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
+import 'package:skipthebrowse/features/search/domain/entities/structured_choice.dart';
 
 const messageId = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
 const conversationId = '97b148c1-5f42-40cf-b11f-2fe63873f19a';
@@ -93,4 +97,49 @@ Recommendation recommendation({
   rating: rating,
   confidence: confidence,
   platforms: platforms,
+);
+
+const searchSessionId = 'search-session-1';
+const interactionId = 'interaction-1';
+
+SearchSession searchSession({
+  String id = searchSessionId,
+  String? initialMessage = 'I want to watch a thriller',
+  List<Interaction> interactions = const [],
+  DateTime createdAt = fixedDateTime,
+}) => SearchSession(
+  id: id,
+  initialMessage: initialMessage,
+  interactions: interactions,
+  recommendations: [],
+  createdAt: createdAt,
+);
+
+Interaction interaction({
+  String id = interactionId,
+  String? userInput,
+  InteractionPrompt? prompt,
+  DateTime timestamp = fixedDateTime,
+}) => Interaction(
+  id: id,
+  userInput: userInput,
+  assistantPrompt:
+      prompt ??
+      const InteractionPrompt(
+        promptPrefix: "What genre are you interested in?",
+        choices: [
+          StructuredChoice(
+            id: 'action',
+            displayText: 'Action',
+            acceptsTextInput: false,
+          ),
+          StructuredChoice(
+            id: 'comedy',
+            displayText: 'Comedy',
+            acceptsTextInput: false,
+          ),
+        ],
+        allowSkip: false,
+      ),
+  timestamp: timestamp,
 );

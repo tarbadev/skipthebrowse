@@ -8,7 +8,7 @@ import 'package:skipthebrowse/features/conversation/domain/entities/conversation
 import '../../../../helpers/mocks.dart';
 import '../../../../helpers/test_factory.dart';
 import '../../../../helpers/test_harness.dart';
-import '../helpers/conversation_screen_tester.dart';
+import '../../../search/presentation/helpers/search_session_screen_tester.dart';
 import '../helpers/home_screen_tester.dart';
 
 void main() {
@@ -22,6 +22,7 @@ void main() {
         createdAt: ConstDateTime(2025),
       ),
     );
+    registerFallbackValue(searchSession());
     registerFallbackValue(Uri());
     registerFallbackValue(
       MaterialPageRoute<void>(builder: (_) => const SizedBox()),
@@ -31,40 +32,36 @@ void main() {
   setUp(() {
     reset(mockObserver);
     reset(mockConversationRepository);
+    reset(mockSearchRepository);
   });
 
-  testWidgets('navigates to conversation screen after creating conversation', (
+  testWidgets('navigates to search session screen after creating session', (
     tester,
   ) async {
-    final createdConversation = conversation();
+    final createdSession = searchSession(interactions: [interaction()]);
 
     when(
-      () => mockConversationRepository.createConversation(any()),
-    ).thenAnswer((_) async => createdConversation);
-    when(
-      () => mockConversationRepository.getConversation(any()),
-    ).thenAnswer((_) async => createdConversation);
+      () => mockSearchRepository.createSearchSession(any()),
+    ).thenAnswer((_) async => createdSession);
 
     await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
     final homeScreenTester = HomeScreenTester(tester);
-    final conversationScreenTester = ConversationScreenTester(tester);
+    final searchSessionScreenTester = SearchSessionScreenTester(tester);
 
     expect(find.text('Looking for something to watch?'), findsOneWidget);
-    expect(conversationScreenTester.isVisible, isFalse);
+    expect(searchSessionScreenTester.isVisible, isFalse);
 
     await homeScreenTester.createSearchSession(question);
 
-    verify(
-      () => mockConversationRepository.createConversation(question),
-    ).called(1);
+    verify(() => mockSearchRepository.createSearchSession(question)).called(1);
 
     await tester.pumpAndSettle();
 
     verify(() => mockObserver.didPush(any(), any())).called(greaterThan(1));
 
     expect(find.text('Looking for something to watch?'), findsNothing);
-    expect(conversationScreenTester.isVisible, isTrue);
+    expect(searchSessionScreenTester.isVisible, isTrue);
   });
 
   group('Conversation Starters', () {
@@ -104,17 +101,14 @@ void main() {
       expect(find.text('Or try a quick starter:'), findsOneWidget);
     });
 
-    testWidgets('tapping first starter chip creates conversation', (
+    testWidgets('tapping first starter chip creates search session', (
       tester,
     ) async {
-      final createdConversation = conversation();
+      final createdSession = searchSession(interactions: [interaction()]);
 
       when(
-        () => mockConversationRepository.createConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
-      when(
-        () => mockConversationRepository.getConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
+        () => mockSearchRepository.createSearchSession(any()),
+      ).thenAnswer((_) async => createdSession);
 
       await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
@@ -124,7 +118,7 @@ void main() {
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
-        () => mockConversationRepository.createConversation(starterText),
+        () => mockSearchRepository.createSearchSession(starterText),
       ).called(1);
 
       await tester.pumpAndSettle();
@@ -132,17 +126,14 @@ void main() {
       verify(() => mockObserver.didPush(any(), any())).called(greaterThan(1));
     });
 
-    testWidgets('tapping second starter chip creates conversation', (
+    testWidgets('tapping second starter chip creates search session', (
       tester,
     ) async {
-      final createdConversation = conversation();
+      final createdSession = searchSession(interactions: [interaction()]);
 
       when(
-        () => mockConversationRepository.createConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
-      when(
-        () => mockConversationRepository.getConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
+        () => mockSearchRepository.createSearchSession(any()),
+      ).thenAnswer((_) async => createdSession);
 
       await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
@@ -152,7 +143,7 @@ void main() {
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
-        () => mockConversationRepository.createConversation(starterText),
+        () => mockSearchRepository.createSearchSession(starterText),
       ).called(1);
 
       await tester.pumpAndSettle();
@@ -160,17 +151,14 @@ void main() {
       verify(() => mockObserver.didPush(any(), any())).called(greaterThan(1));
     });
 
-    testWidgets('tapping third starter chip creates conversation', (
+    testWidgets('tapping third starter chip creates search session', (
       tester,
     ) async {
-      final createdConversation = conversation();
+      final createdSession = searchSession(interactions: [interaction()]);
 
       when(
-        () => mockConversationRepository.createConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
-      when(
-        () => mockConversationRepository.getConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
+        () => mockSearchRepository.createSearchSession(any()),
+      ).thenAnswer((_) async => createdSession);
 
       await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
@@ -180,7 +168,7 @@ void main() {
       await homeScreenTester.tapSearchSessionStarter(starterText);
 
       verify(
-        () => mockConversationRepository.createConversation(starterText),
+        () => mockSearchRepository.createSearchSession(starterText),
       ).called(1);
 
       await tester.pumpAndSettle();
@@ -191,14 +179,11 @@ void main() {
     testWidgets('custom text input still works alongside starters', (
       tester,
     ) async {
-      final createdConversation = conversation();
+      final createdSession = searchSession(interactions: [interaction()]);
 
       when(
-        () => mockConversationRepository.createConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
-      when(
-        () => mockConversationRepository.getConversation(any()),
-      ).thenAnswer((_) async => createdConversation);
+        () => mockSearchRepository.createSearchSession(any()),
+      ).thenAnswer((_) async => createdSession);
 
       await tester.pumpRouterWidget(initialRoute: AppRoutes.home);
 
@@ -208,7 +193,7 @@ void main() {
       await homeScreenTester.createSearchSession(customMessage);
 
       verify(
-        () => mockConversationRepository.createConversation(customMessage),
+        () => mockSearchRepository.createSearchSession(customMessage),
       ).called(1);
 
       await tester.pumpAndSettle();
