@@ -10,6 +10,8 @@ class AppRobot {
 
   AppRobot(this.tester);
 
+  // --- Life Cycle & State ---
+
   Future<void> bootApp({bool clearPreferences = true}) async {
     if (clearPreferences) {
       final prefs = await SharedPreferences.getInstance();
@@ -20,6 +22,8 @@ class AppRobot {
     await tester.pumpAndSettle();
     await waitFor(find.byKey(const Key('home_page_title')));
   }
+
+  // --- Home Screen Actions ---
 
   Future<void> searchFor(String message) async {
     final textField = find.byKey(const Key('add_message_text_box'));
@@ -37,6 +41,8 @@ class AppRobot {
     await tester.pumpAndSettle();
   }
 
+  // --- Navigation Actions ---
+
   Future<void> navigateBack() async {
     final backButton = find.byTooltip('Back');
     if (backButton.evaluate().isNotEmpty) {
@@ -52,6 +58,69 @@ class AppRobot {
     await tester.pumpAndSettle();
   }
 
+  Future<void> goToAccount() async {
+    await tester.tap(find.byIcon(Icons.person_outline).last);
+    await tester.pumpAndSettle();
+  }
+
+  // --- Account Actions ---
+
+  Future<void> tapCreateAccount() async {
+    await tester.tap(find.text('Create Account'));
+    await tester.pumpAndSettle();
+  }
+
+  // --- History Actions ---
+
+  Future<void> searchInHistory(String query) async {
+    final searchField = find.byType(TextField);
+    if (searchField.evaluate().isNotEmpty) {
+      await tester.enterText(searchField.first, query);
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+    }
+  }
+
+  Future<void> openHistoryItem(String term) async {
+    await tester.tap(
+      find
+          .descendant(
+            of: find.byType(ListTile),
+            matching: find.textContaining(term),
+          )
+          .first,
+    );
+    await tester.pumpAndSettle();
+  }
+
+  // --- Verifications ---
+
+  void expectAtHome() {
+    expect(find.byKey(const Key('home_page_title')), findsOneWidget);
+  }
+
+  void expectAtAccountSettings() {
+    expect(find.text('Account'), findsOneWidget);
+  }
+
+  void expectAtUpgradeAccountScreen() {
+    expect(find.text('Upgrade Account'), findsWidgets);
+  }
+
+  void expectAnonymousUserViewVisible() {
+    expect(find.text('Sync Your Data'), findsOneWidget);
+  }
+
+  void expectTextVisible(String text) {
+    expect(find.textContaining(text), findsWidgets);
+  }
+
+  bool isAIResponding() {
+    return find.byType(SelectableText).evaluate().isNotEmpty ||
+        find.byType(ElevatedButton).evaluate().isNotEmpty;
+  }
+
+  // --- Wait Helpers ---
+
   Future<void> waitFor(
     Finder finder, {
     Duration timeout = const Duration(seconds: 20),
@@ -65,11 +134,12 @@ class AppRobot {
   }
 
   Future<void> waitForAIResponse() async {
-    // We wait for the "Finding the perfect match..." text to disappear
-    // OR for a new message bubble to appear.
-    // Let's look for the absence of the loading indicator.
     await waitFor(find.byType(ListView), timeout: const Duration(seconds: 30));
     await tester.pumpAndSettle();
+  }
+
+  Future<void> waitForHistoryItems() async {
+    await waitFor(find.byType(ListTile), timeout: const Duration(seconds: 30));
   }
 }
 
