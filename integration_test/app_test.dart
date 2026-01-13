@@ -1,21 +1,17 @@
 import 'package:integration_test/integration_test.dart';
 
-import 'conversation_navigation_test.dart' as conversation_navigation_test;
-import 'conversation_starters_test.dart' as conversation_starters_test;
-import 'conversation_search_test.dart' as conversation_search_test;
-import 'home_test.dart' as home_test;
-import 'auth_test.dart' as auth_test;
-import 'search_session_flow_test.dart' as search_session_flow_test;
+import 'discovery_journey_test.dart' as discovery_journey;
+import 'auth_lifecycle_journey_test.dart' as auth_journey;
+import 'history_management_journey_test.dart' as history_journey;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // Optimized for real-world interactions
   binding.testTextInput.register();
 
-  home_test.main();
-  conversation_navigation_test.main();
-  conversation_starters_test.main();
-  conversation_search_test.main();
-  auth_test.main();
-  search_session_flow_test.main();
+  // Run journeys sequentially within the same test session
+  discovery_journey.main();
+  auth_journey.main();
+  history_journey.main();
 }
