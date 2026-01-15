@@ -21,19 +21,19 @@ void main() {
         await robot.goToHistory();
 
         await robot.waitForHistoryItems();
-        robot.expectTextVisible(uniqueTerm);
+        await robot.expectTextVisible(uniqueTerm);
 
         await robot.searchInHistory(uniqueTerm);
-        robot.expectTextVisible(uniqueTerm);
+        await robot.expectTextVisible(uniqueTerm);
 
         await robot.openHistoryItem(uniqueTerm);
         await robot.waitForAIResponse();
 
-        robot.expectTextVisible(uniqueTerm);
+        await robot.expectTextVisible(uniqueTerm);
 
         await robot.navigateBack();
         await robot.navigateBack();
-        robot.expectAtHome();
+        await robot.expectAtHome();
       },
     );
   });

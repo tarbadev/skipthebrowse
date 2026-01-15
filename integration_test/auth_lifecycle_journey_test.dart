@@ -12,18 +12,18 @@ void main() {
         final robot = AppRobot(tester);
 
         await robot.bootApp();
-        robot.expectAtHome();
+        await robot.expectAtHome();
 
         await robot.goToAccount();
-        robot.expectAtAccountSettings();
-        robot.expectAnonymousUserViewVisible();
+        await robot.expectAtAccountSettings();
+        await robot.expectAnonymousUserViewVisible();
 
         await robot.tapCreateAccount();
-        robot.expectAtUpgradeAccountScreen();
+        await robot.expectAtUpgradeAccountScreen();
 
         await robot.navigateBack();
         await robot.navigateBack();
-        robot.expectAtHome();
+        await robot.expectAtHome();
       },
     );
   });

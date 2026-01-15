@@ -12,18 +12,18 @@ void main() {
       final robot = AppRobot(tester);
 
       await robot.bootApp();
-      robot.expectAtHome();
+      await robot.expectAtHome();
 
       const query = 'I want to watch a space movie';
       await robot.searchFor(query);
 
       await robot.waitForAIResponse();
-      robot.expectTextVisible(query);
+      await robot.expectTextVisible(query);
 
       expect(robot.isAIResponding(), true);
 
       await robot.navigateBack();
-      robot.expectAtHome();
+      await robot.expectAtHome();
     });
   });
 }
