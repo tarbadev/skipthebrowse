@@ -1,0 +1,11 @@
+description: Discovery journey of a new user
+---
+- expectVisible: Looking for something to watch?
+- pressOn: Describe what you're looking for...
+- writeText: I want to watch a space movie
+- pressOn: Send
+
+- expectVisible: Search Session
+- expectVisible: I want to watch a space movie
+- pressOn: Back
+- expectVisible: Looking for something to watch?

@@ -144,6 +144,7 @@ class _AddMessageWidgetState extends State<AddMessageWidget> {
                             ? Colors.white
                             : Colors.white.withValues(alpha: 0.2),
                       ),
+                tooltip: 'Send',
                 onPressed: _message.isNotEmpty && !widget.isLoading
                     ? _addMessage
                     : null,
