@@ -11,6 +11,7 @@ import 'core/providers/route_provider.dart';
 import 'features/auth/data/repositories/api_auth_repository.dart';
 import 'features/auth/domain/providers/auth_providers.dart';
 import 'features/auth/domain/services/auth_initializer.dart';
+import 'features/auth/domain/services/auth_migration_service.dart';
 import 'features/conversation/data/repositories/rest_client.dart';
 import 'features/conversation/domain/providers/conversation_providers.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -19,6 +20,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
   const secureStorage = FlutterSecureStorage();
+
+  // Migrate auth data from SharedPreferences to FlutterSecureStorage
+  // This runs once per installation and is idempotent
+  final migrationService = AuthMigrationService(
+    sharedPreferences,
+    secureStorage,
+  );
+  await migrationService.migrateIfNeeded();
 
   // Initialize authentication (create anonymous user if needed)
   final dio = Dio(BaseOptions(baseUrl: EnvConfig.apiBaseUrl));
