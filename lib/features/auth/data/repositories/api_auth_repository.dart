@@ -116,19 +116,56 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<User?> getUser() async {
-    final userJson = await _storage.read(key: AuthStorageKeys.user);
+    try {
+      final userJson = await _storage.read(key: AuthStorageKeys.user);
 
-    if (userJson == null) {
+      if (userJson == null) {
+        return null;
+      }
+
+      final userMap = jsonDecode(userJson);
+
+      // Validate structure
+      if (userMap is! Map<String, dynamic>) {
+        debugPrint('User data is not a valid JSON object');
+        // Clear corrupted data
+        await _storage.delete(key: AuthStorageKeys.user);
+        return null;
+      }
+
+      // Validate required fields with safe casting
+      final id = userMap['id'];
+      final username = userMap['username'];
+      final isAnonymous = userMap['is_anonymous'];
+
+      if (id is! String || username is! String || isAnonymous is! bool) {
+        debugPrint('User data missing required fields or wrong types');
+        await _storage.delete(key: AuthStorageKeys.user);
+        return null;
+      }
+
+      return User(
+        id: id,
+        username: username,
+        email: userMap['email'] as String?,
+        isAnonymous: isAnonymous,
+      );
+    } on FormatException catch (e) {
+      debugPrint('Failed to parse user JSON: $e');
+      // Clear corrupted data
+      try {
+        await _storage.delete(key: AuthStorageKeys.user);
+      } catch (deleteError) {
+        debugPrint('Failed to clear corrupted user data: $deleteError');
+      }
+      return null;
+    } on PlatformException catch (e) {
+      debugPrint('Failed to read user from storage: ${e.code} - ${e.message}');
+      return null;
+    } catch (e) {
+      debugPrint('Unexpected error reading user: $e');
       return null;
     }
-
-    final userMap = jsonDecode(userJson) as Map<String, dynamic>;
-    return User(
-      id: userMap['id'] as String,
-      username: userMap['username'] as String,
-      email: userMap['email'] as String?,
-      isAnonymous: userMap['is_anonymous'] as bool,
-    );
   }
 
   @override
