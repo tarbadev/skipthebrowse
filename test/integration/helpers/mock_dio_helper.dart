@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/auth/data/interceptors/auth_interceptor.dart';
 import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 
@@ -17,11 +17,10 @@ class MockDioHelper {
     dio.httpClientAdapter = dioAdapter;
 
     // Add AuthInterceptor to the mock dio instance so headers are handled
-    // We use a dummy SharedPreferences here as it will be filled by tests
-    SharedPreferences.setMockInitialValues({});
-    SharedPreferences.getInstance().then((prefs) {
-      dio.interceptors.add(AuthInterceptor(prefs));
-    });
+    const storage = FlutterSecureStorage();
+    // Clear storage for tests to ensure a clean state
+    FlutterSecureStorage.setMockInitialValues({});
+    dio.interceptors.add(AuthInterceptor(storage));
   }
 
   void mockCreateConversation({

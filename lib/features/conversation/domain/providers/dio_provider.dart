@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skipthebrowse/core/config/env_config.dart';
 import 'package:skipthebrowse/features/auth/data/interceptors/auth_interceptor.dart';
-import 'conversation_providers.dart';
+import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 
 /// Base Dio instance without the AuthInterceptor to avoid circular dependencies
 final baseDioProvider = Provider<Dio>((ref) {
@@ -34,8 +34,8 @@ final dioProvider = Provider<Dio>((ref) {
   );
 
   // Add auth interceptor first to add Authorization header
-  final prefs = ref.watch(sharedPreferencesProvider);
-  dio.interceptors.add(AuthInterceptor(prefs, ref));
+  final storage = ref.watch(secureStorageProvider);
+  dio.interceptors.add(AuthInterceptor(storage, ref));
 
   dio.interceptors.add(
     LogInterceptor(

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -16,11 +17,12 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
+  const secureStorage = FlutterSecureStorage();
 
   // Initialize authentication (create anonymous user if needed)
   final dio = Dio(BaseOptions(baseUrl: EnvConfig.apiBaseUrl));
   final restClient = RestClient(dio);
-  final authRepository = ApiAuthRepository(restClient, sharedPreferences);
+  final authRepository = ApiAuthRepository(restClient, secureStorage);
   final authInitializer = AuthInitializer(authRepository);
   await authInitializer.initialize();
   final bool isDesktopApp =
@@ -55,13 +57,16 @@ void main() async {
       options.replay.sessionSampleRate = 0.1;
       options.replay.onErrorSampleRate = 1.0;
       options.environment = EnvConfig.environment;
-    }, appRunner: () => _runApp(sharedPreferences));
+    }, appRunner: () => _runApp(sharedPreferences, secureStorage));
   } else {
-    _runApp(sharedPreferences);
+    _runApp(sharedPreferences, secureStorage);
   }
 }
 
-void _runApp(SharedPreferences sharedPreferences) {
+void _runApp(
+  SharedPreferences sharedPreferences,
+  FlutterSecureStorage secureStorage,
+) {
   runApp(
     ProviderScope(
       overrides: [

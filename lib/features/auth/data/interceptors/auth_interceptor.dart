@@ -1,24 +1,25 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/providers/auth_providers.dart';
+import '../constants/storage_keys.dart';
 
 class AuthInterceptor extends Interceptor {
-  final SharedPreferences prefs;
+  final FlutterSecureStorage storage;
   final Ref? ref;
 
-  static const String _tokenKey = 'auth_token';
-  static const String _tokenTypeKey = 'token_type';
-
-  AuthInterceptor(this.prefs, [this.ref]);
+  AuthInterceptor(this.storage, [this.ref]);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final accessToken = prefs.getString(_tokenKey);
-    final tokenType = prefs.getString(_tokenTypeKey);
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final accessToken = await storage.read(key: AuthStorageKeys.token);
+    final tokenType = await storage.read(key: AuthStorageKeys.tokenType);
 
     if (accessToken != null && tokenType != null) {
       final capitalizedTokenType =
@@ -26,7 +27,7 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = '$capitalizedTokenType $accessToken';
     }
 
-    super.onRequest(options, handler);
+    handler.next(options);
   }
 
   @override
@@ -38,19 +39,17 @@ class AuthInterceptor extends Interceptor {
       await Sentry.captureException(
         err,
         stackTrace: err.stackTrace,
-        withScope: (scope) {
+        withScope: (scope) async {
           scope.setTag('auth_error', '401_unauthorized');
           scope.setContexts('user_auth', {
             'is_anonymous': isAnonymous,
-            'has_token': prefs.getString(_tokenKey) != null,
+            'has_token': await storage.read(key: AuthStorageKeys.token) != null,
           });
         },
       );
 
       if (isAnonymous && ref != null) {
         try {
-          // Generate a VALID username if the current one is missing or invalid
-          // Backend expects: lowercase, numbers, and hyphens ONLY.
           final currentUsername = authState?.valueOrNull?.user.username;
           final username =
               (currentUsername != null && currentUsername.isNotEmpty)
@@ -110,8 +109,8 @@ class AuthInterceptor extends Interceptor {
 
   Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
     final dio = Dio(BaseOptions(baseUrl: requestOptions.baseUrl));
-    final accessToken = prefs.getString(_tokenKey);
-    final tokenType = prefs.getString(_tokenTypeKey);
+    final accessToken = await storage.read(key: AuthStorageKeys.token);
+    final tokenType = await storage.read(key: AuthStorageKeys.tokenType);
 
     if (accessToken != null && tokenType != null) {
       final capitalizedTokenType =

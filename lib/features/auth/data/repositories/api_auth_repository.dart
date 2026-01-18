@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../domain/entities/auth_session.dart';
 import '../../domain/entities/auth_token.dart';
 import '../../domain/entities/user.dart';
@@ -9,16 +9,13 @@ import '../models/create_anonymous_user_request.dart';
 import '../models/register_user_request.dart';
 import '../models/login_request.dart';
 import '../models/merge_account_request.dart';
+import '../constants/storage_keys.dart';
 
 class ApiAuthRepository implements AuthRepository {
   final RestClient _restClient;
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _storage;
 
-  static const String _tokenKey = 'auth_token';
-  static const String _tokenTypeKey = 'token_type';
-  static const String _userKey = 'user';
-
-  ApiAuthRepository(this._restClient, this._prefs);
+  ApiAuthRepository(this._restClient, this._storage);
 
   @override
   Future<AuthSession> createAnonymousUser(String username) async {
@@ -26,7 +23,6 @@ class ApiAuthRepository implements AuthRepository {
     final response = await _restClient.createAnonymousUser(request);
     final session = response.toEntity();
 
-    // Save session to local storage
     await saveSession(session);
 
     return session;
@@ -34,11 +30,17 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> saveSession(AuthSession session) async {
-    await _prefs.setString(_tokenKey, session.token.accessToken);
-    await _prefs.setString(_tokenTypeKey, session.token.tokenType);
-    await _prefs.setString(
-      _userKey,
-      jsonEncode({
+    await _storage.write(
+      key: AuthStorageKeys.token,
+      value: session.token.accessToken,
+    );
+    await _storage.write(
+      key: AuthStorageKeys.tokenType,
+      value: session.token.tokenType,
+    );
+    await _storage.write(
+      key: AuthStorageKeys.user,
+      value: jsonEncode({
         'id': session.user.id,
         'username': session.user.username,
         'email': session.user.email,
@@ -61,15 +63,15 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> clearSession() async {
-    await _prefs.remove(_tokenKey);
-    await _prefs.remove(_tokenTypeKey);
-    await _prefs.remove(_userKey);
+    await _storage.delete(key: AuthStorageKeys.token);
+    await _storage.delete(key: AuthStorageKeys.tokenType);
+    await _storage.delete(key: AuthStorageKeys.user);
   }
 
   @override
   Future<AuthToken?> getToken() async {
-    final accessToken = _prefs.getString(_tokenKey);
-    final tokenType = _prefs.getString(_tokenTypeKey);
+    final accessToken = await _storage.read(key: AuthStorageKeys.token);
+    final tokenType = await _storage.read(key: AuthStorageKeys.tokenType);
 
     if (accessToken == null || tokenType == null) {
       return null;
@@ -80,7 +82,7 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<User?> getUser() async {
-    final userJson = _prefs.getString(_userKey);
+    final userJson = await _storage.read(key: AuthStorageKeys.user);
 
     if (userJson == null) {
       return null;
@@ -109,7 +111,6 @@ class ApiAuthRepository implements AuthRepository {
     final response = await _restClient.registerUser(request);
     final session = response.toEntity();
 
-    // Save session to local storage
     await saveSession(session);
 
     return session;
@@ -124,7 +125,6 @@ class ApiAuthRepository implements AuthRepository {
     final response = await _restClient.loginUser(request);
     final session = response.toEntity();
 
-    // Save session to local storage
     await saveSession(session);
 
     return session;
@@ -139,7 +139,6 @@ class ApiAuthRepository implements AuthRepository {
     final response = await _restClient.mergeAnonymousAccount(request);
     final session = response.toEntity();
 
-    // Save session to local storage
     await saveSession(session);
 
     return session;

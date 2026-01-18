@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/core/config/router.dart';
+import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
@@ -17,6 +19,7 @@ extension TestX on WidgetTester {
 
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
+    FlutterSecureStorage.setMockInitialValues({});
 
     await pumpWidget(
       ProviderScope(
@@ -29,7 +32,9 @@ extension TestX on WidgetTester {
             mockPendingMessageQueue,
           ),
           dioProvider.overrideWithValue(dio),
+          baseDioProvider.overrideWithValue(dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          secureStorageProvider.overrideWithValue(const FlutterSecureStorage()),
         ],
         child: MaterialApp(home: Scaffold(body: widget)),
       ),
@@ -45,6 +50,7 @@ extension TestX on WidgetTester {
 
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
+    FlutterSecureStorage.setMockInitialValues({});
 
     final goRouter = GoRouter(
       routes: routes,
@@ -64,7 +70,9 @@ extension TestX on WidgetTester {
             mockPendingMessageQueue,
           ),
           dioProvider.overrideWithValue(dio),
+          baseDioProvider.overrideWithValue(dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          secureStorageProvider.overrideWithValue(const FlutterSecureStorage()),
         ],
         child: MaterialApp.router(routerConfig: goRouter),
       ),

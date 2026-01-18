@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
@@ -16,6 +17,7 @@ void main() {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       sharedPreferences = await SharedPreferences.getInstance();
+      FlutterSecureStorage.setMockInitialValues({});
       mockDioHelper = MockDioHelper();
     });
 
@@ -67,10 +69,11 @@ void main() {
       expect(authNotifier.currentUser?.isAnonymous, false);
       expect(authNotifier.token, accessToken);
 
-      // Session should be persisted in SharedPreferences
-      expect(sharedPreferences.getString('auth_token'), accessToken);
-      expect(sharedPreferences.getString('token_type'), 'bearer');
-      expect(sharedPreferences.getString('user'), isNotNull);
+      // Session should be persisted in SecureStorage
+      final storage = container.read(secureStorageProvider);
+      expect(await storage.read(key: 'auth_token'), accessToken);
+      expect(await storage.read(key: 'token_type'), 'bearer');
+      expect(await storage.read(key: 'user'), isNotNull);
     });
 
     test('user can login with email and password', () async {
@@ -113,7 +116,8 @@ void main() {
       expect(authNotifier.token, accessToken);
 
       // Session should be persisted
-      expect(sharedPreferences.getString('auth_token'), accessToken);
+      final storage = container.read(secureStorageProvider);
+      expect(await storage.read(key: 'auth_token'), accessToken);
     });
 
     test('anonymous user can merge account with email and password', () async {
@@ -178,7 +182,8 @@ void main() {
       expect(authNotifier.token, mergedToken); // New token
 
       // Session should be updated
-      expect(sharedPreferences.getString('auth_token'), mergedToken);
+      final storage = container.read(secureStorageProvider);
+      expect(await storage.read(key: 'auth_token'), mergedToken);
     });
 
     test('user can logout and clear session', () async {
@@ -222,10 +227,11 @@ void main() {
       expect(authNotifier.currentUser, null);
       expect(authNotifier.token, null);
 
-      // Session should be cleared from SharedPreferences
-      expect(sharedPreferences.getString('auth_token'), null);
-      expect(sharedPreferences.getString('token_type'), null);
-      expect(sharedPreferences.getString('user'), null);
+      // Session should be cleared from SecureStorage
+      final storage = container.read(secureStorageProvider);
+      expect(await storage.read(key: 'auth_token'), null);
+      expect(await storage.read(key: 'token_type'), null);
+      expect(await storage.read(key: 'user'), null);
     });
 
     test('session persists across app restarts', () async {
@@ -276,7 +282,7 @@ void main() {
       // The notifier starts in loading state, then loads the session
       await Future.delayed(const Duration(milliseconds: 200));
 
-      // Session should be restored from SharedPreferences
+      // Session should be restored from SecureStorage
       expect(authNotifier2.isAuthenticated, true);
       expect(authNotifier2.currentUser?.id, userId);
       expect(authNotifier2.currentUser?.username, username);
