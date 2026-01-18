@@ -12,6 +12,7 @@ import 'features/auth/data/repositories/api_auth_repository.dart';
 import 'features/auth/domain/providers/auth_providers.dart';
 import 'features/auth/domain/services/auth_initializer.dart';
 import 'features/auth/domain/services/auth_migration_service.dart';
+import 'features/auth/domain/services/storage_validator.dart';
 import 'features/conversation/data/repositories/rest_client.dart';
 import 'features/conversation/domain/providers/conversation_providers.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -20,6 +21,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
   const secureStorage = FlutterSecureStorage();
+
+  // Validate secure storage is functional before using it
+  final storageValidator = StorageValidator(secureStorage);
+  final isStorageValid = await storageValidator.validateStorage();
+  if (!isStorageValid) {
+    debugPrint(
+      '⚠️ WARNING: ${storageValidator.getStorageUnavailableMessage()}',
+    );
+    // Continue anyway - app will handle storage errors gracefully
+  }
 
   // Migrate auth data from SharedPreferences to FlutterSecureStorage
   // This runs once per installation and is idempotent
