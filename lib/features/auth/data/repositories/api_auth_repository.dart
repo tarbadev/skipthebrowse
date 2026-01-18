@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../domain/entities/auth_session.dart';
 import '../../domain/entities/auth_token.dart';
@@ -10,6 +12,7 @@ import '../models/register_user_request.dart';
 import '../models/login_request.dart';
 import '../models/merge_account_request.dart';
 import '../constants/storage_keys.dart';
+import '../../domain/exceptions/auth_exceptions.dart';
 
 class ApiAuthRepository implements AuthRepository {
   final RestClient _restClient;
@@ -30,23 +33,37 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> saveSession(AuthSession session) async {
-    await _storage.write(
-      key: AuthStorageKeys.token,
-      value: session.token.accessToken,
-    );
-    await _storage.write(
-      key: AuthStorageKeys.tokenType,
-      value: session.token.tokenType,
-    );
-    await _storage.write(
-      key: AuthStorageKeys.user,
-      value: jsonEncode({
-        'id': session.user.id,
-        'username': session.user.username,
-        'email': session.user.email,
-        'is_anonymous': session.user.isAnonymous,
-      }),
-    );
+    try {
+      await _storage.write(
+        key: AuthStorageKeys.token,
+        value: session.token.accessToken,
+      );
+      await _storage.write(
+        key: AuthStorageKeys.tokenType,
+        value: session.token.tokenType,
+      );
+      await _storage.write(
+        key: AuthStorageKeys.user,
+        value: jsonEncode({
+          'id': session.user.id,
+          'username': session.user.username,
+          'email': session.user.email,
+          'is_anonymous': session.user.isAnonymous,
+        }),
+      );
+    } on PlatformException catch (e) {
+      debugPrint('Failed to save auth session: ${e.code} - ${e.message}');
+      throw AuthStorageException(
+        'Failed to save authentication session. Please check device storage and permissions.',
+        originalError: e,
+      );
+    } catch (e) {
+      debugPrint('Unexpected error saving auth session: $e');
+      throw AuthStorageException(
+        'Failed to save authentication session',
+        originalError: e,
+      );
+    }
   }
 
   @override
@@ -63,21 +80,38 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> clearSession() async {
-    await _storage.delete(key: AuthStorageKeys.token);
-    await _storage.delete(key: AuthStorageKeys.tokenType);
-    await _storage.delete(key: AuthStorageKeys.user);
+    try {
+      await _storage.delete(key: AuthStorageKeys.token);
+      await _storage.delete(key: AuthStorageKeys.tokenType);
+      await _storage.delete(key: AuthStorageKeys.user);
+    } on PlatformException catch (e) {
+      // Log but don't throw - clearing session should be best-effort
+      debugPrint('Failed to clear auth session: ${e.code} - ${e.message}');
+    } catch (e) {
+      debugPrint('Unexpected error clearing auth session: $e');
+    }
   }
 
   @override
   Future<AuthToken?> getToken() async {
-    final accessToken = await _storage.read(key: AuthStorageKeys.token);
-    final tokenType = await _storage.read(key: AuthStorageKeys.tokenType);
+    try {
+      final accessToken = await _storage.read(key: AuthStorageKeys.token);
+      final tokenType = await _storage.read(key: AuthStorageKeys.tokenType);
 
-    if (accessToken == null || tokenType == null) {
+      if (accessToken == null || tokenType == null) {
+        return null;
+      }
+
+      return AuthToken(accessToken: accessToken, tokenType: tokenType);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to read auth token: ${e.code} - ${e.message}');
+      // For read errors, return null (treat as not authenticated)
+      // This allows graceful degradation instead of app crash
+      return null;
+    } catch (e) {
+      debugPrint('Unexpected error reading auth token: $e');
       return null;
     }
-
-    return AuthToken(accessToken: accessToken, tokenType: tokenType);
   }
 
   @override
