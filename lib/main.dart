@@ -9,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
 import 'core/providers/route_provider.dart';
 import 'features/auth/data/repositories/api_auth_repository.dart';
+import 'features/auth/domain/providers/auth_providers.dart';
 import 'features/auth/domain/services/auth_initializer.dart';
 import 'features/conversation/data/repositories/rest_client.dart';
 import 'features/conversation/domain/providers/conversation_providers.dart';
@@ -71,6 +72,7 @@ void _runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        secureStorageProvider.overrideWithValue(secureStorage),
       ],
       child: const SkipTheBrowse(),
     ),
