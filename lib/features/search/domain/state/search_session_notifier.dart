@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skipthebrowse/core/state/base_async_notifier.dart';
 import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';
 import 'package:skipthebrowse/features/search/domain/entities/interaction.dart';
 import 'package:skipthebrowse/features/search/domain/repositories/search_repository.dart';
 
-class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
+class SearchSessionNotifier extends BaseAsyncNotifier<SearchSession?> {
   final SearchRepository repository;
 
   SearchSessionNotifier(this.repository) : super(const AsyncValue.data(null));
@@ -12,18 +13,10 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
     String initialMessage, {
     String region = 'US',
   }) async {
-    state = const AsyncLoading<SearchSession?>().copyWithPrevious(state);
-    try {
-      final session = await repository.createSearchSession(
-        initialMessage,
-        region: region,
-      );
-      state = AsyncValue.data(session);
-      return session;
-    } catch (err, stack) {
-      state = AsyncError<SearchSession?>(err, stack).copyWithPrevious(state);
-      return null;
-    }
+    await executeWithPrevious(
+      () => repository.createSearchSession(initialMessage, region: region),
+    );
+    return state.value;
   }
 
   Future<void> addInteraction(
@@ -73,36 +66,20 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
       createdAt: currentSession.createdAt,
     );
 
-    // Set loading state while keeping optimistic update
-    state = const AsyncLoading<SearchSession?>().copyWithPrevious(
-      AsyncValue.data(updatedSession),
+    // Optimistic update with revert on error
+    await executeWithOptimisticUpdate(
+      optimisticState: updatedSession,
+      operation: () => repository
+          .addInteraction(sessionId, choiceId, customInput: customInput)
+          .then((session) {
+            // Update with actual server response
+            state = AsyncValue.data(session);
+          }),
     );
-
-    try {
-      final session = await repository.addInteraction(
-        sessionId,
-        choiceId,
-        customInput: customInput,
-      );
-      state = AsyncValue.data(session);
-    } catch (err, stack) {
-      // Revert to previous state on error
-      state = AsyncError<SearchSession?>(
-        err,
-        stack,
-      ).copyWithPrevious(AsyncValue.data(currentSession));
-    }
   }
 
-  Future<void> refreshSession(String sessionId) async {
-    state = const AsyncLoading<SearchSession?>().copyWithPrevious(state);
-    try {
-      final session = await repository.getSearchSession(sessionId);
-      state = AsyncValue.data(session);
-    } catch (err, stack) {
-      state = AsyncError<SearchSession?>(err, stack).copyWithPrevious(state);
-    }
-  }
+  Future<void> refreshSession(String sessionId) =>
+      executeWithPrevious(() => repository.getSearchSession(sessionId));
 
   void setSession(SearchSession session) {
     state = AsyncValue.data(session);
