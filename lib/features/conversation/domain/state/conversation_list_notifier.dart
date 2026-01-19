@@ -133,7 +133,12 @@ class ConversationListNotifier
         ),
       );
     } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+      // Preserve loaded conversations on error, reset loading flag
+      final errorState = currentState.copyWith(isLoadingMore: false);
+      state = AsyncError<ConversationListState>(
+        e,
+        stack,
+      ).copyWithPrevious(AsyncValue.data(errorState));
     }
   }
 
@@ -199,7 +204,12 @@ class ConversationListNotifier
         ),
       );
     } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+      // Preserve loaded search results on error, reset loading flag
+      final errorState = currentState.copyWith(isLoadingMore: false);
+      state = AsyncError<ConversationListState>(
+        e,
+        stack,
+      ).copyWithPrevious(AsyncValue.data(errorState));
     }
   }
 
