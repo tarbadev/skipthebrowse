@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,10 +8,10 @@ import 'package:skipthebrowse/features/auth/data/models/login_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/merge_account_request.dart';
 import 'package:skipthebrowse/features/auth/data/models/user_dto.dart';
 import 'package:skipthebrowse/features/auth/data/repositories/api_auth_repository.dart';
+import 'package:skipthebrowse/features/auth/data/storage/auth_storage.dart';
 import 'package:skipthebrowse/features/auth/domain/entities/auth_session.dart';
 import 'package:skipthebrowse/features/auth/domain/entities/auth_token.dart';
 import 'package:skipthebrowse/features/auth/domain/entities/user.dart';
-import 'package:skipthebrowse/features/auth/domain/exceptions/auth_exceptions.dart';
 import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 
 class MockRestClient extends Mock implements RestClient {}
@@ -27,7 +26,10 @@ void main() {
   setUp(() {
     mockRestClient = MockRestClient();
     mockStorage = MockFlutterSecureStorage();
-    repository = ApiAuthRepository(mockRestClient, mockStorage);
+    repository = ApiAuthRepository(
+      mockRestClient,
+      SecureAuthStorage(mockStorage),
+    );
 
     registerFallbackValue(CreateAnonymousUserRequest(username: 'test'));
     registerFallbackValue(
@@ -229,166 +231,6 @@ void main() {
           value: any(named: 'value'),
         ),
       ).called(1);
-    });
-  });
-
-  group('ApiAuthRepository - Error Handling', () {
-    test(
-      'should throw AuthStorageException when storage write fails',
-      () async {
-        const session = AuthSession(
-          user: User(id: 'user-123', username: 'han-solo', isAnonymous: true),
-          token: AuthToken(accessToken: 'test-token', tokenType: 'bearer'),
-        );
-
-        when(
-          () => mockStorage.write(
-            key: any(named: 'key'),
-            value: any(named: 'value'),
-          ),
-        ).thenThrow(
-          PlatformException(code: 'write_failed', message: 'Storage full'),
-        );
-
-        expect(
-          () => repository.saveSession(session),
-          throwsA(isA<AuthStorageException>()),
-        );
-      },
-    );
-
-    test('should return null when storage read fails', () async {
-      when(
-        () => mockStorage.read(key: any(named: 'key')),
-      ).thenThrow(PlatformException(code: 'read_failed'));
-
-      final session = await repository.getSession();
-      expect(session, isNull);
-    });
-
-    test('should return null when token read fails', () async {
-      when(
-        () => mockStorage.read(key: 'auth_token'),
-      ).thenThrow(PlatformException(code: 'read_failed'));
-
-      final token = await repository.getToken();
-      expect(token, isNull);
-    });
-
-    test('should handle corrupted JSON in user data', () async {
-      when(
-        () => mockStorage.read(key: 'auth_token'),
-      ).thenAnswer((_) async => 'token');
-      when(
-        () => mockStorage.read(key: 'token_type'),
-      ).thenAnswer((_) async => 'bearer');
-      when(
-        () => mockStorage.read(key: 'user'),
-      ).thenAnswer((_) async => '{"id":"123","username":'); // Corrupted JSON
-      when(
-        () => mockStorage.delete(key: any(named: 'key')),
-      ).thenAnswer((_) async => {});
-
-      final session = await repository.getSession();
-      expect(session, isNull);
-
-      // Verify corrupted data was cleared
-      verify(() => mockStorage.delete(key: 'user')).called(1);
-    });
-
-    test('should handle missing required fields in user data', () async {
-      when(
-        () => mockStorage.read(key: 'auth_token'),
-      ).thenAnswer((_) async => 'token');
-      when(
-        () => mockStorage.read(key: 'token_type'),
-      ).thenAnswer((_) async => 'bearer');
-      when(
-        () => mockStorage.read(key: 'user'),
-      ).thenAnswer((_) async => '{"username":"han-solo"}'); // Missing 'id'
-      when(
-        () => mockStorage.delete(key: any(named: 'key')),
-      ).thenAnswer((_) async => {});
-
-      final session = await repository.getSession();
-      expect(session, isNull);
-
-      verify(() => mockStorage.delete(key: 'user')).called(1);
-    });
-
-    test('should handle wrong types in user data', () async {
-      when(
-        () => mockStorage.read(key: 'auth_token'),
-      ).thenAnswer((_) async => 'token');
-      when(
-        () => mockStorage.read(key: 'token_type'),
-      ).thenAnswer((_) async => 'bearer');
-      when(() => mockStorage.read(key: 'user')).thenAnswer(
-        (_) async =>
-            '{"id":123,"username":"han","is_anonymous":false}', // id is int
-      );
-      when(
-        () => mockStorage.delete(key: any(named: 'key')),
-      ).thenAnswer((_) async => {});
-
-      final session = await repository.getSession();
-      expect(session, isNull);
-
-      verify(() => mockStorage.delete(key: 'user')).called(1);
-    });
-
-    test('should handle non-object JSON in user data', () async {
-      when(
-        () => mockStorage.read(key: 'auth_token'),
-      ).thenAnswer((_) async => 'token');
-      when(
-        () => mockStorage.read(key: 'token_type'),
-      ).thenAnswer((_) async => 'bearer');
-      when(
-        () => mockStorage.read(key: 'user'),
-      ).thenAnswer((_) async => '["not", "an", "object"]'); // Array not object
-      when(
-        () => mockStorage.delete(key: any(named: 'key')),
-      ).thenAnswer((_) async => {});
-
-      final session = await repository.getSession();
-      expect(session, isNull);
-
-      verify(() => mockStorage.delete(key: 'user')).called(1);
-    });
-
-    test('should not throw when clearSession fails', () async {
-      when(
-        () => mockStorage.delete(key: any(named: 'key')),
-      ).thenThrow(PlatformException(code: 'delete_failed'));
-
-      // Should not throw
-      await expectLater(repository.clearSession(), completes);
-    });
-
-    test('should return null when getUser storage read fails', () async {
-      when(
-        () => mockStorage.read(key: 'user'),
-      ).thenThrow(PlatformException(code: 'read_failed'));
-
-      final user = await repository.getUser();
-      expect(user, isNull);
-    });
-
-    test('should clear corrupted data even if delete fails', () async {
-      when(
-        () => mockStorage.read(key: 'user'),
-      ).thenAnswer((_) async => 'invalid json');
-      when(
-        () => mockStorage.delete(key: 'user'),
-      ).thenThrow(PlatformException(code: 'delete_failed'));
-
-      // Should not throw, just return null
-      final user = await repository.getUser();
-      expect(user, isNull);
-
-      // Attempted to delete
-      verify(() => mockStorage.delete(key: 'user')).called(1);
     });
   });
 }

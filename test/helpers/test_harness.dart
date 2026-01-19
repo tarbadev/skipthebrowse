@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/core/config/router.dart';
+import 'package:skipthebrowse/features/auth/data/storage/auth_storage.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
@@ -34,7 +35,9 @@ extension TestX on WidgetTester {
           dioProvider.overrideWithValue(dio),
           baseDioProvider.overrideWithValue(dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-          secureStorageProvider.overrideWithValue(const FlutterSecureStorage()),
+          authStorageProvider.overrideWithValue(
+            SecureAuthStorage(const FlutterSecureStorage()),
+          ),
         ],
         child: MaterialApp(home: Scaffold(body: widget)),
       ),
@@ -72,7 +75,9 @@ extension TestX on WidgetTester {
           dioProvider.overrideWithValue(dio),
           baseDioProvider.overrideWithValue(dio),
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-          secureStorageProvider.overrideWithValue(const FlutterSecureStorage()),
+          authStorageProvider.overrideWithValue(
+            SecureAuthStorage(const FlutterSecureStorage()),
+          ),
         ],
         child: MaterialApp.router(routerConfig: goRouter),
       ),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../domain/entities/auth_session.dart';
 import '../../domain/entities/auth_token.dart';
 import '../../domain/entities/user.dart';
@@ -13,10 +12,11 @@ import '../models/login_request.dart';
 import '../models/merge_account_request.dart';
 import '../constants/storage_keys.dart';
 import '../../domain/exceptions/auth_exceptions.dart';
+import '../storage/auth_storage.dart';
 
 class ApiAuthRepository implements AuthRepository {
   final RestClient _restClient;
-  final FlutterSecureStorage _storage;
+  final AuthStorage _storage;
 
   ApiAuthRepository(this._restClient, this._storage);
 
@@ -85,7 +85,6 @@ class ApiAuthRepository implements AuthRepository {
       await _storage.delete(key: AuthStorageKeys.tokenType);
       await _storage.delete(key: AuthStorageKeys.user);
     } on PlatformException catch (e) {
-      // Log but don't throw - clearing session should be best-effort
       debugPrint('Failed to clear auth session: ${e.code} - ${e.message}');
     } catch (e) {
       debugPrint('Unexpected error clearing auth session: $e');
@@ -105,8 +104,6 @@ class ApiAuthRepository implements AuthRepository {
       return AuthToken(accessToken: accessToken, tokenType: tokenType);
     } on PlatformException catch (e) {
       debugPrint('Failed to read auth token: ${e.code} - ${e.message}');
-      // For read errors, return null (treat as not authenticated)
-      // This allows graceful degradation instead of app crash
       return null;
     } catch (e) {
       debugPrint('Unexpected error reading auth token: $e');
@@ -125,21 +122,16 @@ class ApiAuthRepository implements AuthRepository {
 
       final userMap = jsonDecode(userJson);
 
-      // Validate structure
       if (userMap is! Map<String, dynamic>) {
-        debugPrint('User data is not a valid JSON object');
-        // Clear corrupted data
         await _storage.delete(key: AuthStorageKeys.user);
         return null;
       }
 
-      // Validate required fields with safe casting
       final id = userMap['id'];
       final username = userMap['username'];
       final isAnonymous = userMap['is_anonymous'];
 
       if (id is! String || username is! String || isAnonymous is! bool) {
-        debugPrint('User data missing required fields or wrong types');
         await _storage.delete(key: AuthStorageKeys.user);
         return null;
       }
@@ -152,7 +144,6 @@ class ApiAuthRepository implements AuthRepository {
       );
     } on FormatException catch (e) {
       debugPrint('Failed to parse user JSON: $e');
-      // Clear corrupted data
       try {
         await _storage.delete(key: AuthStorageKeys.user);
       } catch (deleteError) {

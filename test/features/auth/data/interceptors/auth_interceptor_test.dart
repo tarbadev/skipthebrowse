@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:skipthebrowse/features/auth/data/interceptors/auth_interceptor.dart';
+import 'package:skipthebrowse/features/auth/data/storage/auth_storage.dart';
 
 class MockFlutterSecureStorage extends Mock implements FlutterSecureStorage {}
 
@@ -22,7 +23,7 @@ void main() {
 
   setUp(() {
     mockStorage = MockFlutterSecureStorage();
-    interceptor = AuthInterceptor(mockStorage);
+    interceptor = AuthInterceptor(SecureAuthStorage(mockStorage));
     mockHandler = MockRequestInterceptorHandler();
   });
 

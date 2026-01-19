@@ -69,8 +69,8 @@ void main() {
       expect(authNotifier.currentUser?.isAnonymous, false);
       expect(authNotifier.token, accessToken);
 
-      // Session should be persisted in SecureStorage
-      final storage = container.read(secureStorageProvider);
+      // Session should be persisted in Storage
+      final storage = container.read(authStorageProvider);
       expect(await storage.read(key: 'auth_token'), accessToken);
       expect(await storage.read(key: 'token_type'), 'bearer');
       expect(await storage.read(key: 'user'), isNotNull);
@@ -116,7 +116,7 @@ void main() {
       expect(authNotifier.token, accessToken);
 
       // Session should be persisted
-      final storage = container.read(secureStorageProvider);
+      final storage = container.read(authStorageProvider);
       expect(await storage.read(key: 'auth_token'), accessToken);
     });
 
@@ -182,7 +182,7 @@ void main() {
       expect(authNotifier.token, mergedToken); // New token
 
       // Session should be updated
-      final storage = container.read(secureStorageProvider);
+      final storage = container.read(authStorageProvider);
       expect(await storage.read(key: 'auth_token'), mergedToken);
     });
 
@@ -227,8 +227,8 @@ void main() {
       expect(authNotifier.currentUser, null);
       expect(authNotifier.token, null);
 
-      // Session should be cleared from SecureStorage
-      final storage = container.read(secureStorageProvider);
+      // Session should be cleared from Storage
+      final storage = container.read(authStorageProvider);
       expect(await storage.read(key: 'auth_token'), null);
       expect(await storage.read(key: 'token_type'), null);
       expect(await storage.read(key: 'user'), null);
@@ -282,7 +282,7 @@ void main() {
       // The notifier starts in loading state, then loads the session
       await Future.delayed(const Duration(milliseconds: 200));
 
-      // Session should be restored from SecureStorage
+      // Session should be restored from Storage
       expect(authNotifier2.isAuthenticated, true);
       expect(authNotifier2.currentUser?.id, userId);
       expect(authNotifier2.currentUser?.username, username);

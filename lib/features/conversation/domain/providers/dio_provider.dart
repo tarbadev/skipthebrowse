@@ -34,7 +34,7 @@ final dioProvider = Provider<Dio>((ref) {
   );
 
   // Add auth interceptor first to add Authorization header
-  final storage = ref.watch(secureStorageProvider);
+  final storage = ref.watch(authStorageProvider);
   dio.interceptors.add(AuthInterceptor(storage, ref));
 
   dio.interceptors.add(

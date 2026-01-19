@@ -9,10 +9,9 @@ import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
 import 'core/providers/route_provider.dart';
 import 'features/auth/data/repositories/api_auth_repository.dart';
+import 'features/auth/data/storage/auth_storage.dart';
 import 'features/auth/domain/providers/auth_providers.dart';
 import 'features/auth/domain/services/auth_initializer.dart';
-import 'features/auth/domain/services/auth_migration_service.dart';
-import 'features/auth/domain/services/storage_validator.dart';
 import 'features/conversation/data/repositories/rest_client.dart';
 import 'features/conversation/domain/providers/conversation_providers.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -22,28 +21,17 @@ void main() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   const secureStorage = FlutterSecureStorage();
 
-  // Validate secure storage is functional before using it
-  final storageValidator = StorageValidator(secureStorage);
-  final isStorageValid = await storageValidator.validateStorage();
-  if (!isStorageValid) {
-    debugPrint(
-      '⚠️ WARNING: ${storageValidator.getStorageUnavailableMessage()}',
-    );
-    // Continue anyway - app will handle storage errors gracefully
-  }
-
-  // Migrate auth data from SharedPreferences to FlutterSecureStorage
-  // This runs once per installation and is idempotent
-  final migrationService = AuthMigrationService(
-    sharedPreferences,
-    secureStorage,
-  );
-  await migrationService.migrateIfNeeded();
+  // Initialize storage based on platform/mode
+  final useInsecureStorage =
+      kDebugMode && defaultTargetPlatform == TargetPlatform.macOS;
+  final AuthStorage storage = useInsecureStorage
+      ? InsecureAuthStorage(sharedPreferences)
+      : SecureAuthStorage(secureStorage);
 
   // Initialize authentication (create anonymous user if needed)
   final dio = Dio(BaseOptions(baseUrl: EnvConfig.apiBaseUrl));
   final restClient = RestClient(dio);
-  final authRepository = ApiAuthRepository(restClient, secureStorage);
+  final authRepository = ApiAuthRepository(restClient, storage);
   final authInitializer = AuthInitializer(authRepository);
   await authInitializer.initialize();
   final bool isDesktopApp =
@@ -78,21 +66,18 @@ void main() async {
       options.replay.sessionSampleRate = 0.1;
       options.replay.onErrorSampleRate = 1.0;
       options.environment = EnvConfig.environment;
-    }, appRunner: () => _runApp(sharedPreferences, secureStorage));
+    }, appRunner: () => _runApp(sharedPreferences, storage));
   } else {
-    _runApp(sharedPreferences, secureStorage);
+    _runApp(sharedPreferences, storage);
   }
 }
 
-void _runApp(
-  SharedPreferences sharedPreferences,
-  FlutterSecureStorage secureStorage,
-) {
+void _runApp(SharedPreferences sharedPreferences, AuthStorage storage) {
   runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-        secureStorageProvider.overrideWithValue(secureStorage),
+        authStorageProvider.overrideWithValue(storage),
       ],
       child: const SkipTheBrowse(),
     ),

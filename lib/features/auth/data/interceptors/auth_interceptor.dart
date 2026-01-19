@@ -1,14 +1,14 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/providers/auth_providers.dart';
 import '../constants/storage_keys.dart';
+import '../storage/auth_storage.dart';
 
 class AuthInterceptor extends Interceptor {
-  final FlutterSecureStorage storage;
+  final AuthStorage storage;
   final Ref? ref;
 
   AuthInterceptor(this.storage, [this.ref]);
