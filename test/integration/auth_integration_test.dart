@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 
 import 'helpers/mock_dio_helper.dart';
 

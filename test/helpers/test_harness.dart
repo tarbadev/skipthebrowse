@@ -8,7 +8,7 @@ import 'package:skipthebrowse/core/config/router.dart';
 import 'package:skipthebrowse/features/auth/data/storage/auth_storage.dart';
 import 'package:skipthebrowse/features/auth/domain/providers/auth_providers.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 
 import 'mocks.dart';

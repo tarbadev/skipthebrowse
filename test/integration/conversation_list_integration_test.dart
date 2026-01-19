@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/main.dart';
 
 import '../features/conversation/presentation/helpers/conversation_list_screen_tester.dart';

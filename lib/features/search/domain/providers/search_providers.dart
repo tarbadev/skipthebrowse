@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/features/search/data/repositories/api_search_repository.dart';
 import 'package:skipthebrowse/features/search/data/repositories/search_rest_client.dart';
 import 'package:skipthebrowse/features/search/domain/entities/search_session.dart';

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skipthebrowse/features/conversation/data/models/conversation_response.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/features/conversation/presentation/screens/conversation_screen.dart';
 
 import '../features/conversation/presentation/helpers/conversation_screen_tester.dart';

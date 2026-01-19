@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/features/auth/data/repositories/api_auth_repository.dart';
 import 'package:skipthebrowse/features/auth/data/storage/auth_storage.dart';
 import 'package:skipthebrowse/features/auth/domain/repositories/auth_repository.dart';
 import 'package:skipthebrowse/features/auth/domain/state/auth_notifier.dart';
 import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 import 'package:skipthebrowse/features/conversation/domain/providers/conversation_providers.dart';
-import 'package:skipthebrowse/features/conversation/domain/providers/dio_provider.dart';
 import '../entities/auth_session.dart';
 
 final authStorageProvider = Provider<AuthStorage>((ref) {

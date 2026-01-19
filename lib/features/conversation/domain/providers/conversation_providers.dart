@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skipthebrowse/core/network/dio_provider.dart';
 import 'package:skipthebrowse/features/conversation/data/repositories/rest_client.dart';
 import 'package:skipthebrowse/features/conversation/domain/entities/conversation.dart';
 import 'package:skipthebrowse/features/conversation/domain/services/pending_message_queue.dart';
@@ -8,7 +9,6 @@ import 'package:skipthebrowse/features/conversation/domain/state/conversation_no
 
 import '../../data/repositories/api_conversation_repository.dart';
 import '../repositories/conversation_repository.dart';
-import 'dio_provider.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be overridden in main()');
