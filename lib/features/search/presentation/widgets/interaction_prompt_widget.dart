@@ -48,6 +48,7 @@ class _InteractionPromptWidgetState extends State<InteractionPromptWidget> {
 
     final selectedChoice = widget.prompt.choices.firstWhere(
       (c) => c.id == _selectedChoiceId,
+      orElse: () => widget.prompt.choices.first,
     );
 
     final customInput =
@@ -67,7 +68,10 @@ class _InteractionPromptWidgetState extends State<InteractionPromptWidget> {
   Widget build(BuildContext context) {
     final responsive = context.responsive;
     final selectedChoice = _selectedChoiceId != null
-        ? widget.prompt.choices.firstWhere((c) => c.id == _selectedChoiceId)
+        ? widget.prompt.choices.firstWhere(
+            (c) => c.id == _selectedChoiceId,
+            orElse: () => widget.prompt.choices.first,
+          )
         : null;
 
     return Container(

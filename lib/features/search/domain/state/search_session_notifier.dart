@@ -34,17 +34,20 @@ class SearchSessionNotifier extends StateNotifier<AsyncValue<SearchSession?>> {
     final currentSession = state.value;
     if (currentSession == null) return;
 
+    // Safety check: Ensure interactions list is not empty
+    if (currentSession.interactions.isEmpty) return;
+
+    final lastInteraction = currentSession.interactions.last;
+    final choices = lastInteraction.assistantPrompt.choices;
+
+    // Safety check: Ensure choices list is not empty
+    if (choices.isEmpty) return;
+
     // Find the display text for the selected choice
-    final selectedChoice = currentSession
-        .interactions
-        .last
-        .assistantPrompt
-        .choices
-        .firstWhere(
-          (c) => c.id == choiceId,
-          orElse: () =>
-              currentSession.interactions.last.assistantPrompt.choices.first,
-        );
+    final selectedChoice = choices.firstWhere(
+      (c) => c.id == choiceId,
+      orElse: () => choices.first,
+    );
 
     // Build user input with display text (not ID)
     final userInputText = customInput != null
