@@ -13,12 +13,15 @@ import '../entities/auth_session.dart';
 final authStorageProvider = Provider<AuthStorage>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
 
-  // Disable secure storage in debug mode on macOS to avoid entitlement issues
-  // without a developer account.
-  final useInsecureStorage =
+  // Disable secure storage in certain environments to avoid entitlement/keyring issues:
+  // 1. Debug mode on macOS (avoids keychain entitlement requirement without dev account)
+  // 2. Linux integration tests/CI (avoids headless Libsecret errors)
+  final bool isMacDebug =
       kDebugMode && defaultTargetPlatform == TargetPlatform.macOS;
+  final bool isLinuxCI =
+      !kReleaseMode && defaultTargetPlatform == TargetPlatform.linux;
 
-  if (useInsecureStorage) {
+  if (isMacDebug || isLinuxCI) {
     return InsecureAuthStorage(prefs);
   }
 
