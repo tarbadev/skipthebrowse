@@ -34,7 +34,7 @@ dev_dependencies:
   mocktail: ^1.0.4
   const_date_time: ^1.2.1
   http_mock_adapter: ^0.6.1
-  build_runner: ^2.10.2
+  build_runner: ^2.10.5
   retrofit_generator: ^10.2.1
   json_serializable: ^6.11.4
   flutter_launcher_icons: ^0.14.4
