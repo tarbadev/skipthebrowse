@@ -5,6 +5,7 @@ import 'package:skipthebrowse/features/search/domain/entities/search_session.dar
 import 'package:skipthebrowse/features/search/domain/providers/search_providers.dart';
 import 'package:skipthebrowse/features/search/presentation/widgets/interaction_prompt_widget.dart';
 import 'package:skipthebrowse/features/search/presentation/widgets/recommendation_card_with_status.dart';
+import 'package:skipthebrowse/features/search/presentation/widgets/error_display_widget.dart';
 
 class SearchSessionScreen extends ConsumerStatefulWidget {
   final SearchSession session;
@@ -71,6 +72,7 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
     final sessionState = ref.watch(searchSessionProvider);
     final currentSession = sessionState.value ?? widget.session;
     final isLoading = sessionState.isLoading;
+    final hasError = sessionState.hasError;
 
     // Listen for new interactions and auto-scroll
     ref.listen<AsyncValue<SearchSession?>>(searchSessionProvider, (
@@ -155,7 +157,8 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                   (currentSession.initialMessage != null ? 1 : 0) +
                   currentSession.interactions.length +
                   currentSession.recommendations.length +
-                  (isLoading ? 1 : 0),
+                  (isLoading ? 1 : 0) +
+                  (hasError ? 1 : 0),
               itemBuilder: (context, index) {
                 // Show initial message first
                 if (currentSession.initialMessage != null && index == 0) {
@@ -327,7 +330,26 @@ class _SearchSessionScreenState extends ConsumerState<SearchSessionScreen> {
                         _handleStatusChange(recommendation.id, status),
                   );
                 } else {
-                  // Show loading spinner at the end
+                  // Show error or loading spinner at the end
+                  if (hasError && sessionState.error != null) {
+                    return ErrorDisplayWidget(
+                      error: sessionState.error!,
+                      onRetry: () {
+                        // Retry the last operation
+                        ref
+                            .read(searchSessionProvider.notifier)
+                            .refreshSession(currentSession.id);
+                      },
+                      onDismiss: () {
+                        // Clear error by refreshing to current state
+                        ref
+                            .read(searchSessionProvider.notifier)
+                            .setSession(currentSession);
+                      },
+                    );
+                  }
+
+                  // Show loading spinner
                   return Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.responsive(

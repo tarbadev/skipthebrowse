@@ -6,6 +6,7 @@ import 'package:skipthebrowse/features/search/data/repositories/search_rest_clie
 import 'package:skipthebrowse/features/search/data/models/create_search_session_request.dart';
 import 'package:skipthebrowse/features/search/data/models/add_interaction_request.dart';
 import 'package:skipthebrowse/features/search/data/models/update_recommendation_status_request.dart';
+import 'package:skipthebrowse/features/search/data/utils/error_mapper.dart';
 
 class ApiSearchRepository implements SearchRepository {
   final SearchRestClient restClient;
@@ -17,13 +18,17 @@ class ApiSearchRepository implements SearchRepository {
     String message, {
     String region = 'US',
   }) async {
-    final request = CreateSearchSessionRequest(
-      message: message,
-      region: region,
-    );
+    try {
+      final request = CreateSearchSessionRequest(
+        message: message,
+        region: region,
+      );
 
-    final response = await restClient.createSearchSession(request);
-    return response.toEntity();
+      final response = await restClient.createSearchSession(request);
+      return response.toEntity();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
@@ -32,19 +37,27 @@ class ApiSearchRepository implements SearchRepository {
     String choiceId, {
     String? customInput,
   }) async {
-    final request = AddInteractionRequest(
-      choiceId: choiceId,
-      customInput: customInput,
-    );
+    try {
+      final request = AddInteractionRequest(
+        choiceId: choiceId,
+        customInput: customInput,
+      );
 
-    final response = await restClient.addInteraction(sessionId, request);
-    return response.toEntity();
+      final response = await restClient.addInteraction(sessionId, request);
+      return response.toEntity();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
   Future<SearchSession> getSearchSession(String sessionId) async {
-    final response = await restClient.getSearchSession(sessionId);
-    return response.toEntity();
+    try {
+      final response = await restClient.getSearchSession(sessionId);
+      return response.toEntity();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
@@ -52,8 +65,12 @@ class ApiSearchRepository implements SearchRepository {
     int limit = 50,
     int offset = 0,
   }) async {
-    final response = await restClient.listSearchSessions(limit, offset);
-    return response.sessions.map((s) => s.toEntity()).toList();
+    try {
+      final response = await restClient.listSearchSessions(limit, offset);
+      return response.sessions.map((s) => s.toEntity()).toList();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
@@ -62,12 +79,16 @@ class ApiSearchRepository implements SearchRepository {
     RecommendationStatus status, {
     String? feedback,
   }) async {
-    final request = UpdateRecommendationStatusRequest(
-      status: _statusToString(status),
-      feedback: feedback,
-    );
+    try {
+      final request = UpdateRecommendationStatusRequest(
+        status: _statusToString(status),
+        feedback: feedback,
+      );
 
-    await restClient.updateRecommendationStatus(recommendationId, request);
+      await restClient.updateRecommendationStatus(recommendationId, request);
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
@@ -76,15 +97,19 @@ class ApiSearchRepository implements SearchRepository {
     int limit = 100,
     int offset = 0,
   }) async {
-    final statusString = status != null ? _statusToString(status) : null;
+    try {
+      final statusString = status != null ? _statusToString(status) : null;
 
-    final response = await restClient.getRecommendationHistory(
-      statusString,
-      limit,
-      offset,
-    );
+      final response = await restClient.getRecommendationHistory(
+        statusString,
+        limit,
+        offset,
+      );
 
-    return response.recommendations.map((r) => r.toEntity()).toList();
+      return response.recommendations.map((r) => r.toEntity()).toList();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   @override
@@ -92,8 +117,12 @@ class ApiSearchRepository implements SearchRepository {
     String query, {
     int limit = 50,
   }) async {
-    final response = await restClient.searchRecommendations(query, limit);
-    return response.recommendations.map((r) => r.toEntity()).toList();
+    try {
+      final response = await restClient.searchRecommendations(query, limit);
+      return response.recommendations.map((r) => r.toEntity()).toList();
+    } catch (error, stackTrace) {
+      throw SearchErrorMapper.mapException(error, stackTrace);
+    }
   }
 
   String _statusToString(RecommendationStatus status) {
